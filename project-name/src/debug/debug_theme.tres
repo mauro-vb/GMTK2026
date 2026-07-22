@@ -1,0 +1,11 @@
+[gd_resource type="Theme" format=3 uid="uid://cqkmwrp8bqc0j"]
+
+[ext_resource type="FontFile" uid="uid://dumnwgfl70q28" path="res://assets/fonts/SF-Mono-Medium.otf" id="1_foq4l"]
+
+[resource]
+default_font = ExtResource("1_foq4l")
+Label/font_sizes/font_size = 6
+MarginContainer/constants/margin_bottom = 8
+MarginContainer/constants/margin_left = 8
+MarginContainer/constants/margin_right = 8
+MarginContainer/constants/margin_top = 8
