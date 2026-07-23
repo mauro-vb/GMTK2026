@@ -15,5 +15,5 @@ func physics_update(delta: float) -> void:
 		transitioned.emit(PlayerState.STATE_ID.JUMP)
 		return
 
-	if Input.get_axis("left", "right") != 0:
+	if player.get_movement_direction() != 0:
 		transitioned.emit(PlayerState.STATE_ID.RUN)
