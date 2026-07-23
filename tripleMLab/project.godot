@@ -20,6 +20,10 @@ boot_splash/image="uid://ro85vxlog3m8"
 config/icon="uid://d3mmiy4avnipm"
 boot_splash/minimum_display_time=1000
 
+[autoload]
+
+Global="*uid://bt12hsq3tpkhv"
+
 [display]
 
 window/size/viewport_width=640

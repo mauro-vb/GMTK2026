@@ -10,6 +10,7 @@ const NAME_SETTING: String = "application/config/name"
 
 
 func _ready() -> void:
+	mouse_entered.connect(func(): print("mouse entered menu"))
 	_set_version_label()
 	_set_debug_label()
 
