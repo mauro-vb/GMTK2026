@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://gkjr0jw35tlv"]
-
-[ext_resource type="Script" uid="uid://dp4wolcchrafv" path="res://src/levels/level_objects/markers/player_spawn/player_spawn.gd" id="1_fcirr"]
-
-[node name="PlayerSpawn" type="Node2D" unique_id=1373603790]
-script = ExtResource("1_fcirr")

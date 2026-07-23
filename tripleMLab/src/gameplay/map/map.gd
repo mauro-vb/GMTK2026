@@ -67,8 +67,9 @@ func unlock_row(row: int = progress) -> void:
 			map_node.available = true
 
 func unlock_next_nodes() -> void:
+	
 	for map_node: MapNode in nodes.get_children():
-		if last_node.next_nodes.has(map_node):
+		if last_node.next_nodes.has(map_node.node):
 			map_node.available = true
 	
 func _add_map_node(node: MapNodeData) -> void:

@@ -20,9 +20,9 @@ var node: MapNodeData: set = _set_node
 @onready var label: Label = %Label
 
 
-static func new_map_node(node: MapNodeData) -> MapNode:
+static func new_map_node(node_data: MapNodeData) -> MapNode:
 	var map_node: MapNode = SCENE.instantiate()
-	map_node.node = node
+	map_node.node = node_data
 	return map_node
 
 	

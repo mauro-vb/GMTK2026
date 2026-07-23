@@ -134,6 +134,7 @@ func exit_room() -> void:
 	change_scene(MAP_HUD_SCENE_UID, SceneContainer.UI)
 	_current_level = null
 	world.add_child(map)
+	map.unlock_next_nodes()
 
 
 ## Instantiates the player and adds it to the player layer.
