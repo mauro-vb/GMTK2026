@@ -13,7 +13,7 @@ func _ready() -> void:
 	_set_version_label()
 	_set_debug_label()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	_set_fps_label()
 
 func _set_fps_label() -> void:

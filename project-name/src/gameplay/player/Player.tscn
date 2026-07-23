@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://kwjq37d8yab5"]
+
+[ext_resource type="Script" uid="uid://cw7ipdntfp1k0" path="res://src/gameplay/player/player.gd" id="1_khxic"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_munyu"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_munyu"]
+
+[node name="Player" type="CharacterBody2D" unique_id=2129440237]
+collision_layer = 2
+script = ExtResource("1_khxic")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=980908053]
+shape = SubResource("CapsuleShape2D_munyu")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=160040822]
+position = Vector2(0, -4.7683716e-07)
+scale = Vector2(16, 28)
+texture = SubResource("PlaceholderTexture2D_munyu")

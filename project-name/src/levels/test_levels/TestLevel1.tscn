@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://bm4yugu5nagbx"]
+
+[ext_resource type="Script" uid="uid://onk04f1qqrs4" path="res://src/levels/platforming_level.gd" id="1_abowo"]
+[ext_resource type="PackedScene" uid="uid://gkjr0jw35tlv" path="res://src/levels/level_objects/markers/player_spawn/PlayerSpawn.tscn" id="2_t75tf"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_munyu"]
+size = Vector2(386.5, 27)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hphrt"]
+size = Vector2(20, 83)
+
+[node name="TestLevel1" type="Node2D" unique_id=694732243]
+script = ExtResource("1_abowo")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1276522925]
+position = Vector2(308, 341)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=269546183]
+shape = SubResource("RectangleShape2D_munyu")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D" unique_id=1046021920]
+position = Vector2(183, -55.5)
+shape = SubResource("RectangleShape2D_hphrt")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D" unique_id=980240218]
+position = Vector2(-183, -55)
+shape = SubResource("RectangleShape2D_hphrt")
+
+[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D" unique_id=992670853]
+color = Color(0.86496663, 0.47806484, 0.563994, 1)
+polygon = PackedVector2Array(-194, -96, -173, -96, -173, -14, 174, -14, 173, -96, 192, -96, 194, 12, -193, 13)
+
+[node name="PlayerSpawn" parent="." unique_id=1140908321 instance=ExtResource("2_t75tf")]
+unique_name_in_owner = true
+position = Vector2(163, 312)
