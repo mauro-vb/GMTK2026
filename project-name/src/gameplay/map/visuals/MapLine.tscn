@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://c5j5raii7leet"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_munyu"]
+
+[node name="MapLine" type="Line2D" unique_id=1813444437]
+texture_repeat = 2
+width = 3.0
+texture = SubResource("PlaceholderTexture2D_munyu")
+texture_mode = 1

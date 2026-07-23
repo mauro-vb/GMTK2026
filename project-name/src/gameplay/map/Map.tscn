@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://ipmc68r6n333"]
+
+[ext_resource type="Script" uid="uid://dpubotveeljh4" path="res://src/gameplay/map/generation/map_generator.gd" id="1_5tkdj"]
+[ext_resource type="Script" uid="uid://cmvrcwrbksum6" path="res://src/gameplay/map/map.gd" id="1_e5mg7"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_v5ehn"]
+
+[node name="Map" type="Node2D" unique_id=999007867]
+script = ExtResource("1_e5mg7")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1945304725]
+unique_name_in_owner = true
+
+[node name="Visuals" type="Node2D" parent="." unique_id=1914238985]
+unique_name_in_owner = true
+
+[node name="Lines" type="Node2D" parent="Visuals" unique_id=645184045]
+unique_name_in_owner = true
+
+[node name="MapNodes" type="Node2D" parent="Visuals" unique_id=1813259470]
+unique_name_in_owner = true
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=212875366]
+layer = -1
+
+[node name="Background" type="TextureRect" parent="CanvasLayer" unique_id=93764597]
+modulate = Color(1, 0.76862746, 1, 1)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CanvasTexture_v5ehn")
+
+[node name="MapGenerator" type="Node" parent="." unique_id=942355219]
+unique_name_in_owner = true
+script = ExtResource("1_5tkdj")

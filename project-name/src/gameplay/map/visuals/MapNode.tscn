@@ -1,0 +1,145 @@
+[gd_scene format=3 uid="uid://w254awtxtink"]
+
+[ext_resource type="Script" uid="uid://b4mqtqo3vddlm" path="res://src/gameplay/map/visuals/map_node.gd" id="1_nmt8y"]
+[ext_resource type="Texture2D" uid="uid://d3mmiy4avnipm" path="res://assets/art/ui/icons/uglyface.png" id="2_fblr7"]
+[ext_resource type="Theme" uid="uid://cqkmwrp8bqc0j" path="res://src/debug/debug_theme.tres" id="3_ujqq1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_l8tct"]
+
+[sub_resource type="Animation" id="Animation_l8tct"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Visuals/Line2D:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Visuals/Line2D:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_flrkp"]
+resource_name = "highlight"
+length = 0.5
+loop_mode = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 0.40612772),
+"update": 0,
+"values": [Vector2(0.75, 0.75), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_r0tvu"]
+resource_name = "selected"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visuals/Line2D:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.23333333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Visuals/Line2D:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.23333333, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, -1.7086773377024482]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.5),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"_on_map_room_selected"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_r0tvu"]
+_data = {
+&"RESET": SubResource("Animation_l8tct"),
+&"highlight": SubResource("Animation_flrkp"),
+&"selected": SubResource("Animation_r0tvu")
+}
+
+[node name="MapNode" type="Area2D" unique_id=1635390115]
+collision_layer = 32
+collision_mask = 0
+script = ExtResource("1_nmt8y")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=57157463]
+visible = false
+shape = SubResource("CircleShape2D_l8tct")
+
+[node name="Visuals" type="Node2D" parent="." unique_id=531061537]
+
+[node name="Line2D" type="Line2D" parent="Visuals" unique_id=337833819]
+modulate = Color(1, 1, 1, 0)
+points = PackedVector2Array(-8.273639, -16.547277, 8.273639, -16.547277, 16.547277, -8.273639, 24.820915, 0, 8.273639, 16.547277, -8.273639, 16.547277, -16.547277, 8.273639, -16.547277, -8.273639)
+closed = true
+width = 2.0
+default_color = Color(0.5686275, 0.5686275, 0.5686275, 0.6156863)
+
+[node name="Sprite2D" type="Sprite2D" parent="Visuals" unique_id=336178298]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_fblr7")
+
+[node name="Label" type="Label" parent="Visuals" unique_id=2128665146]
+unique_name_in_owner = true
+offset_left = -24.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 7.0
+theme = ExtResource("3_ujqq1")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=49552360]
+libraries/ = SubResource("AnimationLibrary_r0tvu")
