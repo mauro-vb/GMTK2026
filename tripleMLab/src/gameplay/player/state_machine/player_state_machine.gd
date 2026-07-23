@@ -1,7 +1,7 @@
 extends Node
 class_name PlayerStateMachine
 
-@export var initial_state_id: PlayerState.ID = PlayerState.ID.IDLE
+@export var initial_state_id: PlayerState.STATE_ID = PlayerState.STATE_ID.IDLE
 
 var current_state: PlayerState
 var states: Dictionary = {}
@@ -20,7 +20,7 @@ func physics_update(delta: float) -> void:
 	if current_state:
 		current_state.physics_update(delta)
 
-func _on_state_transitioned(new_state_id: PlayerState.ID) -> void:
+func _on_state_transitioned(new_state_id: PlayerState.STATE_ID) -> void:
 	var new_state: PlayerState = states.get(new_state_id)
 	if new_state == null or new_state == current_state:
 		return
