@@ -1,6 +1,9 @@
 extends PlayerState
 class_name StateJump
 
+func get_state_id() -> PlayerState.ID:
+	return PlayerState.ID.JUMP
+
 func enter() -> void:
 	player.velocity.y = stats.jump_velocity
 	player.consume_jump()
@@ -12,4 +15,4 @@ func physics_update(delta: float) -> void:
 		player.velocity.y *= stats.jump_cut_multiplier
 
 	if player.velocity.y >= 0:
-		transitioned.emit("StateFall")
+		transitioned.emit(PlayerState.ID.FALL)

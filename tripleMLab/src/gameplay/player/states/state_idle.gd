@@ -1,16 +1,19 @@
 extends PlayerState
 class_name StateIdle
 
+func get_state_id() -> PlayerState.ID:
+	return PlayerState.ID.IDLE
+	
 func physics_update(delta: float) -> void:
 	player.apply_horizontal_movement(delta)
 
 	if not player.is_on_floor():
-		transitioned.emit("StateFall")
+		transitioned.emit(PlayerState.ID.FALL)
 		return
 
 	if player.can_jump():
-		transitioned.emit("StateJump")
+		transitioned.emit(PlayerState.ID.JUMP)
 		return
 
 	if Input.get_axis("left", "right") != 0:
-		transitioned.emit("StateRun")
+		transitioned.emit(PlayerState.ID.RUN)
