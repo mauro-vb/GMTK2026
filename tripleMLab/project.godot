@@ -23,6 +23,7 @@ boot_splash/minimum_display_time=1000
 [autoload]
 
 Global="*uid://bt12hsq3tpkhv"
+RunState="*res://src/autoloads/run_state.gd"
 
 [display]
 

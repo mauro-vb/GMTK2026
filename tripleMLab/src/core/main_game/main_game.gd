@@ -11,6 +11,7 @@ const LEVEL_HUD_SCENE_UID: String = "uid://4o0nmaeak4ns"
 const MAP_SCENE_UID: String = "uid://ipmc68r6n333"
 const PLAYER_SCENE_UID: String = "uid://kwjq37d8yab5"
 const TEST_LEVEL_UID: String = "uid://bm4yugu5nagbx"
+const SHOP_LEVEL_SCENE: String = "res://src/levels/shop/ShopLevel.tscn"
 
 var player: Player = null
 var map: Map = null
@@ -91,16 +92,24 @@ func change_scene(new_scene_uid: String, container: SceneContainer = SceneContai
 
 
 func load_game() -> void:
+	RunState.start_run()
 	change_scene(MAP_HUD_SCENE_UID, SceneContainer.UI)
 	map = load_scene(MAP_SCENE_UID) as Map
 	if map == null:
 		push_error("MainGame: MAP_SCENE_UID did not resolve to a Map instance")
 		return
-	map.node_selected.connect(func(_l): enter_room(TEST_LEVEL_UID))
-	# TODO: node_selected currently ignores `l` and always loads TEST_LEVEL_UID.
-	#       Map nodes should carry their own level type/UID (combat, event, shop,
-	#       rest, elite, boss...) so enter_room can load the right scene per node
-	#       instead of hardcoding one test level.
+	map.node_selected.connect(_on_map_node_selected)
+
+
+func _on_map_node_selected(node: MapNodeData) -> void:
+	if _current_level != null:
+		return
+	match node.type:
+		MapNodeData.Type.SHOP:
+			enter_room(SHOP_LEVEL_SCENE)
+		_:
+			# TODO: HEAL and FINAL still need their own scenes.
+			enter_room(TEST_LEVEL_UID)
 
 
 func enter_room(level_uid: String) -> void:
@@ -125,11 +134,15 @@ func enter_room(level_uid: String) -> void:
 		return
 
 	_place_player_at_level_spawn()
+	set_player_active(true)
+	RunState.set_ticking(_current_level.should_tick_time())
 
 
 func exit_room() -> void:
 	# TODO: transition out before unloading, mirroring enter_room, so leaving
 	#       a room doesn't just snap back to the map instantly either.
+	RunState.set_ticking(false)
+	set_player_active(false)
 	unload_scene(SceneContainer.LEVEL)
 	change_scene(MAP_HUD_SCENE_UID, SceneContainer.UI)
 	_current_level = null
@@ -150,6 +163,26 @@ func _init_player() -> void:
 		return
 
 	player_root.add_child(player)
+	set_player_active(false)
+
+
+## Shows and simulates the player only while a level is active. Outside levels
+## (start menu, map) the player would otherwise fall through empty space and
+## stay visible behind the UI.
+func set_player_active(active: bool) -> void:
+	if player == null:
+		return
+	set_player_frozen(not active)
+	player.visible = active
+
+
+## Halts player physics/input while keeping them visible — used for modal
+## moments inside a level (e.g. the shop's purchase card).
+func set_player_frozen(frozen: bool) -> void:
+	if player == null:
+		return
+	player.velocity = Vector2.ZERO
+	player.process_mode = Node.PROCESS_MODE_DISABLED if frozen else Node.PROCESS_MODE_INHERIT
 
 
 ## Finds the default spawn location in the currently loaded level and places the Player there.

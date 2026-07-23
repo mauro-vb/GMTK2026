@@ -6,8 +6,18 @@ signal selected(node: MapNodeData)
 const ICONS: Dictionary[MapNodeData.Type, String] = {
 	MapNodeData.Type.NOT_ASSIGNED: "NA",
 	MapNodeData.Type.LEVEL: "LEVEL",
+	MapNodeData.Type.SHOP: "SHOP",
 	MapNodeData.Type.HEAL: "HEAL",
 	MapNodeData.Type.FINAL: "FINAL",
+}
+
+## Placeholder type indication until nodes get real per-type icons.
+const TYPE_COLORS: Dictionary[MapNodeData.Type, Color] = {
+	MapNodeData.Type.NOT_ASSIGNED: Color.WHITE,
+	MapNodeData.Type.LEVEL: Color.WHITE,
+	MapNodeData.Type.SHOP: Color(1.0, 0.82, 0.2),
+	MapNodeData.Type.HEAL: Color(0.5, 0.95, 0.55),
+	MapNodeData.Type.FINAL: Color(0.95, 0.35, 0.35),
 }
 
 const SCENE: PackedScene = preload("res://src/gameplay/map/visuals/MapNode.tscn")
@@ -28,7 +38,9 @@ static func new_map_node(node_data: MapNodeData) -> MapNode:
 	
 func _ready() -> void:
 	input_event.connect(_on_input_event)
-	
+	sprite.modulate = TYPE_COLORS.get(node.type, Color.WHITE)
+	label.text = ICONS.get(node.type, "?")[0]
+
 func show_selected() -> void:
 	animation_player.play("selected")
 

@@ -1,0 +1,239 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/levels/shop/shop_level.gd" id="1_shop"]
+[ext_resource type="PackedScene" uid="uid://gkjr0jw35tlv" path="res://src/levels/level_objects/player_spawn/PlayerSpawn.tscn" id="2_shop"]
+[ext_resource type="PackedScene" uid="uid://mhk2a54mwtho" path="res://src/levels/level_objects/level_exit/LevelExit.tscn" id="3_shop"]
+[ext_resource type="PackedScene" path="res://src/gameplay/shop/pedestal/ShopPedestal.tscn" id="4_shop"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(640, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
+size = Vector2(16, 300)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
+size = Vector2(200, 12)
+
+[node name="ShopLevel" type="Node2D"]
+script = ExtResource("1_shop")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+collision_mask = 0
+
+[node name="FloorShape" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(320, 348)
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="LeftWallShape" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(8, 210)
+shape = SubResource("RectangleShape2D_wall")
+
+[node name="RightWallShape" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(632, 210)
+shape = SubResource("RectangleShape2D_wall")
+
+[node name="LeftPlatformShape" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(150, 276)
+shape = SubResource("RectangleShape2D_platform")
+one_way_collision = true
+
+[node name="RightPlatformShape" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(490, 276)
+shape = SubResource("RectangleShape2D_platform")
+one_way_collision = true
+
+[node name="FloorVisual" type="Polygon2D" parent="StaticBody2D"]
+color = Color(0.2, 0.18, 0.24, 1)
+polygon = PackedVector2Array(0, 336, 640, 336, 640, 360, 0, 360)
+
+[node name="LeftWallVisual" type="Polygon2D" parent="StaticBody2D"]
+color = Color(0.2, 0.18, 0.24, 1)
+polygon = PackedVector2Array(0, 60, 16, 60, 16, 360, 0, 360)
+
+[node name="RightWallVisual" type="Polygon2D" parent="StaticBody2D"]
+color = Color(0.2, 0.18, 0.24, 1)
+polygon = PackedVector2Array(624, 60, 640, 60, 640, 360, 624, 360)
+
+[node name="LeftPlatformVisual" type="Polygon2D" parent="StaticBody2D"]
+color = Color(0.28, 0.25, 0.33, 1)
+polygon = PackedVector2Array(50, 270, 250, 270, 250, 282, 50, 282)
+
+[node name="RightPlatformVisual" type="Polygon2D" parent="StaticBody2D"]
+color = Color(0.28, 0.25, 0.33, 1)
+polygon = PackedVector2Array(390, 270, 590, 270, 590, 282, 390, 282)
+
+[node name="Shopkeeper" type="Node2D" parent="."]
+position = Vector2(320, 336)
+
+[node name="Body" type="Polygon2D" parent="Shopkeeper"]
+color = Color(0.85, 0.7, 0.35, 1)
+polygon = PackedVector2Array(-12, 0, -12, -40, 12, -40, 12, 0)
+
+[node name="NameLabel" type="Label" parent="Shopkeeper"]
+offset_left = -40.0
+offset_top = -52.0
+offset_right = 40.0
+offset_bottom = -40.0
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
+text = "SHOPKEEP"
+
+[node name="ShopSign" type="Label" parent="."]
+offset_left = 240.0
+offset_top = 76.0
+offset_right = 400.0
+offset_bottom = 100.0
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+text = "SHOP"
+
+[node name="InfoSign" type="Label" parent="."]
+offset_left = 170.0
+offset_top = 102.0
+offset_right = 470.0
+offset_bottom = 114.0
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+horizontal_alignment = 1
+text = "+10s FOR VISITING  -  TIME EXCHANGE: ONE DEAL PER VISIT"
+
+[node name="LeftRelicSign" type="Label" parent="."]
+offset_left = 90.0
+offset_top = 226.0
+offset_right = 210.0
+offset_bottom = 238.0
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+horizontal_alignment = 1
+text = "RELICS"
+
+[node name="RightRelicSign" type="Label" parent="."]
+offset_left = 430.0
+offset_top = 226.0
+offset_right = 550.0
+offset_bottom = 238.0
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+horizontal_alignment = 1
+text = "RELICS"
+
+[node name="RelicPedestals" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="RelicPedestal1" parent="RelicPedestals" instance=ExtResource("4_shop")]
+position = Vector2(150, 270)
+
+[node name="RelicPedestal2" parent="RelicPedestals" instance=ExtResource("4_shop")]
+position = Vector2(490, 270)
+
+[node name="ItemPedestals" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="ItemPedestal1" parent="ItemPedestals" instance=ExtResource("4_shop")]
+position = Vector2(190, 336)
+
+[node name="ItemPedestal2" parent="ItemPedestals" instance=ExtResource("4_shop")]
+position = Vector2(450, 336)
+
+[node name="BuyTimePedestal" parent="." instance=ExtResource("4_shop")]
+unique_name_in_owner = true
+position = Vector2(255, 336)
+
+[node name="SellTimePedestal" parent="." instance=ExtResource("4_shop")]
+unique_name_in_owner = true
+position = Vector2(385, 336)
+
+[node name="SpeechBubble" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 30
+offset_left = 210.0
+offset_top = 216.0
+offset_right = 430.0
+offset_bottom = 264.0
+
+[node name="Tail" type="Polygon2D" parent="SpeechBubble"]
+position = Vector2(110, 48)
+color = Color(0.1, 0.1, 0.1, 0.9)
+polygon = PackedVector2Array(-8, 0, 10, 0, 0, 18)
+
+[node name="MarginContainer" type="MarginContainer" parent="SpeechBubble"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 5
+
+[node name="SpeechLabel" type="Label" parent="SpeechBubble/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+autowrap_mode = 2
+vertical_alignment = 1
+text = "Welcome, traveler!"
+
+[node name="PurchaseCard" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 40
+offset_left = 210.0
+offset_top = 112.0
+offset_right = 430.0
+offset_bottom = 248.0
+
+[node name="MarginContainer" type="MarginContainer" parent="PurchaseCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PurchaseCard/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SoldLabel" type="Label" parent="PurchaseCard/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 0.82, 0.2, 1)
+horizontal_alignment = 1
+text = "SOLD!"
+
+[node name="CardNameLabel" type="Label" parent="PurchaseCard/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
+text = "Item Name"
+
+[node name="CardDescriptionLabel" type="Label" parent="PurchaseCard/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+horizontal_alignment = 1
+autowrap_mode = 2
+text = "Item description."
+
+[node name="CardEffectLabel" type="Label" parent="PurchaseCard/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.6, 0.9, 1, 1)
+horizontal_alignment = 1
+text = "Effect"
+
+[node name="ContinueLabel" type="Label" parent="PurchaseCard/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+horizontal_alignment = 1
+text = "UP: CONTINUE (time is paused)"
+
+[node name="PlayerSpawn" parent="." instance=ExtResource("2_shop")]
+unique_name_in_owner = true
+position = Vector2(48, 320)
+
+[node name="LevelExit" parent="." instance=ExtResource("3_shop")]
+unique_name_in_owner = true
+position = Vector2(608, 310)

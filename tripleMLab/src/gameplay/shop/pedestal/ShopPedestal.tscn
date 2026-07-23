@@ -1,0 +1,51 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/shop/pedestal/shop_pedestal.gd" id="1_ped"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ped"]
+size = Vector2(40, 72)
+
+[node name="ShopPedestal" type="Area2D"]
+z_index = 5
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("1_ped")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -36)
+shape = SubResource("RectangleShape2D_ped")
+
+[node name="Base" type="Polygon2D" parent="."]
+color = Color(0.35, 0.32, 0.4, 1)
+polygon = PackedVector2Array(-14, 0, -14, -22, -18, -26, 18, -26, 14, -22, 14, 0)
+
+[node name="Icon" type="Polygon2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -36)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
+[node name="PriceLabel" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = -40.0
+offset_top = 2.0
+offset_right = 40.0
+offset_bottom = 14.0
+theme_override_colors/font_outline_color = Color(0.05, 0.05, 0.08, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
+text = "10c"
+
+[node name="PromptLabel" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+offset_left = -40.0
+offset_top = -62.0
+offset_right = 40.0
+offset_bottom = -50.0
+theme_override_colors/font_outline_color = Color(0.05, 0.05, 0.08, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
+text = "UP: buy"

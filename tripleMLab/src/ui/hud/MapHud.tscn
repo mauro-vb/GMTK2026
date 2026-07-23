@@ -1,6 +1,8 @@
-[gd_scene format=3 uid="uid://ogipvp6hivr7"]
+[gd_scene load_steps=2 format=3 uid="uid://ogipvp6hivr7"]
 
-[node name="MapHud" type="Control" unique_id=1413962022]
+[ext_resource type="PackedScene" path="res://src/ui/hud/RunStats.tscn" id="1_hud"]
+
+[node name="MapHud" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -9,18 +11,19 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1191340943]
+[node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1652584020]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="Label" type="Label" parent="MarginContainer/HBoxContainer" unique_id=1319991548]
+[node name="RunStats" parent="MarginContainer/HBoxContainer" instance=ExtResource("1_hud")]
 layout_mode = 2
-text = "Map HUD"
