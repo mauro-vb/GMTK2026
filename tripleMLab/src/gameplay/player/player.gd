@@ -41,6 +41,13 @@ func _ready() -> void:
 	_floor_check_reach = floor_check.target_position.y
 	state_machine.setup(self, stats)
 
+# Clears carried-over motion and held input when the player leaves a room, so a
+# run isn't resumed mid-fall or still drifting. Called by MainGame.exit_room()
+func reset_physics() -> void:
+	velocity = Vector2.ZERO
+	coyote_timer = 0.0
+	jump_buffer_timer = 0.0
+	_direction_stack.clear()
 
 # Newly-pressed direction overrides already-held opposite direction, instead of canceling out
 func _unhandled_input(event: InputEvent) -> void:
