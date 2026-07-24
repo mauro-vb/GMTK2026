@@ -8,13 +8,14 @@ process_mode = 3
 script = ExtResource("1_o4umv")
 
 [node name="Systems" type="Node" parent="." unique_id=500019305]
-
-[node name="RunManager" type="Node" parent="Systems" unique_id=4462877]
-
-[node name="LevelManager" type="Node" parent="Systems" unique_id=546553879]
+unique_name_in_owner = true
 
 [node name="World" type="Node2D" parent="." unique_id=413458378]
+unique_name_in_owner = true
 process_mode = 1
+
+[node name="PlayerRoot" type="Node2D" parent="World" unique_id=11877546]
+unique_name_in_owner = true
 
 [node name="LevelRoot" type="Node2D" parent="World" unique_id=1081947092]
 unique_name_in_owner = true
@@ -25,18 +26,19 @@ unique_name_in_owner = true
 [node name="VisualEffectsRoot" type="Node2D" parent="World" unique_id=1264653061]
 unique_name_in_owner = true
 
-[node name="HudLayer" type="CanvasLayer" parent="." unique_id=839162593]
+[node name="UILayer" type="CanvasLayer" parent="." unique_id=839162593]
 process_mode = 1
 layer = 10
 
-[node name="HudRoot" type="Control" parent="HudLayer" unique_id=1958874830]
+[node name="UIRoot" type="Control" parent="UILayer" unique_id=1958874830]
 unique_name_in_owner = true
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
-metadata/_edit_use_anchors_ = true
 
 [node name="PauseLayer" type="CanvasLayer" parent="." unique_id=1584175431]
 process_mode = 2
@@ -45,11 +47,12 @@ layer = 20
 [node name="PauseRoot" type="Control" parent="PauseLayer" unique_id=215884647]
 unique_name_in_owner = true
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
-metadata/_edit_use_anchors_ = true
 
 [node name="TransitionLayer" type="CanvasLayer" parent="." unique_id=2093672756]
 process_mode = 3
@@ -58,11 +61,12 @@ layer = 100
 [node name="TransitionRoot" type="Control" parent="TransitionLayer" unique_id=2084997929]
 unique_name_in_owner = true
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
-metadata/_edit_use_anchors_ = true
 
 [node name="DebugLayer" type="CanvasLayer" parent="." unique_id=1780710799]
 process_mode = 3
@@ -76,6 +80,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 metadata/_edit_use_anchors_ = true
 
 [node name="DebugTextOverlay" parent="DebugLayer/DebugRoot" unique_id=1852495765 instance=ExtResource("2_7isfe")]

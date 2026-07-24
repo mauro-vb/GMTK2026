@@ -16,10 +16,10 @@ const LEVEL_ROOM_WEIGHT: float = 10.0
 const SHOP_ROOM_WEIGHT: float = 2.5
 const HEAL_ROOM_WEIGHT: float = 4.0
 
-var random_node_type_total_weights: Dictionary[MapNodeData.Type, float] = {
-	MapNodeData.Type.LEVEL: 0.0,
-	MapNodeData.Type.SHOP: 0.0,
-	MapNodeData.Type.HEAL: 0.0,
+var random_node_type_total_weights: Dictionary[Room.Type, float] = {
+	Room.Type.LEVEL: 0.0,
+	Room.Type.SHOP: 0.0,
+	Room.Type.HEAL: 0.0,
 }
 
 var random_node_type_total_weight: float = 0.0
@@ -45,15 +45,15 @@ func _generate_initial_grid() -> Array[Array]:
 	var result: Array[Array] = []
 	
 	for y: int in HEIGHT:
-		var adjacent_rooms: Array[MapNodeData] = []
+		var adjacent_rooms: Array[Room] = []
 		for x: int in WIDTH:
-			var current_map_node: MapNodeData = MapNodeData.new()
+			var current_map_node: Room = Room.new()
 			var offset: Vector2 = Vector2(randf(), randf()) * PLACEMENT_RANDOMNESS
 			current_map_node.position = Vector2(x * X_DIST, y * -Y_DIST) + offset
 			current_map_node.coordinates = Vector2i(x, y)
 			current_map_node.next_nodes = []
 			
-			# Final MapNodeData shouldn't be random
+			# Final Room shouldn't be random
 			if y == HEIGHT - 1:
 				current_map_node.position.y = (y + 1) * -Y_DIST
 			
@@ -79,8 +79,8 @@ func _get_random_starting_points() -> Array[int]:
 	return starting_points
 
 func _setup_connection(y: int, x: int) -> int:
-	var next_node: MapNodeData = null
-	var current_node: MapNodeData = map_data[y][x]
+	var next_node: Room = null
+	var current_node: Room = map_data[y][x]
 	
 	while not next_node or _would_cross_existing_path(y, x, next_node):
 		var randx: int = clampi(randi_range(x - 1, x + 1), 0, WIDTH - 1)
@@ -91,9 +91,9 @@ func _setup_connection(y: int, x: int) -> int:
 	
 	return next_node.coordinates.x
 
-func _would_cross_existing_path(y: int, x: int, node: MapNodeData) -> bool:
-	var left_n: MapNodeData = null
-	var right_n: MapNodeData = null
+func _would_cross_existing_path(y: int, x: int, node: Room) -> bool:
+	var left_n: Room = null
+	var right_n: Room = null
 	
 	if x > 0:
 		left_n = map_data[y][x - 1]
@@ -101,12 +101,12 @@ func _would_cross_existing_path(y: int, x: int, node: MapNodeData) -> bool:
 		right_n = map_data[y][x + 1]
 	
 	if right_n and node.coordinates.x > x:
-		for next_node: MapNodeData in right_n.next_nodes:
+		for next_node: Room in right_n.next_nodes:
 			if next_node.coordinates.x <= x:
 				return true
 	
 	if left_n and node.coordinates.x < x:
-		for next_node: MapNodeData in left_n.next_nodes:
+		for next_node: Room in left_n.next_nodes:
 			if next_node.coordinates.x >= x:
 				return true
 	
@@ -114,41 +114,41 @@ func _would_cross_existing_path(y: int, x: int, node: MapNodeData) -> bool:
 
 func _setup_final_node() -> void:
 	var middle: int = floori(WIDTH * .5)
-	var final_node: MapNodeData = map_data[HEIGHT - 1][middle]
+	var final_node: Room = map_data[HEIGHT - 1][middle]
 	
 	for x: int in WIDTH:
-		var current_node: MapNodeData = map_data[HEIGHT - 2][x]
+		var current_node: Room = map_data[HEIGHT - 2][x]
 		if current_node.next_nodes.size() > 0:
-			current_node.next_nodes = [final_node] as Array[MapNodeData]
+			current_node.next_nodes = [final_node] as Array[Room]
 		
-	final_node.type =  MapNodeData.Type.FINAL
+	final_node.type =  Room.Type.FINAL
 
 func _setup_random_node_weights() -> void:
-	random_node_type_total_weights[MapNodeData.Type.LEVEL] = LEVEL_ROOM_WEIGHT
-	random_node_type_total_weights[MapNodeData.Type.HEAL] = LEVEL_ROOM_WEIGHT + HEAL_ROOM_WEIGHT
-	random_node_type_total_weights[MapNodeData.Type.SHOP] = LEVEL_ROOM_WEIGHT + HEAL_ROOM_WEIGHT + SHOP_ROOM_WEIGHT
+	random_node_type_total_weights[Room.Type.LEVEL] = LEVEL_ROOM_WEIGHT
+	random_node_type_total_weights[Room.Type.HEAL] = LEVEL_ROOM_WEIGHT + HEAL_ROOM_WEIGHT
+	random_node_type_total_weights[Room.Type.SHOP] = LEVEL_ROOM_WEIGHT + HEAL_ROOM_WEIGHT + SHOP_ROOM_WEIGHT
 	
-	random_node_type_total_weight = random_node_type_total_weights[MapNodeData.Type.SHOP]
+	random_node_type_total_weight = random_node_type_total_weights[Room.Type.SHOP]
 	
 func _setup_node_types() -> void:
-	var set_full_row: Callable = func(y: int, type: MapNodeData.Type) -> void:
-		for node: MapNodeData in map_data[y]:
+	var set_full_row: Callable = func(y: int, type: Room.Type) -> void:
+		for node: Room in map_data[y]:
 			node.type = type
 			
 	# TODO: Come up with custom rules
 	# Example set first floor always to LEVEL
-	set_full_row.call(0, MapNodeData.Type.LEVEL)
+	set_full_row.call(0, Room.Type.LEVEL)
 	# Example set last floor always to HEAL
-	set_full_row.call(floori(HEIGHT * .5), MapNodeData.Type.HEAL)
+	set_full_row.call(floori(HEIGHT * .5), Room.Type.HEAL)
 	
-	for current_row: Array[MapNodeData] in map_data:
-		for node: MapNodeData in current_row:
-			for next_node: MapNodeData in node.next_nodes:
-				if next_node.type == MapNodeData.Type.NOT_ASSIGNED:
+	for current_row: Array[Room] in map_data:
+		for node: Room in current_row:
+			for next_node: Room in node.next_nodes:
+				if next_node.type == Room.Type.NOT_ASSIGNED:
 					_set_node_randomly(next_node)
 	
-func _set_node_randomly(node: MapNodeData) -> void:
-	var is_consecutive_type: Callable = func(candidate: MapNodeData.Type, type: MapNodeData.Type) -> bool:
+func _set_node_randomly(node: Room) -> void:
+	var is_consecutive_type: Callable = func(candidate: Room.Type, type: Room.Type) -> bool:
 		return candidate == type and _node_has_parent_of_type(node, type)
 	# TODO: Setup Custom Rules
 	# Examples: 
@@ -161,30 +161,30 @@ func _set_node_randomly(node: MapNodeData) -> void:
 	# No heals after specified row (that is forced to be heal)
 	var heal_on_specific_row: bool = true
 
-	var type_candidate: MapNodeData.Type = MapNodeData.Type.NOT_ASSIGNED
+	var type_candidate: Room.Type = Room.Type.NOT_ASSIGNED
 	
 	while heal_before_4 or consecutive_heal or consecutive_shop or heal_on_specific_row:
 		type_candidate = _get_random_node_type_by_weight()
 		
-		heal_before_4 = type_candidate == MapNodeData.Type.HEAL and node.coordinates.y < 3
-		consecutive_heal = is_consecutive_type.call(type_candidate, MapNodeData.Type.HEAL)
-		consecutive_shop = is_consecutive_type.call(type_candidate, MapNodeData.Type.SHOP)
-		heal_on_specific_row = type_candidate == MapNodeData.Type.HEAL and node.coordinates.y == floori(HEIGHT * .5) + 1
+		heal_before_4 = type_candidate == Room.Type.HEAL and node.coordinates.y < 3
+		consecutive_heal = is_consecutive_type.call(type_candidate, Room.Type.HEAL)
+		consecutive_shop = is_consecutive_type.call(type_candidate, Room.Type.SHOP)
+		heal_on_specific_row = type_candidate == Room.Type.HEAL and node.coordinates.y == floori(HEIGHT * .5) + 1
 		
 	node.type = type_candidate
 	
 	
-func _get_random_node_type_by_weight() -> MapNodeData.Type:
+func _get_random_node_type_by_weight() -> Room.Type:
 	var roll: float = randf_range(.0, random_node_type_total_weight)
 	
-	for type: MapNodeData.Type in random_node_type_total_weights:
+	for type: Room.Type in random_node_type_total_weights:
 		if random_node_type_total_weights[type] > roll:
 			return type
 			
-	return MapNodeData.Type.LEVEL
+	return Room.Type.LEVEL
 	
-func _node_has_parent_of_type(node: MapNodeData, type: MapNodeData.Type) -> bool:
-	for parent: MapNodeData in node.parents:
+func _node_has_parent_of_type(node: Room, type: Room.Type) -> bool:
+	for parent: Room in node.parents:
 		if parent.type == type:
 			return true
 			

@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://mhk2a54mwtho"]
+
+[ext_resource type="Script" uid="uid://c6no7ssx0ruy8" path="res://src/levels/level_objects/level_exit/level_exit.gd" id="1_ttwuj"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_munyu"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_munyu"]
+
+[node name="LevelExit" type="Area2D" unique_id=167028476]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_ttwuj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1024968457]
+shape = SubResource("CircleShape2D_munyu")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1361352326]
+modulate = Color(0.58128065, 0.24704531, 0.12646493, 1)
+scale = Vector2(14.5, 14.5)
+texture = SubResource("PlaceholderTexture2D_munyu")

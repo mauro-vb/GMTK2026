@@ -42,52 +42,7 @@ func _update_timers(delta: float) -> void:
 	else:
 		jump_buffer_timer = max(jump_buffer_timer - delta, 0.0)
 
-# Falling gravity > rising gravity, and gravity is reduced near the jump apex
-# (jump_hang_threshold) for a brief "float" feeling. See PlayerStats for tuning
-func _apply_gravity(delta: float) -> void:
-	if is_on_floor():
-		return
-
-	var gravity_multiplier := 1.0
-
-	if abs(velocity.y) < stats.jump_hang_threshold:
-		gravity_multiplier = stats.jump_hang_gravity_mult
-	elif velocity.y > 0:
-		gravity_multiplier = stats.fall_gravity_mult
-
-	velocity.y = min(velocity.y + stats.gravity * gravity_multiplier * delta, stats.max_fall_speed)
-
-# True only within both the coyote-time window (recently left ground)
-# AND the jump-buffer window (recently pressed jump) — see _update_timers().
-func can_jump() -> bool:
-	return coyote_timer > 0.0 and jump_buffer_timer > 0.0
-
-func consume_jump() -> void:
-	coyote_timer = 0.0
-	jump_buffer_timer = 0.0
-
-func get_movement_direction() -> float:
-	if _direction_stack.is_empty():
-		return 0.0
-	return -1.0 if _direction_stack.back() == "left" else 1.0
-
-func apply_horizontal_movement(delta: float) -> void:
-	var direction := get_movement_direction()
-	var target_speed := direction * stats.move_speed
-	var accel := stats.acceleration
-
-	if not is_on_floor() and abs(velocity.y) < stats.jump_hang_threshold:
-		target_speed *= stats.jump_hang_max_speed_mult
-		accel *= stats.jump_hang_accel_mult
-
-	if direction != 0:
-		velocity.x = move_toward(velocity.x, target_speed, accel * delta)
-	else:
-		velocity.x = move_toward(velocity.x, 0, stats.friction * delta)
-
-func _push_direction(dir: String) -> void:
-	_direction_stack.erase(dir)
-	_direction_stack.append(dir)
-
-func _pop_direction(dir: String) -> void:
-	_direction_stack.erase(dir)
+	move_and_slide()
+	
+func reset_physics() -> void:
+	velocity = Vector2.ZERO

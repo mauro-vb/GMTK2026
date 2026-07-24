@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://bm4yugu5nagbx"]
 
-[ext_resource type="Script" uid="uid://onk04f1qqrs4" path="res://src/levels/platforming_level.gd" id="1_abowo"]
-[ext_resource type="PackedScene" uid="uid://gkjr0jw35tlv" path="res://src/levels/level_objects/markers/player_spawn/PlayerSpawn.tscn" id="2_t75tf"]
+[ext_resource type="Script" uid="uid://vl5l3vkfttjf" path="res://src/gameplay/room_scenes/base_level.gd" id="1_01rr6"]
+[ext_resource type="PackedScene" uid="uid://gkjr0jw35tlv" path="res://src/levels/level_objects/player_spawn/PlayerSpawn.tscn" id="2_t75tf"]
+[ext_resource type="PackedScene" uid="uid://mhk2a54mwtho" path="res://src/levels/level_objects/level_exit/LevelExit.tscn" id="3_01rr6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_munyu"]
 size = Vector2(386.5, 27)
@@ -10,7 +11,7 @@ size = Vector2(386.5, 27)
 size = Vector2(20, 83)
 
 [node name="TestLevel1" type="Node2D" unique_id=694732243]
-script = ExtResource("1_abowo")
+script = ExtResource("1_01rr6")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1276522925]
 position = Vector2(308, 341)
@@ -34,3 +35,7 @@ polygon = PackedVector2Array(-194, -96, -173, -96, -173, -14, 174, -14, 173, -96
 [node name="PlayerSpawn" parent="." unique_id=1140908321 instance=ExtResource("2_t75tf")]
 unique_name_in_owner = true
 position = Vector2(163, 312)
+
+[node name="LevelExit" parent="." unique_id=167028476 instance=ExtResource("3_01rr6")]
+unique_name_in_owner = true
+position = Vector2(453, 310)
