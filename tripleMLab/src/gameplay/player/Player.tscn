@@ -12,6 +12,9 @@
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_munyu"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oelj7"]
+size = Vector2(18, 0.5)
+
 [node name="Player" type="CharacterBody2D" unique_id=2129440237]
 collision_layer = 2
 script = ExtResource("1_khxic")
@@ -26,6 +29,7 @@ scale = Vector2(16, 28)
 texture = SubResource("PlaceholderTexture2D_munyu")
 
 [node name="StateMachine" type="Node" parent="." unique_id=90990164]
+unique_name_in_owner = true
 script = ExtResource("2_qeda6")
 
 [node name="StateIdle" type="Node" parent="StateMachine" unique_id=1801092891]
@@ -39,3 +43,10 @@ script = ExtResource("5_vgqeu")
 
 [node name="StateFall" type="Node" parent="StateMachine" unique_id=2040253433]
 script = ExtResource("6_21ga0")
+
+[node name="FloorCheck" type="ShapeCast2D" parent="." unique_id=1243180421]
+unique_name_in_owner = true
+position = Vector2(0, 15)
+shape = SubResource("RectangleShape2D_oelj7")
+target_position = Vector2(0, 1)
+collision_mask = 256

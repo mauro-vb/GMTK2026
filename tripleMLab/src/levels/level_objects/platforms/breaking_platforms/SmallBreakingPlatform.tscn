@@ -1,11 +1,11 @@
-[gd_scene format=3 uid="uid://bc7bujlwfh0bx"]
+[gd_scene format=3 uid="uid://bdjdmeyyivvvh"]
 
 [ext_resource type="Script" uid="uid://mrij1w8mbngl" path="res://src/levels/level_objects/platforms/breaking_platforms/breaking_platform.gd" id="1_hd2lr"]
+[ext_resource type="Script" uid="uid://wtrhnlrl86rw" path="res://src/components/one_way_area.gd" id="2_3g8ng"]
 [ext_resource type="Texture2D" uid="uid://cykccqxa7hvnj" path="res://assets/art/platforms/SmallBreaking.png" id="2_p78sj"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3g8ng"]
-radius = 2.0
-height = 16.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4ben2"]
+size = Vector2(1, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3g8ng"]
 size = Vector2(16, 6)
@@ -97,25 +97,26 @@ _data = {
 }
 
 [node name="SmallBreakingPlatform" type="AnimatableBody2D" unique_id=1249245850]
+collision_layer = 256
 collision_mask = 0
 script = ExtResource("1_hd2lr")
 
-[node name="Area2D" type="Area2D" parent="." unique_id=2083631722]
+[node name="OneWayArea2D" type="Area2D" parent="." unique_id=2083631722]
 unique_name_in_owner = true
-visible = false
 collision_layer = 0
 collision_mask = 2
+script = ExtResource("2_3g8ng")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1546068425]
-position = Vector2(0, 1)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="OneWayArea2D" unique_id=1546068425]
+position = Vector2(1.1920929e-07, -0.5)
 rotation = 1.5707964
-shape = SubResource("CapsuleShape2D_3g8ng")
+shape = SubResource("RectangleShape2D_4ben2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=446448525]
 unique_name_in_owner = true
-visible = false
 position = Vector2(0, 3)
 shape = SubResource("RectangleShape2D_3g8ng")
+one_way_collision = true
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=335957560]
 unique_name_in_owner = true

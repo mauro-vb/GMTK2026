@@ -11,6 +11,7 @@ const RECONSTRUCT_TIME: float = 1.75
 
 # Public
 # Private
+var _entered_detection_area: bool = false
 # On Ready
 @onready var detection_area: Area2D = %Area2D
 @onready var sprite: Sprite2D = %Sprite2D
@@ -44,19 +45,27 @@ func _enable() -> void:
 	animation_player.play("reconstruct")
 	
 # Callbacks
-func _on_body_entered(_body: Node2D) -> void:
-	if break_on_jump:
-		animation_player.play("initial_break")
-	else:
-		animation_player.play("break")
-		await animation_player.animation_finished
-		_disable()
+func _on_body_entered(body: Node2D) -> void:
+	if body is not Player:
+		return
+	if body.floor_check.is_colliding():
+		if break_on_jump:
+			_entered_detection_area = true
+			animation_player.play("initial_break")
+		else:
+			animation_player.play("break")
+			await animation_player.animation_finished
+			_disable()
 		
 
-func _on_body_exited(_body: Node2D) -> void:
-	if animation_player.current_animation != "":
+func _on_body_exited(body: Node2D) -> void:
+	if body is not Player:
+		return
+	if _entered_detection_area:
+		_entered_detection_area = false
+		if animation_player.current_animation != "":
+			await animation_player.animation_finished
+		animation_player.play("break_on_jump")
 		await animation_player.animation_finished
-	animation_player.play("break_on_jump")
-	await animation_player.animation_finished
-	_disable()
+		_disable()
 	
