@@ -20,6 +20,11 @@ boot_splash/image="uid://ro85vxlog3m8"
 config/icon="uid://d3mmiy4avnipm"
 boot_splash/minimum_display_time=1000
 
+[autoload]
+
+Global="*uid://bt12hsq3tpkhv"
+UIDs="*uid://drtyv6qm28dmv"
+
 [display]
 
 window/size/viewport_width=640
@@ -35,6 +40,10 @@ window/stretch/scale_mode="integer"
 folder_colors={
 "res://src/debug/": "yellow"
 }
+
+[gui]
+
+theme/custom="uid://djryy3nm637jt"
 
 [input]
 
