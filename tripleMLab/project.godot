@@ -141,6 +141,7 @@ scroll_down={
 2d_physics/layer_4="Interactable"
 2d_physics/layer_5="DropThrough"
 2d_physics/layer_6="MapNodes"
+2d_physics/layer_7="Pogoable"
 
 [physics]
 

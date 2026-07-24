@@ -7,10 +7,14 @@
 [ext_resource type="Script" uid="uid://bgv6kmuipr2oy" path="res://src/gameplay/player/states/state_run.gd" id="4_7og37"]
 [ext_resource type="Script" uid="uid://cw13dl5h86vba" path="res://src/gameplay/player/states/state_jump.gd" id="5_vgqeu"]
 [ext_resource type="Script" uid="uid://sicf3k0fekb2" path="res://src/gameplay/player/states/state_fall.gd" id="6_21ga0"]
+[ext_resource type="Script" uid="uid://ckgn0cpv58vxk" path="res://src/gameplay/player/states/state_pogo.gd" id="8_7og37"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_munyu"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_munyu"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_r4liw"]
+radius = 16.0
 
 [node name="Player" type="CharacterBody2D" unique_id=2129440237]
 collision_layer = 2
@@ -39,3 +43,13 @@ script = ExtResource("5_vgqeu")
 
 [node name="StateFall" type="Node" parent="StateMachine" unique_id=2040253433]
 script = ExtResource("6_21ga0")
+
+[node name="StatePogo" type="Node" parent="StateMachine" unique_id=1526737315]
+script = ExtResource("8_7og37")
+
+[node name="PogoDetector" type="Area2D" parent="." unique_id=1963245913]
+collision_layer = 0
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PogoDetector" unique_id=1387530344]
+shape = SubResource("CircleShape2D_r4liw")

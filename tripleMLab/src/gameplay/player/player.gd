@@ -4,10 +4,14 @@ class_name Player
 @export var stats: PlayerStats
 
 @onready var state_machine: PlayerStateMachine = $StateMachine
+@onready var pogo_detector: Area2D = $PogoDetector
 
 var coyote_timer: float = 0.0
 var jump_buffer_timer: float = 0.0
 var is_jump_cut: bool = false
+
+var pogo_buffer_timer: float = 0.0
+var pogo_grace_timer: float = 0.0
 
 # Tracks held direction keys in press order (most recent = last).
 var _direction_stack: Array[String] = []
@@ -44,7 +48,15 @@ func _update_timers(delta: float) -> void:
 		jump_buffer_timer = stats.jump_buffer_time
 	else:
 		jump_buffer_timer = max(jump_buffer_timer - delta, 0.0)
+	
+	var touching_pogoable := pogo_detector.has_overlapping_bodies() or pogo_detector.has_overlapping_areas()
+	pogo_grace_timer = stats.pogo_grace_time if touching_pogoable else max(pogo_grace_timer - delta, 0.0)
 
+	if Input.is_action_just_pressed("attack"):
+		pogo_buffer_timer = stats.pogo_buffer_time
+	else:
+		pogo_buffer_timer = max(pogo_buffer_timer - delta, 0.0)
+		
 # Falling gravity > rising gravity, and gravity is reduced near the jump apex
 # (jump_hang_threshold) for a brief "float" feeling. See PlayerStats for tuning
 func _apply_gravity(delta: float) -> void:
@@ -72,6 +84,14 @@ func consume_jump() -> void:
 	jump_buffer_timer = 0.0
 	is_jump_cut = false
 
+func can_pogo() -> bool:
+	return pogo_grace_timer > 0.0 and pogo_buffer_timer > 0.0
+
+func consume_pogo() -> void:
+	pogo_grace_timer = 0.0
+	pogo_buffer_timer = 0.0
+	is_jump_cut = false
+	
 func get_movement_direction() -> float:
 	if _direction_stack.is_empty():
 		return 0.0
