@@ -20,3 +20,7 @@ class_name PlayerStats
 @export var jump_hang_accel_mult: float = 1.1    # bonus air control near apex
 @export var jump_hang_max_speed_mult: float = 1.1  # bonus max speed near apex
 @export var jump_cut_gravity_mult: float = 3.0 # prevents velocity snap when jump is released early
+
+# Pogo (bounce off objects on the "Pogoable" physics layer)
+@export var pogo_buffer_time: float = 0.1
+@export var pogo_grace_time: float = 0.1
