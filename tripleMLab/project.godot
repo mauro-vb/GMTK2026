@@ -23,6 +23,7 @@ boot_splash/minimum_display_time=1000
 [autoload]
 
 Global="*uid://bt12hsq3tpkhv"
+UIDs="*uid://drtyv6qm28dmv"
 
 [display]
 
@@ -39,6 +40,10 @@ window/stretch/scale_mode="integer"
 folder_colors={
 "res://src/debug/": "yellow"
 }
+
+[gui]
+
+theme/custom="res://src/ui/theme/game_theme.tres"
 
 [input]
 

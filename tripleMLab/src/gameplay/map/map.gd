@@ -1,7 +1,7 @@
 class_name Map
 extends Node2D
 
-signal node_selected(node: MapNodeData)
+signal selected(room: Room)
 
 const SCROLL_SPEED: int = 15
 const MAP_LINE: PackedScene = preload("res://src/gameplay/map/visuals/MapLine.tscn")
@@ -14,7 +14,7 @@ const MAP_LINE: PackedScene = preload("res://src/gameplay/map/visuals/MapLine.ts
 
 var map_data: Array[Array]
 var progress: int
-var last_node: MapNodeData
+var last_room: Room
 var camera_edge_y: float
 
 func _ready() -> void:
@@ -40,9 +40,9 @@ func generate_new_map() -> void:
 
 func create_map() -> void:
 	for current_row: Array in map_data:
-		for node: MapNodeData in current_row:
-			if node.next_nodes.size() > 0:
-				_add_map_node(node)
+		for room: Room in current_row:
+			if room.next_nodes.size() > 0:
+				_add_map_node(room)
 	
 	# Final Room Needs Manual Spawning (once, not per row)
 	var middle: int = floori(MapGenerator.WIDTH * .5)
@@ -63,40 +63,40 @@ func hide_map() -> void:
 
 func unlock_row(row: int = progress) -> void:
 	for map_node: MapNode in nodes.get_children():
-		if map_node.node.coordinates.y == row:
+		if map_node.room.coordinates.y == row:
 			map_node.available = true
 
 func unlock_next_nodes() -> void:
 	
 	for map_node: MapNode in nodes.get_children():
-		if last_node.next_nodes.has(map_node.node):
+		if last_room.next_nodes.has(map_node.room):
 			map_node.available = true
 	
-func _add_map_node(node: MapNodeData) -> void:
-	var new_map_node: MapNode = MapNode.new_map_node(node)
+func _add_map_node(room: Room) -> void:
+	var new_map_node: MapNode = MapNode.new_map_node(room)
 	new_map_node.selected.connect(_on_node_selected)
 	nodes.add_child(new_map_node)
-	_connect_lines(node)
+	_connect_lines(room)
 
-	if node.selected and node.coordinates.y < progress:
+	if room.selected and room.coordinates.y < progress:
 		new_map_node.show_selected()
 
-func _connect_lines(node: MapNodeData) -> void:
-	if node.next_nodes.size() < 1:
+func _connect_lines(room: Room) -> void:
+	if room.next_nodes.size() < 1:
 		return
 		
-	for next: MapNodeData in node.next_nodes:
+	for next: Room in room.next_nodes:
 		var new_map_line: Line2D = MAP_LINE.instantiate()
-		new_map_line.add_point(node.position)
+		new_map_line.add_point(room.position)
 		new_map_line.add_point(next.position)
 		lines.add_child(new_map_line)
 	
 	
-func _on_node_selected(node: MapNodeData) -> void:
+func _on_node_selected(room: Room) -> void:
 	for map_node: MapNode in nodes.get_children():
-		if map_node.node.coordinates.y == node.coordinates.y:
+		if map_node.room.coordinates.y == room.coordinates.y:
 			map_node.available = false
 	
-	last_node = node
+	last_room = room
 	progress += 1
-	node_selected.emit(node)
+	selected.emit(room)
