@@ -38,6 +38,7 @@ func _set_available(value: bool) -> void:
 	available = value
 	
 	if available:
+		await get_tree().create_timer(randf_range(.0,.25)).timeout
 		animation_player.play("highlight")
 	elif not room.selected:
 		animation_player.play("RESET")
