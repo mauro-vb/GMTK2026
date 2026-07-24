@@ -7,6 +7,7 @@ class_name Player
 
 var coyote_timer: float = 0.0
 var jump_buffer_timer: float = 0.0
+var is_jump_cut: bool = false
 
 # Tracks held direction keys in press order (most recent = last).
 var _direction_stack: Array[String] = []
@@ -24,6 +25,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_pop_direction("left")
 	elif event.is_action_released("right"):
 		_pop_direction("right")
+	elif event.is_action_released("jump") and velocity.y < 0:
+		is_jump_cut = true
 
 func _physics_process(delta: float) -> void:
 	_update_timers(delta)
@@ -50,7 +53,9 @@ func _apply_gravity(delta: float) -> void:
 
 	var gravity_multiplier := 1.0
 
-	if abs(velocity.y) < stats.jump_hang_threshold:
+	if is_jump_cut and velocity.y < 0:
+		gravity_multiplier = stats.jump_cut_gravity_mult
+	elif abs(velocity.y) < stats.jump_hang_threshold:
 		gravity_multiplier = stats.jump_hang_gravity_mult
 	elif velocity.y > 0:
 		gravity_multiplier = stats.fall_gravity_mult
@@ -65,6 +70,7 @@ func can_jump() -> bool:
 func consume_jump() -> void:
 	coyote_timer = 0.0
 	jump_buffer_timer = 0.0
+	is_jump_cut = false
 
 func get_movement_direction() -> float:
 	if _direction_stack.is_empty():

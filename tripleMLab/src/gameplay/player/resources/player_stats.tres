@@ -4,4 +4,5 @@
 
 [resource]
 script = ExtResource("1_cv0hb")
+jump_cut_gravity_mult = 2.0
 metadata/_custom_type_script = "uid://cpr5a14lofg2m"

@@ -11,8 +11,5 @@ func enter() -> void:
 func physics_update(delta: float) -> void:
 	player.apply_horizontal_movement(delta)
 
-	if Input.is_action_just_released("jump") and player.velocity.y < 0:
-		player.velocity.y *= stats.jump_cut_multiplier
-
 	if player.velocity.y >= 0:
 		transitioned.emit(PlayerState.STATE_ID.FALL)
