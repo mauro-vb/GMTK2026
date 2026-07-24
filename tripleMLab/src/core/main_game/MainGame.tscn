@@ -9,10 +9,6 @@ script = ExtResource("1_o4umv")
 
 [node name="Systems" type="Node" parent="." unique_id=500019305]
 
-[node name="RunManager" type="Node" parent="Systems" unique_id=4462877]
-
-[node name="LevelManager" type="Node" parent="Systems" unique_id=546553879]
-
 [node name="World" type="Node2D" parent="." unique_id=413458378]
 unique_name_in_owner = true
 process_mode = 1
