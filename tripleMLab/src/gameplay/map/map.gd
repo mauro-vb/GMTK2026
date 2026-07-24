@@ -49,8 +49,8 @@ func create_map() -> void:
 	_add_map_node(map_data[MapGenerator.HEIGHT - 1][middle])
 	
 	# Map Visuals Placement (also once)
-	var map_widht_pixels: int = MapGenerator.X_DIST * (MapGenerator.WIDTH - 1)
-	visuals.position.x = (get_viewport_rect().size.x - map_widht_pixels) / 2
+	var map_width_pixels: int = MapGenerator.X_DIST * (MapGenerator.WIDTH - 1)
+	visuals.position.x = (get_viewport_rect().size.x - map_width_pixels) / 2
 	visuals.position.y = 0
 
 func show_map() -> void:
