@@ -15,6 +15,7 @@ const ENTRY_BONUS_SECONDS: float = 10.0
 @onready var sell_time_pedestal: ShopPedestal = %SellTimePedestal
 @onready var speech_bubble: PanelContainer = %SpeechBubble
 @onready var speech_label: Label = %SpeechLabel
+@onready var speech_tail: Polygon2D = %Tail
 @onready var purchase_card: PanelContainer = %PurchaseCard
 @onready var card_name_label: Label = %CardNameLabel
 @onready var card_description_label: Label = %CardDescriptionLabel
@@ -56,6 +57,11 @@ func _ready() -> void:
 
 	speech_bubble.hide()
 	purchase_card.hide()
+
+	# The bubble panel grows with wrapped text; keep the tail glued to its
+	# bottom edge so it always points down at the shopkeeper.
+	speech_bubble.resized.connect(_position_speech_tail)
+	_position_speech_tail()
 
 
 ## The shop owns the interact press: dismiss the purchase card if one is open,
@@ -194,6 +200,10 @@ func _pitch_for(pedestal: ShopPedestal) -> String:
 	if item.on_sale:
 		pitch += " Half off, today only!"
 	return pitch
+
+
+func _position_speech_tail() -> void:
+	speech_tail.position = Vector2(speech_bubble.size.x * 0.5, speech_bubble.size.y)
 
 
 func _say(text: String) -> void:

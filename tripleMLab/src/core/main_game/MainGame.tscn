@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c3h4fjpm8o51f" path="res://src/core/main_game/main_game.gd" id="1_o4umv"]
 [ext_resource type="PackedScene" uid="uid://db1jshga21j3c" path="res://src/debug/DebugTextOverlay.tscn" id="2_7isfe"]
+[ext_resource type="PackedScene" path="res://src/ui/transition/ScreenTransition.tscn" id="3_trans"]
 
 [node name="MainGame" type="Node" unique_id=909690569]
 process_mode = 3
@@ -70,6 +71,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="ScreenTransition" parent="TransitionLayer/TransitionRoot" instance=ExtResource("3_trans")]
+unique_name_in_owner = true
+layout_mode = 1
 
 [node name="DebugLayer" type="CanvasLayer" parent="." unique_id=1780710799]
 process_mode = 3

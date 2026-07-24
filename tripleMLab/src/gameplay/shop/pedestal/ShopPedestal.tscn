@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://src/gameplay/shop/pedestal/shop_pedestal.gd" id="1_ped"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ped"]
-size = Vector2(40, 72)
+size = Vector2(64, 72)
 
 [node name="ShopPedestal" type="Area2D"]
 z_index = 5

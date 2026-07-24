@@ -18,12 +18,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 8
+theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 4
+mouse_filter = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+[node name="StatsPanel" type="PanelContainer" parent="MarginContainer"]
 layout_mode = 2
+size_flags_horizontal = 0
 size_flags_vertical = 0
+theme_type_variation = &"HudPanel"
 
-[node name="RunStats" parent="MarginContainer/HBoxContainer" instance=ExtResource("1_hud")]
+[node name="RunStats" parent="MarginContainer/StatsPanel" instance=ExtResource("1_hud")]
 layout_mode = 2

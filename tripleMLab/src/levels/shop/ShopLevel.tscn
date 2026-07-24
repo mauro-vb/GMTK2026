@@ -99,9 +99,9 @@ text = "+10s FOR VISITING  -  TIME EXCHANGE: ONE DEAL PER VISIT"
 
 [node name="LeftRelicSign" type="Label" parent="."]
 offset_left = 90.0
-offset_top = 226.0
+offset_top = 194.0
 offset_right = 210.0
-offset_bottom = 238.0
+offset_bottom = 206.0
 theme_override_font_sizes/font_size = 6
 theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 horizontal_alignment = 1
@@ -109,9 +109,9 @@ text = "RELICS"
 
 [node name="RightRelicSign" type="Label" parent="."]
 offset_left = 430.0
-offset_top = 226.0
+offset_top = 194.0
 offset_right = 550.0
-offset_bottom = 238.0
+offset_bottom = 206.0
 theme_override_font_sizes/font_size = 6
 theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
 horizontal_alignment = 1
@@ -151,8 +151,11 @@ offset_left = 210.0
 offset_top = 216.0
 offset_right = 430.0
 offset_bottom = 264.0
+grow_horizontal = 2
+grow_vertical = 0
 
 [node name="Tail" type="Polygon2D" parent="SpeechBubble"]
+unique_name_in_owner = true
 position = Vector2(110, 48)
 color = Color(0.1, 0.1, 0.1, 0.9)
 polygon = PackedVector2Array(-8, 0, 10, 0, 0, 18)
