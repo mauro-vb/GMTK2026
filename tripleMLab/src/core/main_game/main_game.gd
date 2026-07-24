@@ -148,7 +148,7 @@ func enter_level(level_uid: String) -> void:
 	if _current_room == null:
 		push_error("'%s' did not resolve to a BaseLevel instance" % level_uid)
 		return
-
+	
 	player_root.add_child(player)
 	
 

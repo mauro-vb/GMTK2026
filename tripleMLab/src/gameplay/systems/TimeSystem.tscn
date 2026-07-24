@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://bjktioxpxjuo"]
+
+[ext_resource type="Script" uid="uid://cfbp3vjygbydj" path="res://src/gameplay/systems/time_system.gd" id="1_aevuv"]
+
+[node name="TimeSystem" type="Node" unique_id=1012287516]
+script = ExtResource("1_aevuv")
+
+[node name="MainTimer" type="Timer" parent="." unique_id=1788369069]
+unique_name_in_owner = true
