@@ -45,7 +45,7 @@ func _set_available(value: bool) -> void:
 func _set_room(value: Room) -> void:
 	room = value
 	position = room.position
-	#label.text = ICONS[node.type]
+	%Label.text = room.get_type()
 	#sprite.texture = ICONS[node.type]
 
 func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:

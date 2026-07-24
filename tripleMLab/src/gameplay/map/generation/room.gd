@@ -12,4 +12,7 @@ var selected: bool = false
 var parents: Array[Room] = []
 
 func _to_string() -> String:
-	return "%s: (%s)" % [coordinates, Type.keys()[type][0]]
+	return "%s: (%s)" % [coordinates, get_type()[0]]
+
+func get_type() -> String:
+	return Type.keys()[type]

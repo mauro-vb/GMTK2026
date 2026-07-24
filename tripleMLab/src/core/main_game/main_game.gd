@@ -191,11 +191,13 @@ func exit_room() -> void:
 	#       e.g.:
 	#       await _play_transition_out()
 	time_system.ticking = false
+	if _current_room is BaseLevel:
+		player.reset_physics()
+		player_root.remove_child(player)
 	unload_scene(SceneContainer.LEVEL)
 	change_scene(UIDs.MAP_HUD_SCENE_UID, SceneContainer.UI)
 	_current_room = null
-	player.reset_physics()
-	player_root.remove_child(player)
+	
 	world.add_child(map)
 	map.unlock_next_nodes()
 	# TODO: await _play_transition_in() here once transitions exist.
