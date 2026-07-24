@@ -196,6 +196,7 @@ func exit_room() -> void:
 	unload_scene(SceneContainer.LEVEL)
 	change_scene(UIDs.MAP_HUD_SCENE_UID, SceneContainer.UI)
 	_current_room = null
+	player.reset_physics()
 	player_root.remove_child(player)
 	world.add_child(map)
 	map.unlock_next_nodes()
