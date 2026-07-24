@@ -19,3 +19,4 @@ class_name PlayerStats
 @export var jump_hang_gravity_mult: float = 0.5  # reduced gravity near apex
 @export var jump_hang_accel_mult: float = 1.1    # bonus air control near apex
 @export var jump_hang_max_speed_mult: float = 1.1  # bonus max speed near apex
+@export var jump_cut_gravity_mult: float = 3.0 # prevents velocity snap when jump is released early
