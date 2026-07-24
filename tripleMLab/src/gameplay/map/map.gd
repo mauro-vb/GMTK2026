@@ -67,7 +67,9 @@ func unlock_row(row: int = progress) -> void:
 			map_node.available = true
 
 func unlock_next_nodes() -> void:
-	
+	if last_room == null:
+		return
+
 	for map_node: MapNode in nodes.get_children():
 		if last_room.next_nodes.has(map_node.room):
 			map_node.available = true
