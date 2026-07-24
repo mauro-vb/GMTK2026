@@ -103,7 +103,7 @@ func load_game() -> void:
 	#       map.node_selected.connect(func(node_data):
 	#           enter_room(node_data.level_uid, node_data.room_type)
 	#       )
-	map.selected.connect(func(room): enter_room(room.scene_uid, Room.Type.LEVEL))
+	map.selected.connect(func(room): enter_room(room.scene_uid, room.type))
 
 
 ## Leaves the map and hands off to the correct room handler based on type.
