@@ -1,0 +1,131 @@
+[gd_scene format=3 uid="uid://bc7bujlwfh0bx"]
+
+[ext_resource type="Script" uid="uid://mrij1w8mbngl" path="res://src/levels/level_objects/platforms/breaking_platforms/breaking_platform.gd" id="1_hd2lr"]
+[ext_resource type="Texture2D" uid="uid://cykccqxa7hvnj" path="res://assets/art/platforms/SmallBreaking.png" id="2_p78sj"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3g8ng"]
+radius = 2.0
+height = 16.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3g8ng"]
+size = Vector2(16, 6)
+
+[sub_resource type="Animation" id="Animation_p78sj"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_3g8ng"]
+resource_name = "break"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1.0000012),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0.047058824)]
+}
+
+[sub_resource type="Animation" id="Animation_ewlgh"]
+resource_name = "break_on_jump"
+length = 0.15
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.15),
+"transitions": PackedFloat32Array(1, 1.0000012),
+"update": 0,
+"values": [Color(1, 1, 1, 0.7058824), Color(1, 1, 1, 0.047058824)]
+}
+
+[sub_resource type="Animation" id="Animation_keihh"]
+resource_name = "initial_break"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1.0000012),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0.7058824)]
+}
+
+[sub_resource type="Animation" id="Animation_4ben2"]
+resource_name = "reconstruct"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1.0000012),
+"update": 0,
+"values": [Color(1, 1, 1, 0.078431375), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_4ben2"]
+_data = {
+&"RESET": SubResource("Animation_p78sj"),
+&"break": SubResource("Animation_3g8ng"),
+&"break_on_jump": SubResource("Animation_ewlgh"),
+&"initial_break": SubResource("Animation_keihh"),
+&"reconstruct": SubResource("Animation_4ben2")
+}
+
+[node name="SmallBreakingPlatform" type="AnimatableBody2D" unique_id=1249245850]
+collision_mask = 0
+script = ExtResource("1_hd2lr")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=2083631722]
+unique_name_in_owner = true
+visible = false
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1546068425]
+position = Vector2(0, 1)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_3g8ng")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=446448525]
+unique_name_in_owner = true
+visible = false
+position = Vector2(0, 3)
+shape = SubResource("RectangleShape2D_3g8ng")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=335957560]
+unique_name_in_owner = true
+position = Vector2(0, 3)
+texture = ExtResource("2_p78sj")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2021204157]
+unique_name_in_owner = true
+libraries/ = SubResource("AnimationLibrary_4ben2")
+
+[node name="Timer" type="Timer" parent="." unique_id=662297365]
+unique_name_in_owner = true
+one_shot = true
