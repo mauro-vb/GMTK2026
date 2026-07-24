@@ -6,5 +6,7 @@ extends Node2D
 
 signal exited
 
+@export var should_tick_time: bool = true
+
 func exit() -> void:
 	exited.emit()
