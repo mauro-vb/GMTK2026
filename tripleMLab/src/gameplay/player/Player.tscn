@@ -1,6 +1,12 @@
 [gd_scene format=3 uid="uid://kwjq37d8yab5"]
 
 [ext_resource type="Script" uid="uid://cw7ipdntfp1k0" path="res://src/gameplay/player/player.gd" id="1_khxic"]
+[ext_resource type="Resource" uid="uid://vw6bybj2xufy" path="res://src/gameplay/player/resources/player_stats.tres" id="2_eqbko"]
+[ext_resource type="Script" uid="uid://dinto2hwecmf2" path="res://src/gameplay/player/state_machine/player_state_machine.gd" id="2_qeda6"]
+[ext_resource type="Script" uid="uid://cmt7igrjvnp52" path="res://src/gameplay/player/states/state_idle.gd" id="3_eqbko"]
+[ext_resource type="Script" uid="uid://bgv6kmuipr2oy" path="res://src/gameplay/player/states/state_run.gd" id="4_7og37"]
+[ext_resource type="Script" uid="uid://cw13dl5h86vba" path="res://src/gameplay/player/states/state_jump.gd" id="5_vgqeu"]
+[ext_resource type="Script" uid="uid://sicf3k0fekb2" path="res://src/gameplay/player/states/state_fall.gd" id="6_21ga0"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_munyu"]
 
@@ -9,6 +15,7 @@
 [node name="Player" type="CharacterBody2D" unique_id=2129440237]
 collision_layer = 2
 script = ExtResource("1_khxic")
+stats = ExtResource("2_eqbko")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=980908053]
 shape = SubResource("CapsuleShape2D_munyu")
@@ -17,3 +24,18 @@ shape = SubResource("CapsuleShape2D_munyu")
 position = Vector2(0, -4.7683716e-07)
 scale = Vector2(16, 28)
 texture = SubResource("PlaceholderTexture2D_munyu")
+
+[node name="StateMachine" type="Node" parent="." unique_id=90990164]
+script = ExtResource("2_qeda6")
+
+[node name="StateIdle" type="Node" parent="StateMachine" unique_id=1801092891]
+script = ExtResource("3_eqbko")
+
+[node name="StateRun" type="Node" parent="StateMachine" unique_id=715293277]
+script = ExtResource("4_7og37")
+
+[node name="StateJump" type="Node" parent="StateMachine" unique_id=2030079420]
+script = ExtResource("5_vgqeu")
+
+[node name="StateFall" type="Node" parent="StateMachine" unique_id=2040253433]
+script = ExtResource("6_21ga0")
