@@ -4,6 +4,3 @@
 
 [node name="TimeSystem" type="Node" unique_id=1012287516]
 script = ExtResource("1_aevuv")
-
-[node name="MainTimer" type="Timer" parent="." unique_id=1788369069]
-unique_name_in_owner = true

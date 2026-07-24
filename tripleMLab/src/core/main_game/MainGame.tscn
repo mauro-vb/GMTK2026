@@ -8,6 +8,7 @@ process_mode = 3
 script = ExtResource("1_o4umv")
 
 [node name="Systems" type="Node" parent="." unique_id=500019305]
+unique_name_in_owner = true
 
 [node name="World" type="Node2D" parent="." unique_id=413458378]
 unique_name_in_owner = true

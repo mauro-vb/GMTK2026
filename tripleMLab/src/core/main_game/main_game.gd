@@ -5,19 +5,16 @@ extends Node
 
 enum SceneContainer { WORLD, LEVEL, UI, TRANSITION, PAUSE }
 
-# TODO: Map node data needs to carry a room type + its own level UID instead of
-#       enter_room always being handed TEST_LEVEL_UID. Once Map exposes that,
-#       this enum is what enter_room will switch on to route to the right
-#       enter_* method below.
-#enum RoomType { COMBAT, ELITE, BOSS, SHOP, EVENT, REST }
-
-
+var time_system: TimeSystem = null
 var player: Player = null
 var map: Map = null
 
 var _container_roots: Dictionary[SceneContainer, Node] = {}
 var _loaded_scenes: Dictionary[SceneContainer, Node] = {}
 var _current_room: RoomScene = null
+
+# System root node
+@onready var systems: Node = %Systems
 
 # Game World root nodes
 @onready var world: Node2D = %World
@@ -43,7 +40,7 @@ func _ready() -> void:
 		SceneContainer.PAUSE: pause_root,
 	}
 	load_scene(UIDs.START_MENU_SCENE_UID, SceneContainer.UI)
-	_init_player()
+	
 
 
 func _input(event: InputEvent) -> void:
@@ -75,7 +72,6 @@ func load_scene(scene_uid: String, container: SceneContainer = SceneContainer.WO
 	_loaded_scenes[container] = instance
 	return instance
 
-
 ## Frees the container's currently tracked scene instance, if any.
 func unload_scene(container: SceneContainer) -> void:
 	var current: Node = _loaded_scenes.get(container)
@@ -84,13 +80,13 @@ func unload_scene(container: SceneContainer) -> void:
 	current.queue_free()
 	_loaded_scenes.erase(container)
 
-
 func change_scene(new_scene_uid: String, container: SceneContainer = SceneContainer.WORLD) -> Node:
 	unload_scene(container)
 	return load_scene(new_scene_uid, container)
 
-
 func load_game() -> void:
+	_init_player()
+	_load_systems()
 	change_scene(UIDs.MAP_HUD_SCENE_UID, SceneContainer.UI)
 	map = load_scene(UIDs.MAP_SCENE_UID) as Map
 	if map == null:
@@ -132,6 +128,7 @@ func enter_room(room_uid: String, room_type: Room.Type) -> void:
 	if _current_room == null:
 		push_error("Failed to load room '%s' as RoomType %s" % [room_uid, Room.Type.keys()[room_type]])
 		return
+	time_system.ticking = _current_room.should_tick_time
 	_current_room.exited.connect(exit_room, CONNECT_DEFERRED | CONNECT_ONE_SHOT)
 
 	# TODO: await _play_transition_in() here once transitions exist, so every
@@ -193,6 +190,7 @@ func exit_room() -> void:
 	#       so leaving a room doesn't just snap back to the map instantly either.
 	#       e.g.:
 	#       await _play_transition_out()
+	time_system.ticking = false
 	unload_scene(SceneContainer.LEVEL)
 	change_scene(UIDs.MAP_HUD_SCENE_UID, SceneContainer.UI)
 	_current_room = null
@@ -215,3 +213,19 @@ func _init_player() -> void:
 	if player == null:
 		push_error("Loaded player scene does not extend Player or DNE: " + UIDs.PLAYER_SCENE_UID)
 		return
+
+func _load_system(system_uid: String) -> Node:
+	var system_scene: PackedScene = ResourceLoader.load(system_uid)
+	if system_scene == null:
+		push_error("Could not load system scene: " + system_uid)
+		return
+
+	var system_node: Node = system_scene.instantiate()
+	if system_node == null:
+		push_error("Loaded system scene does not extend Player or DNE: " + UIDs.PLAYER_SCENE_UID)
+		return
+	systems.add_child(system_node)
+	return system_node
+	
+func _load_systems() -> void:
+	time_system = _load_system(UIDs.TIME_SYSTEM_UID)
