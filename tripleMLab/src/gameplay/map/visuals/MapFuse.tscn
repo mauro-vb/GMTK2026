@@ -1,0 +1,138 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://src/gameplay/map/visuals/map_fuse.gd" id="1_fuse"]
+[ext_resource type="Texture2D" path="res://assets/art/map/fuse/fuse_cord.png" id="2_cord"]
+[ext_resource type="Texture2D" path="res://assets/art/map/fuse/fuse_cord_burnt.png" id="3_burnt"]
+[ext_resource type="Texture2D" path="res://assets/art/map/fuse/fuse_spark.png" id="4_spark"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_spark0"]
+atlas = ExtResource("4_spark")
+region = Rect2(0, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_spark1"]
+atlas = ExtResource("4_spark")
+region = Rect2(8, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_spark2"]
+atlas = ExtResource("4_spark")
+region = Rect2(16, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_spark3"]
+atlas = ExtResource("4_spark")
+region = Rect2(24, 0, 8, 8)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fuse"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_spark0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_spark1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_spark2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_spark3")
+}],
+"loop": true,
+"name": &"burn",
+"speed": 12.0
+}]
+
+[sub_resource type="Gradient" id="Gradient_smoke"]
+offsets = PackedFloat32Array(0, 0.2, 1)
+colors = PackedColorArray(0.6, 0.58, 0.56, 0, 0.58, 0.56, 0.54, 0.45, 0.5, 0.49, 0.48, 0)
+
+[node name="MapFuse" type="Node2D"]
+script = ExtResource("1_fuse")
+
+[node name="Unburnt" type="Line2D" parent="."]
+texture_filter = 1
+texture_repeat = 2
+width = 4.0
+texture = ExtResource("2_cord")
+texture_mode = 1
+joint_mode = 0
+begin_cap_mode = 1
+end_cap_mode = 1
+antialiased = false
+
+[node name="Burnt" type="Line2D" parent="."]
+texture_filter = 1
+texture_repeat = 2
+z_index = 1
+width = 4.0
+texture = ExtResource("3_burnt")
+texture_mode = 1
+joint_mode = 0
+begin_cap_mode = 1
+end_cap_mode = 1
+antialiased = false
+
+[node name="Smoke" type="CPUParticles2D" parent="."]
+z_index = 2
+emitting = false
+amount = 14
+lifetime = 2.6
+one_shot = true
+lifetime_randomness = 0.4
+emission_shape = 3
+emission_rect_extents = Vector2(1, 1)
+direction = Vector2(0, -1)
+spread = 25.0
+gravity = Vector2(0, -5)
+initial_velocity_min = 2.0
+initial_velocity_max = 6.0
+scale_amount_min = 1.0
+scale_amount_max = 2.0
+color_ramp = SubResource("Gradient_smoke")
+
+[node name="ArrivalBurst" type="CPUParticles2D" parent="."]
+z_index = 3
+emitting = false
+amount = 16
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+lifetime_randomness = 0.5
+direction = Vector2(0, -1)
+spread = 180.0
+gravity = Vector2(0, 40)
+initial_velocity_min = 25.0
+initial_velocity_max = 60.0
+damping_min = 40.0
+damping_max = 60.0
+scale_amount_min = 1.0
+scale_amount_max = 1.0
+color = Color(1, 0.6, 0.15, 1)
+
+[node name="SparkHead" type="Node2D" parent="."]
+z_index = 4
+
+[node name="Spark" type="AnimatedSprite2D" parent="SparkHead"]
+texture_filter = 1
+visible = false
+sprite_frames = SubResource("SpriteFrames_fuse")
+animation = &"burn"
+
+[node name="EmberTrail" type="CPUParticles2D" parent="SparkHead"]
+emitting = false
+amount = 12
+lifetime = 0.45
+lifetime_randomness = 0.5
+direction = Vector2(0, -1)
+spread = 60.0
+gravity = Vector2(0, -12)
+initial_velocity_min = 4.0
+initial_velocity_max = 14.0
+damping_min = 10.0
+damping_max = 20.0
+scale_amount_min = 1.0
+scale_amount_max = 1.0
+color = Color(1, 0.54, 0.16, 1)
+
+[node name="Hiss" type="AudioStreamPlayer2D" parent="SparkHead"]
+
+[node name="Pop" type="AudioStreamPlayer2D" parent="."]

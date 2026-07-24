@@ -14,6 +14,14 @@ var _direction_stack: Array[String] = []
 func _ready() -> void:
 	state_machine.setup(self, stats)
 
+# Clears carried-over motion and held input when the player leaves a room, so a
+# run isn't resumed mid-fall or still drifting. Called by MainGame.exit_room()
+func reset_physics() -> void:
+	velocity = Vector2.ZERO
+	coyote_timer = 0.0
+	jump_buffer_timer = 0.0
+	_direction_stack.clear()
+
 # Newly-pressed direction overrides already-held opposite direction, instead of canceling out
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("left"):
