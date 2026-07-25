@@ -6,6 +6,7 @@ extends Node
 enum SceneContainer { WORLD, LEVEL, UI, TRANSITION, PAUSE }
 
 var time_system: TimeSystem = null
+var modifiers_system: ModifiersSystem = null
 var player: Player = null
 var map: Map = null
 
@@ -85,8 +86,9 @@ func change_scene(new_scene_uid: String, container: SceneContainer = SceneContai
 	return load_scene(new_scene_uid, container)
 
 func load_game() -> void:
-	_init_player()
 	_load_systems()
+	_init_player()
+	
 	change_scene(UIDs.MAP_HUD_SCENE_UID, SceneContainer.UI)
 	map = load_scene(UIDs.MAP_SCENE_UID) as Map
 	if map == null:
@@ -140,13 +142,13 @@ func enter_room(room_uid: String, room_type: Room.Type) -> void:
 func enter_level(level_uid: String) -> void:
 	change_scene(UIDs.LEVEL_HUD_SCENE_UID, SceneContainer.UI)
 
-
 	_current_room = load_scene(level_uid, SceneContainer.LEVEL) as BaseLevel
 	if _current_room == null:
 		push_error("'%s' did not resolve to a BaseLevel instance" % level_uid)
 		return
 	
 	player_root.add_child(player)
+	modifiers_system.activate_modifiers(Modifier.Type.ENTER_LEVEL)
 	
 
 	# TODO: this is where EntityRoot gets populated — currently levels presumably
@@ -193,6 +195,7 @@ func exit_room() -> void:
 	time_system.ticking = false
 	if _current_room is BaseLevel:
 		#player.reset_physics()
+		modifiers_system.activate_modifiers(Modifier.Type.EXIT_LEVEL)
 		player_root.remove_child(player)
 	unload_scene(SceneContainer.LEVEL)
 	change_scene(UIDs.MAP_HUD_SCENE_UID, SceneContainer.UI)
@@ -215,6 +218,9 @@ func _init_player() -> void:
 	if player == null:
 		push_error("Loaded player scene does not extend Player or DNE: " + UIDs.PLAYER_SCENE_UID)
 		return
+	
+	## TESTING
+	modifiers_system.add_modifier(load(UIDs.SPARE_FUSE_UID))
 
 func _load_system(system_uid: String) -> Node:
 	var system_scene: PackedScene = ResourceLoader.load(system_uid)
@@ -231,3 +237,4 @@ func _load_system(system_uid: String) -> Node:
 	
 func _load_systems() -> void:
 	time_system = _load_system(UIDs.TIME_SYSTEM_UID)
+	modifiers_system = _load_system(UIDs.MODIFIERS_SYSTEM_UID)

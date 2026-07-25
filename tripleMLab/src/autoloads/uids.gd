@@ -12,3 +12,7 @@ const TEST_LEVEL_UID: String = "uid://dgclkxh6ouioi"
 
 # SYSTEMS
 const TIME_SYSTEM_UID: String = "uid://bjktioxpxjuo"
+const MODIFIERS_SYSTEM_UID: String = "uid://sgn327tv2pc6"
+
+# MODIFIERS
+const SPARE_FUSE_UID: String = "uid://bivxio7ycorca"

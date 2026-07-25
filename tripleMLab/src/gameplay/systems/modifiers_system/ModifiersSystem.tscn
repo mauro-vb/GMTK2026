@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://sgn327tv2pc6"]
+
+[ext_resource type="Script" uid="uid://bob7d1awax3ps" path="res://src/gameplay/systems/modifiers_system/modifiers_system.gd" id="1_2q30o"]
+
+[node name="ModifiersSystem" type="Node" unique_id=1450184216]
+script = ExtResource("1_2q30o")
