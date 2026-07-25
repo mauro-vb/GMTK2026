@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AbilityCostModifier" format=3 uid="uid://cx2qm8wbk5nhd"]
+
+[ext_resource type="Script" uid="uid://cm8bq3fjx6vkr" path="res://src/gameplay/systems/modifiers_system/ability_cost_modifier.gd" id="1_cp001"]
+
+[resource]
+script = ExtResource("1_cp001")
+ability = 2
+cost = 0.5
+type = 2
+modifier_name = "Costly Pogo"
+id = "costly_pogo"
+description = "Every pogo burns half a second."
+metadata/_custom_type_script = "uid://cm8bq3fjx6vkr"

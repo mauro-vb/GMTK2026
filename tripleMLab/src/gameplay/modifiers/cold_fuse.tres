@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FreezeModifier" format=3 uid="uid://b3xkq7wvn5dtm"]
+
+[ext_resource type="Script" uid="uid://cq7wn3xmv1a4k" path="res://src/gameplay/systems/modifiers_system/freeze_modifier.gd" id="1_cf001"]
+
+[resource]
+script = ExtResource("1_cf001")
+freeze_seconds = 2.0
+type = 0
+modifier_name = "Cold Fuse"
+id = "cold_fuse"
+description = "The fuse starts damp. For the first 2 seconds of a level nothing burns - and you cannot move either."
+metadata/_custom_type_script = "uid://cq7wn3xmv1a4k"

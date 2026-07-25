@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="OrbWindowModifier" format=3 uid="uid://cn9dh4prj2wsl"]
+
+[ext_resource type="Script" uid="uid://bt5r9djhk2mxe" path="res://src/gameplay/systems/modifiers_system/orb_window_modifier.gd" id="1_co001"]
+
+[resource]
+script = ExtResource("1_co001")
+affected_orb = 4
+effect = 0
+override_value = 0.0
+window_seconds = 3.0
+type = 0
+modifier_name = "Coating"
+id = "coating"
+description = "A fireproof coat. Hot orbs do nothing at all for the first 3 seconds of a level."
+metadata/_custom_type_script = "uid://bt5r9djhk2mxe"

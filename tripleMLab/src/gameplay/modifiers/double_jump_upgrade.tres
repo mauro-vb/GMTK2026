@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GrantAbilityModifier" format=3 uid="uid://dq2xs7wkh4mtb"]
+
+[ext_resource type="Script" uid="uid://dw7lz5crn4mtg" path="res://src/gameplay/systems/modifiers_system/grant_ability_modifier.gd" id="1_dj001"]
+
+[resource]
+script = ExtResource("1_dj001")
+ability = 1
+granted = true
+type = 2
+modifier_name = "Second Wind"
+id = "double_jump_upgrade"
+description = "You can double jump."
+metadata/_custom_type_script = "uid://dw7lz5crn4mtg"

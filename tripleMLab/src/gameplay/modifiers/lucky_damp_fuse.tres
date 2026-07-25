@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://dp3kb2vhm6wxz"]
+
+[ext_resource type="Script" uid="uid://cj9xt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_ld001"]
+
+[resource]
+script = ExtResource("1_ld001")
+multiplier = 0.0
+type = 0
+modifier_name = "Maybe Damp Fuse"
+id = "lucky_damp_fuse"
+description = "A 25% chance that time does not tick at all on the next level."
+duration = 1
+duration_levels = 1
+chance = 0.25
+metadata/_custom_type_script = "uid://cj9xt4bvm7dpl"

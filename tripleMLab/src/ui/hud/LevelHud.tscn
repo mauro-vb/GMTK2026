@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://4o0nmaeak4ns"]
 
 [ext_resource type="Script" uid="uid://lecx635e8e6k" path="res://src/ui/hud/level_hud.gd" id="1_jfydk"]
+[ext_resource type="PackedScene" uid="uid://dv6ct8mkr3jqw" path="res://src/ui/modifier_display/ModifierDisplay.tscn" id="2_mdlvl"]
 
 [node name="LevelHud" type="Control" unique_id=1413962022]
 layout_mode = 3
@@ -31,3 +32,6 @@ text = "Level HUD"
 [node name="TimeLabel" type="Label" parent="MarginContainer/HBoxContainer" unique_id=978662358]
 unique_name_in_owner = true
 layout_mode = 2
+
+[node name="ModifierDisplay" parent="." unique_id=1413962023 instance=ExtResource("2_mdlvl")]
+layout_mode = 1

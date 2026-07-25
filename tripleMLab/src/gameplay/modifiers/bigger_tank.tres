@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AddMaxTimeModifier" format=3 uid="uid://dm6ts3xvp7cwl"]
+
+[ext_resource type="Script" uid="uid://bk4nd9wtp2xhz" path="res://src/gameplay/systems/modifiers_system/add_max_time_modifier.gd" id="1_bt001"]
+
+[resource]
+script = ExtResource("1_bt001")
+amount = 15.0
+type = 2
+stackable = true
+modifier_name = "Bigger Tank"
+id = "bigger_tank"
+description = "Raise the maximum time you can hold by 15 seconds."
+metadata/_custom_type_script = "uid://bk4nd9wtp2xhz"

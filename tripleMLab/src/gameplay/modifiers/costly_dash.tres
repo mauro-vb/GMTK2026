@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AbilityCostModifier" format=3 uid="uid://bv7ln4srj9tqc"]
+
+[ext_resource type="Script" uid="uid://cm8bq3fjx6vkr" path="res://src/gameplay/systems/modifiers_system/ability_cost_modifier.gd" id="1_cd001"]
+
+[resource]
+script = ExtResource("1_cd001")
+ability = 0
+cost = 1.0
+type = 2
+modifier_name = "Costly Dash"
+id = "costly_dash"
+description = "Every dash burns 1 second."
+metadata/_custom_type_script = "uid://cm8bq3fjx6vkr"

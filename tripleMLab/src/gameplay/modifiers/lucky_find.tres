@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="GainModifierModifier" format=3 uid="uid://cz3jq8vpk6mrt"]
+
+[ext_resource type="Script" uid="uid://dh6qw2nrk8vsy" path="res://src/gameplay/systems/modifiers_system/gain_modifier_modifier.gd" id="1_lf001"]
+[ext_resource type="Resource" uid="uid://bm5tc7xdw2nhk" path="res://src/gameplay/modifiers/fresh_fuse.tres" id="2_lf002"]
+[ext_resource type="Resource" uid="uid://dj3nh8lrx6pmv" path="res://src/gameplay/modifiers/slow_burn.tres" id="3_lf003"]
+[ext_resource type="Resource" uid="uid://dm6ts3xvp7cwl" path="res://src/gameplay/modifiers/bigger_tank.tres" id="4_lf004"]
+[ext_resource type="Resource" uid="uid://dk6mt8zbv3rqx" path="res://src/gameplay/modifiers/primed.tres" id="5_lf005"]
+
+[resource]
+script = ExtResource("1_lf001")
+pool = Array[Modifier]([ExtResource("2_lf002"), ExtResource("3_lf003"), ExtResource("4_lf004"), ExtResource("5_lf005")])
+max_level_time = 0.0
+type = 1
+modifier_name = "Lucky Find"
+id = "lucky_find"
+description = "A 25% chance of turning up a new modifier at the end of a level."
+chance = 0.25
+metadata/_custom_type_script = "uid://dh6qw2nrk8vsy"

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://ogipvp6hivr7"]
 
 [ext_resource type="Script" uid="uid://b2e8edoeungoa" path="res://src/ui/hud/map_hud.gd" id="1_lph0r"]
+[ext_resource type="PackedScene" uid="uid://dv6ct8mkr3jqw" path="res://src/ui/modifier_display/ModifierDisplay.tscn" id="2_mdmap"]
 
 [node name="MapHud" type="Control" unique_id=1413962022]
 layout_mode = 3
@@ -31,3 +32,6 @@ text = "Map HUD"
 [node name="TimeLabel" type="Label" parent="MarginContainer/HBoxContainer" unique_id=1642964719]
 unique_name_in_owner = true
 layout_mode = 2
+
+[node name="ModifierDisplay" parent="." unique_id=1413962024 instance=ExtResource("2_mdmap")]
+layout_mode = 1
