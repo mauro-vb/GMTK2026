@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="GainModifierModifier" format=3 uid="uid://dv8ks3mqb7ntw"]
 
+[ext_resource type="Script" uid="uid://dguj7fxtd604" path="res://src/gameplay/systems/modifiers_system/resources/modifier.gd" id="1_hrqos"]
 [ext_resource type="Script" uid="uid://dh6qw2nrk8vsy" path="res://src/gameplay/systems/modifiers_system/gain_modifier_modifier.gd" id="1_sp001"]
 [ext_resource type="Resource" uid="uid://cl6vb3mnp8wjx" path="res://src/gameplay/modifiers/dash_upgrade.tres" id="2_sp002"]
 [ext_resource type="Resource" uid="uid://dq2xs7wkh4mtb" path="res://src/gameplay/modifiers/double_jump_upgrade.tres" id="3_sp003"]
@@ -7,7 +8,7 @@
 
 [resource]
 script = ExtResource("1_sp001")
-pool = Array[Modifier]([ExtResource("2_sp002"), ExtResource("3_sp003"), ExtResource("4_sp004")])
+pool = Array[ExtResource("1_hrqos")]([ExtResource("2_sp002"), ExtResource("3_sp003"), ExtResource("4_sp004")])
 max_level_time = 20.0
 type = 1
 modifier_name = "Speedrunner's Prize"

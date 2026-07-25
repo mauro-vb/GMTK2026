@@ -15,6 +15,8 @@ func _ready() -> void:
 
 
 func _place_player_at_spawn() -> void:
+	if Global.main_game == null:
+		return
 	var player: Player = Global.main_game.player
 	if player == null:
 		push_error("Cannot place player at spawn, Global.main_game.player is null")
