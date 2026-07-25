@@ -13,7 +13,6 @@ func enter() -> void:
 	player.is_dashing = true
 	player.velocity.y = 0.0 
 	player.velocity.x = stats.dash_speed * _dash_direction
-	print("dash_speed: ", stats.dash_speed, " | velocity.x: ", player.velocity.x)
 	player.consume_dash()
 	player.play_animation("dash")
 
