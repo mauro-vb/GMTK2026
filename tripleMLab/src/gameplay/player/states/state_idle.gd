@@ -22,6 +22,12 @@ func physics_update(delta: float) -> void:
 		transitioned.emit(PlayerState.STATE_ID.FALL)
 		return
 
+	# Checked before the jump so down + jump drops through instead of jumping
+	if player.can_drop_through():
+		player.consume_drop_through()
+		transitioned.emit(PlayerState.STATE_ID.FALL)
+		return
+
 	if player.can_jump():
 		transitioned.emit(PlayerState.STATE_ID.JUMP)
 		return

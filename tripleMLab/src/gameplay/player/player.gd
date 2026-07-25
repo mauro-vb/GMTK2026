@@ -44,6 +44,10 @@ var air_jumps_used: int = 0
 var is_dashing: bool = false
 var dash_used: bool = false
 
+# drop-through behavior
+var _drop_through_timer: float = 0.0
+var _dropped_platforms: Array[DropThroughPlatform] = []
+
 # Tracks held direction keys in press order (most recent = last).
 var _direction_stack: Array[String] = []
 
@@ -77,6 +81,8 @@ func reset_for_new_room() -> void:
 	is_dashing = false
 	dash_used = false
 	_direction_stack.clear()
+	_drop_through_timer = 0.0
+	_end_drop_through()
 	# Last, so the state it enters sees the cleared flags — play_animation() is
 	# swallowed while _is_whiffing is still set
 	state_machine.reset()
@@ -138,7 +144,12 @@ func _update_timers(delta: float) -> void:
 		pogo_buffer_timer = stats.pogo_buffer_time
 	else:
 		pogo_buffer_timer = max(pogo_buffer_timer - delta, 0.0)
-		
+
+	if _drop_through_timer > 0.0:
+		_drop_through_timer = max(_drop_through_timer - delta, 0.0)
+		if _drop_through_timer == 0.0:
+			_end_drop_through()
+
 # Falling gravity > rising gravity, and gravity is reduced near the jump apex
 # (jump_hang_threshold) for a brief "float" feeling. See PlayerStats for tuning
 func _apply_gravity(delta: float) -> void:
@@ -187,6 +198,50 @@ func consume_double_jump() -> void:
 	jump_buffer_timer = 0.0
 	is_jump_cut = false
 	pay_ability_cost(Ability.DOUBLE_JUMP)
+
+# Jump + down while standing on drop-through platforms falls through them instead of
+# jumping. Reuses the jump buffer so the two presses don't have to land on the same frame.
+# Every body under the feet has to be droppable — at a seam with a solid platform the
+# player would stay put anyway, and consuming the jump for nothing eats an input
+func can_drop_through() -> bool:
+	if not is_on_floor() or jump_buffer_timer <= 0.0:
+		return false
+	if not Input.is_action_pressed("down"):
+		return false
+	return not _get_platforms_underfoot().is_empty()
+
+# The exceptions target only the platforms being dropped through, not the whole layer,
+# so anything else in the fall path still catches the player. They're lifted on a timer
+# rather than on losing contact: the one-way margin can still shove the player back up
+# just after the feet clear the shape
+func consume_drop_through() -> void:
+	_dropped_platforms = _get_platforms_underfoot()
+	for platform in _dropped_platforms:
+		add_collision_exception_with(platform)
+	_drop_through_timer = stats.drop_through_time
+	velocity.y = stats.drop_through_velocity
+	consume_jump()
+
+func _end_drop_through() -> void:
+	for platform in _dropped_platforms:
+		if is_instance_valid(platform):
+			remove_collision_exception_with(platform)
+	_dropped_platforms.clear()
+
+# Returns the drop-through platforms directly beneath the feet, or nothing at all if
+# any of the bodies down there isn't one
+func _get_platforms_underfoot() -> Array[DropThroughPlatform]:
+	var platforms: Array[DropThroughPlatform] = []
+	# Cast at its resting length: a look-ahead left over from a fall would reach past
+	# the platform being stood on and pick up whatever sits below it
+	floor_check.target_position.y = _floor_check_reach
+	floor_check.force_shapecast_update()
+	for i in floor_check.get_collision_count():
+		var collider: Object = floor_check.get_collider(i)
+		if not collider is DropThroughPlatform:
+			return []
+		platforms.append(collider)
+	return platforms
 
 func can_dash() -> bool:
 	return has_dash_ability and not dash_used
