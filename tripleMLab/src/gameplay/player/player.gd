@@ -316,9 +316,9 @@ func apply_horizontal_movement(delta: float) -> void:
 #
 # The cast has to reach at least as far as the player will move this frame.
 # Its resting length only clears the feet by half a pixel, but a fall at
-# max_fall_speed covers 15px per physics tick — without the look-ahead the feet
-# step straight over that band, the mask never gets enabled, and the player
-# tunnels through the platform.
+# max_fall_speed covers several pixels per physics tick — without the look-ahead
+# the feet step straight over that band, the mask never gets enabled, and the
+# player tunnels through the platform.
 func _update_platform_collision(delta: float) -> void:
 	var reach := _floor_check_reach
 	if velocity.y > 0.0:

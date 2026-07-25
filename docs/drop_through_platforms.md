@@ -196,11 +196,12 @@ through the top one and lands on the lower one.
 **Released on a timer, not on losing contact.** Ending the exception the moment
 `FloorCheck` stops seeing the platform would re-enable collision while the player's body
 is still inside the shape, where the 7px one-way margin can shove them back up. A fixed
-`drop_through_time` (0.2s ≈ 12 frames) puts the player ~27px clear of a 5px platform
+`drop_through_time` (0.2s ≈ 12 frames) puts the player ~30px clear of a 5px platform
 before collision returns — comfortably past the shape plus its margin. Because the
 exception is per-instance, a generous window costs nothing.
 
-**The downward nudge.** `velocity.y = stats.drop_through_velocity` (80). Without it,
+**The downward nudge.** `velocity.y = stats.drop_through_velocity` (40 in
+`player_stats.tres`). Without it,
 `_apply_gravity()` early-returns while `is_on_floor()` is still true, so the first frame
 of the drop has zero downward velocity and the player appears to hesitate. The nudge also
 guarantees separation from the platform on the very first frame.
@@ -231,7 +232,7 @@ Called from two places:
 
 | stat | default | effect |
 |---|---|---|
-| `drop_through_velocity` | 80.0 | initial downward speed. Raise for a snappier "yank" down, lower for a softer release. |
+| `drop_through_velocity` | 80.0 (**40.0** in `player_stats.tres`) | initial downward speed. Raise for a snappier "yank" down, lower for a softer release. How fast the drop *reads* is governed far more by `max_fall_speed` and `fall_gravity_mult` — see [`player_movement_tuning.md`](player_movement_tuning.md) §4.3. |
 | `drop_through_time` | 0.2 | how long the platform is ignored. Only needs to outlast the fall past the platform's shape + one-way margin; the per-instance exception means over-shooting is harmless. |
 
 Reused from existing stats: `jump_buffer_time` sets how far apart the down and jump
