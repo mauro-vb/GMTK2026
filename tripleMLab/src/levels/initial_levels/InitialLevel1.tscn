@@ -1,4 +1,4 @@
-[gd_scene format=4 uid="uid://bxu2auvoeusi3"]
+[gd_scene format=4 uid="uid://br7vmi8326s8m"]
 
 [ext_resource type="Script" uid="uid://vl5l3vkfttjf" path="res://src/gameplay/room_scenes/base_level.gd" id="1_4lu54"]
 [ext_resource type="PackedScene" uid="uid://vfgbeafbho51" path="res://src/levels/level_objects/orb/Orb.tscn" id="2_ovdke"]
