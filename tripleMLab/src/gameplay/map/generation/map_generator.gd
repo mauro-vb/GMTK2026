@@ -6,16 +6,16 @@ extends Node
 ## is spaced by [constant STEP_DIST] on x, while the parallel branches within a
 ## row fan out down the screen, spaced by [constant LANE_DIST] on y. Both are
 ## sized so the whole tree fits one 640x360 screen without scrolling.
-const STEP_DIST: int = 21
-const LANE_DIST: int = 19
+const STEP_DIST: int = 32
+const LANE_DIST: int = 24
 ## Kept small: room icons are 26px and cords pass under them, so a big jitter
 ## would let neighbours touch and swallow the fuse between them.
 const PLACEMENT_RANDOMNESS: int = 4
 
 # Size
-const HEIGHT: int = 13
-const WIDTH: int = 8
-const PATHS: int = 5
+const LENGTH: int = 9
+const WIDTH: int = 5
+const PATHS: int = 3
 
 # Room type distribution
 const LEVEL_ROOM_WEIGHT: float = 10.0
@@ -38,7 +38,7 @@ func generate_map() -> Array[Array]:
 	
 	for x: int in starting_points:
 		var current_x: int = x
-		for y in HEIGHT - 1:
+		for y in LENGTH - 1:
 			current_x = _setup_connection(y, current_x)
 	
 	_setup_final_node()
@@ -50,7 +50,7 @@ func generate_map() -> Array[Array]:
 func _generate_initial_grid() -> Array[Array]:
 	var result: Array[Array] = []
 	
-	for y: int in HEIGHT:
+	for y: int in LENGTH:
 		var adjacent_rooms: Array[Room] = []
 		for x: int in WIDTH:
 			var current_map_node: Room = Room.new()
@@ -61,7 +61,7 @@ func _generate_initial_grid() -> Array[Array]:
 
 			# Final Room shouldn't be random: it sits one step past the last row
 			# and dead centre of the lanes, so the master fuses visibly converge.
-			if y == HEIGHT - 1:
+			if y == LENGTH - 1:
 				current_map_node.position = Vector2((y + 1) * STEP_DIST, (WIDTH - 1) * .5 * LANE_DIST)
 
 			adjacent_rooms.append(current_map_node)
@@ -121,10 +121,10 @@ func _would_cross_existing_path(y: int, x: int, node: Room) -> bool:
 
 func _setup_final_node() -> void:
 	var middle: int = floori(WIDTH * .5)
-	var final_node: Room = map_data[HEIGHT - 1][middle]
+	var final_node: Room = map_data[LENGTH - 1][middle]
 	
 	for x: int in WIDTH:
-		var current_node: Room = map_data[HEIGHT - 2][x]
+		var current_node: Room = map_data[LENGTH - 2][x]
 		if current_node.next_nodes.size() > 0:
 			current_node.next_nodes = [final_node] as Array[Room]
 		
@@ -146,7 +146,7 @@ func _setup_node_types() -> void:
 	# Example set first floor always to LEVEL
 	set_full_row.call(0, Room.Type.LEVEL)
 	# Example set last floor always to HEAL
-	set_full_row.call(floori(HEIGHT * .5), Room.Type.HEAL)
+	set_full_row.call(floori(LENGTH * .5), Room.Type.HEAL)
 	
 	for current_row: Array[Room] in map_data:
 		for node: Room in current_row:
@@ -176,7 +176,7 @@ func _set_node_randomly(node: Room) -> void:
 		heal_before_4 = type_candidate == Room.Type.HEAL and node.coordinates.y < 3
 		consecutive_heal = is_consecutive_type.call(type_candidate, Room.Type.HEAL)
 		consecutive_shop = is_consecutive_type.call(type_candidate, Room.Type.SHOP)
-		heal_on_specific_row = type_candidate == Room.Type.HEAL and node.coordinates.y == floori(HEIGHT * .5) + 1
+		heal_on_specific_row = type_candidate == Room.Type.HEAL and node.coordinates.y == floori(LENGTH * .5) + 1
 		
 	node.type = type_candidate
 	

@@ -15,6 +15,7 @@ class_name PlayerStats
 @export var jump_buffer_time: float = 0.1
 
 # Asymmetric gravity + jump hang time (apex float)
+@export var ascend_gravity_mult: float = 1.25
 @export var fall_gravity_mult: float = 1.5      # extra gravity while falling
 @export var jump_hang_threshold: float = 50.0    # |velocity.y| below this = "near apex"
 @export var jump_hang_gravity_mult: float = 0.5  # reduced gravity near apex
@@ -30,3 +31,7 @@ class_name PlayerStats
 # Double jump
 @export var double_jump_velocity: float = -360.0
 @export var max_air_jumps: int = 1
+
+# Dash
+@export var dash_speed: float = 600.0
+@export var dash_duration: float = 0.15
