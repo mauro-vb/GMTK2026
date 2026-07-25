@@ -12,7 +12,6 @@ func _ready() -> void:
 	
 	_place_player_at_spawn()
 	level_exit.reached_exit.connect(_on_exit_reached)
-	print("%s %s" % [name, get_parent().name])
 
 
 func _place_player_at_spawn() -> void:
