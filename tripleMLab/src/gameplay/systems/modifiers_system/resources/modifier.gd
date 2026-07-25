@@ -3,7 +3,7 @@ extends Resource
 
 # Signals
 # Enums
-enum Type { ENTER_LEVEL, EXIT_LEVEL, EVENT_BASED }
+enum Type { ENTER_LEVEL, EXIT_LEVEL, EVENT_BASED, COLD_ORB_TOUCHED, HOT_ORB_TOUCHED }
 # Constants
 
 # Exports
