@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="FreeAbilityModifier" format=3 uid="uid://dk6mt8zbv3rqx"]
+[gd_resource type="Resource" script_class="FreeAbilityModifier" format=3 uid="uid://dk6mt80bv3rqx"]
 
 [ext_resource type="Script" uid="uid://dn82kfvw6plq3" path="res://src/gameplay/systems/modifiers_system/free_ability_modifier.gd" id="1_pr001"]
 
 [resource]
 script = ExtResource("1_pr001")
-uses = 1
 type = 0
 modifier_name = "Primed"
 id = "primed"

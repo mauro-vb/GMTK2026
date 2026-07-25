@@ -4,7 +4,6 @@
 
 [resource]
 script = ExtResource("1_cf001")
-freeze_seconds = 2.0
 type = 0
 modifier_name = "Cold Fuse"
 id = "cold_fuse"
