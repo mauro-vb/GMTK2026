@@ -126,7 +126,7 @@ animations = [{
 }],
 "loop": 0,
 "name": &"double_jump",
-"speed": 10.0
+"speed": 14.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -143,7 +143,7 @@ animations = [{
 }],
 "loop": 0,
 "name": &"fall",
-"speed": 7.0
+"speed": 14.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -206,7 +206,7 @@ animations = [{
 }],
 "loop": 0,
 "name": &"pogo",
-"speed": 10.0
+"speed": 14.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -248,13 +248,15 @@ script = ExtResource("1_khxic")
 stats = ExtResource("2_eqbko")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=980908053]
+visible = false
 position = Vector2(1, 8)
 shape = SubResource("RectangleShape2D_w2ppj")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=162606036]
-position = Vector2(1, 8)
+position = Vector2(2, 10)
 sprite_frames = SubResource("SpriteFrames_r4liw")
-animation = &"fall"
+animation = &"run"
+frame_progress = 0.5477125
 
 [node name="StateMachine" type="Node" parent="." unique_id=90990164]
 unique_name_in_owner = true
@@ -285,6 +287,7 @@ collision_layer = 0
 collision_mask = 64
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="PogoDetector" unique_id=1387530344]
+visible = false
 shape = SubResource("RectangleShape2D_8gqqd")
 debug_color = Color(0.7397435, 0.41185108, 0.5868222, 0.41960785)
 

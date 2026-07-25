@@ -20,6 +20,7 @@ var is_jump_cut: bool = false
 # pogo behavior
 var pogo_buffer_timer: float = 0.0
 var pogo_grace_timer: float = 0.0
+var _is_whiffing: bool = false # pogoing outside of pogo area
 
 # double jump behavior
 var air_jumps_used: int = 0
@@ -61,7 +62,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_pop_direction("right")
 	elif event.is_action_released("jump") and velocity.y < 0:
 		is_jump_cut = true
-
+	elif event.is_action_pressed("attack") and pogo_grace_timer <= 0.0 and not _is_whiffing:
+		play_pogo_whiff()
 
 func _physics_process(delta: float) -> void:
 	_update_timers(delta)
@@ -108,6 +110,8 @@ func _apply_gravity(delta: float) -> void:
 		gravity_multiplier = stats.jump_cut_gravity_mult
 	elif abs(velocity.y) < stats.jump_hang_threshold:
 		gravity_multiplier = stats.jump_hang_gravity_mult
+	elif velocity.y < 0:
+		gravity_multiplier = stats.ascend_gravity_mult
 	elif velocity.y > 0:
 		gravity_multiplier = stats.fall_gravity_mult
 
@@ -117,7 +121,6 @@ func _apply_gravity(delta: float) -> void:
 # AND the jump-buffer window (recently pressed jump) — see _update_timers().
 func can_jump() -> bool:
 	return coyote_timer > 0.0 and jump_buffer_timer > 0.0
-
 
 func consume_jump() -> void:
 	coyote_timer = 0.0
@@ -147,9 +150,22 @@ func get_movement_direction() -> float:
 	return -1.0 if _direction_stack.back() == "left" else 1.0
 
 func play_animation(anim_name: String) -> void:
+	if _is_whiffing and anim_name != "pogo":
+		return
 	if sprite.animation != anim_name:
 		sprite.play(anim_name)
 
+func play_pogo_whiff() -> void:
+	_is_whiffing = true
+	play_animation("pogo")
+	await sprite.animation_finished
+	_is_whiffing = false
+	_resume_state_animation()
+
+func _resume_state_animation() -> void:
+	var state_name: String = PlayerState.STATE_ID.find_key(state_machine.current_state.get_state_id())
+	play_animation(state_name.to_lower())
+	
 func update_facing() -> void:
 	var direction := get_movement_direction()
 	if direction != 0:
