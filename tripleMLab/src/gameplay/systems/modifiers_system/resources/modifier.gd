@@ -100,6 +100,21 @@ func modify_workshop_skip_bonus(seconds: float) -> float:
 func on_workshop_visited(_picks_taken: int) -> bool:
 	return false
 
+## Whether this modifier would do anything at all for the run as it stands.
+##
+## Almost everything is unconditionally useful and inherits `true`. The exception
+## is a modifier that only modifies *another* modifier's effect — "Primed"
+## refunds an ability's time cost, and abilities cost nothing until something has
+## priced them, so on a run with nothing priced it is a card that does literally
+## nothing.
+##
+## A workshop won't lay out a dead pick (see [WorkshopEntry.is_available]). Asked
+## of the modifier rather than encoded in the pool so the answer can't go stale:
+## adding a third modifier that prices an ability makes Primed offerable again
+## without anyone remembering to update a list.
+func is_useful(_modifiers_system: ModifiersSystem) -> bool:
+	return true
+
 func get_description() -> String:
 	return description
 

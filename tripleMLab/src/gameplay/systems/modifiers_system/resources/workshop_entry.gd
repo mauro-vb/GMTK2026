@@ -28,13 +28,18 @@ func is_combined() -> bool:
 	return modifier != null and modifier.linked_modifier != null
 
 ## Whether a workshop this deep into a run may offer this at all. Modifiers the
-## player already holds are filtered out too, unless the modifier stacks.
+## player already holds are filtered out too, unless the modifier stacks — and so
+## are ones that would do nothing for this particular run (see
+## [method Modifier.is_useful]), because a bench slot spent on a card that can't
+## help is worse than a slot spent on a boring one.
 func is_available(depth: int, modifiers_system: ModifiersSystem) -> bool:
 	if modifier == null:
 		return false
 	if depth < min_depth:
 		return false
 	if modifiers_system != null and modifiers_system.has_modifier(modifier.id) and not modifier.stackable:
+		return false
+	if not modifier.is_useful(modifiers_system):
 		return false
 
 	return true

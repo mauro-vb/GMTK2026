@@ -45,6 +45,8 @@ func modify_workshop_offer_weight(w: float, _combined: bool) -> float:  return w
 func modify_workshop_skip_bonus(seconds: float) -> float:              return seconds
 ## Return true to be dropped — how a one-shot perk spends itself.
 func on_workshop_visited(_picks_taken: int) -> bool:                   return false
+## Would this do anything for the run as it stands? A bench won't offer a dead pick.
+func is_useful(_modifiers_system: ModifiersSystem) -> bool:            return true
 ```
 
 Every one is pass-through by default, so **all 27 pre-existing modifiers inherit "changes
@@ -146,8 +148,9 @@ Terms are kept off the modifier deliberately. "How good is this?" belongs to the
 the same modifier can arrive by other routes (Lucky Find, a linked trade-off) that these
 terms have no say over.
 
-`is_available(depth, system)` filters out anything gated deeper than the current row, and
-anything the player already holds unless the modifier is `stackable`.
+`is_available(depth, system)` filters out anything gated deeper than the current row,
+anything the player already holds unless the modifier is `stackable`, and anything
+that would be a **dead pick** (§2.3).
 
 ### 2.2 Pacing without rarity
 
@@ -164,7 +167,47 @@ Then the player's own modifiers get a say, by whether a card carries a trade-off
 plain cards ×2.0 and trade-off cards ×0.25; **Danger Money** does the reverse
 (×0.35 / ×2.5). One buys safety, the other buys power at a price.
 
-### 2.3 The draw
+### 2.3 Dead picks
+
+Some modifiers only modify *another* modifier's effect. **Primed** refunds an
+ability's time cost — and abilities cost nothing until something has priced them:
+
+```gdscript
+var cost: float = ability_time_costs.get(ability, 0.0)
+if cost <= 0.0:
+    return                    # ← never reaches the free-use counter
+```
+
+Exactly two modifiers price an ability (`AbilityCostModifier`): **Costly Dash**,
+which rides along with Kick Start, and **Costly Pogo**. On a run carrying
+neither, Primed and Double Primed are cards that do *literally nothing*, and both
+were offerable from row 0 — a trap, because they read like plain upgrades and
+cost a bench slot that could have been +15 seconds.
+
+So a modifier gets asked whether it would do anything, and the pool won't lay out
+one that says no:
+
+```gdscript
+func is_useful(modifiers_system: ModifiersSystem) -> bool:
+    if modifiers_system == null:
+        return true                    # nobody to ask ≠ known useless
+    for modifier: Modifier in modifiers_system.modifiers:
+        if modifier is AbilityCostModifier:
+            return true
+    return false
+```
+
+Asked of the **modifier**, not encoded in the pool, and asked **by class**, not by
+id. Both on purpose: a third modifier that prices an ability makes Primed
+offerable again on its own, with no list for anyone to forget to update.
+
+Everything else inherits `true` from the base and is unaffected.
+
+> Not yet wired into `GainModifierModifier` — Lucky Find and Chain Reaction can
+> still hand out a Primed that does nothing. Same one-line fix if it turns out to
+> matter in play.
+
+### 2.4 The draw
 
 `WorkshopPool.draw(count, depth, modifiers_system)` is weighted and **without
 replacement**: the winner is removed from the candidate list and its weight subtracted
@@ -173,7 +216,7 @@ from the running total rather than the whole list being re-summed each round.
 Running short of candidates lays out a **smaller bench** rather than repeating itself or
 failing, and pushes a warning. Asking for zero returns empty rather than erroring.
 
-### 2.4 `default_pool.tres`
+### 2.5 `default_pool.tres`
 
 38 entries, 13 of which are combined cards.
 
@@ -495,7 +538,7 @@ visual in `WorkshopStyle`.
 
 ## 7. Verified behaviour
 
-`src/debug/WorkshopCheck.tscn` — 68 checks, all passing:
+`src/debug/WorkshopCheck.tscn` — 74 checks, all passing:
 
 ```
 godot --headless res://src/debug/WorkshopCheck.tscn
@@ -511,7 +554,8 @@ visits.
 | combined | the pool offers combined cards but not only combined cards; **no drawback is offered on its own**; every drawback has a name and a description to print |
 | draw | 3 offers at depths 0/4/8, no duplicates, nothing gated deeper leaks through, zero-draw is empty not an error, oversized draw caps at pool size |
 | hooks | each perk's arithmetic; one-shot spends on a pick but keeps on an empty exit; a plain modifier changes nothing |
-| clock | overlapping rate contributions multiply, unwind in any order, and never leave the clock at 0 — see §8 |
+| clock | overlapping rate contributions multiply, unwind in any order, and never leave the clock at 0 — see §8a |
+| dead picks | Primed is hidden on a run with nothing priced and returns once something is; an ordinary modifier is never hidden |
 | live visit 1 | Open Bench + Second Set of Hands → 5 cards, 2 picks; take one (bench stays open) then the second (bench closes); modifiers granted; one-shot spent; permanent kept |
 | live visit 2 | Scrap Heap's sweep lays a genuinely different bench and is spent; leaving empty-handed pays Union Break's 8s (30.0 → 38.0) |
 | live visit 3 | Danger Money puts a combined card on the bench; its seam names the drawback; taking it grants **both** halves |
@@ -598,11 +642,12 @@ tick-rate drawback on a combined card — do what its card says.
 
 | file | change |
 |---|---|
-| `systems/modifiers_system/resources/modifier.gd` | **+6 workshop hooks**, all pass-through |
+| `systems/modifiers_system/resources/modifier.gd` | **+6 workshop hooks** and `is_useful()`, all pass-through |
 | `systems/modifiers_system/modifiers_system.gd` | **+6 aggregators**, incl. `notify_workshop_visited()` |
 | `systems/time_system/time_system.gd` | rate contributions replace save/restore (§8a) |
 | `systems/modifiers_system/tick_rate_modifier.gd` | registers a contribution instead of snapshotting |
 | `systems/modifiers_system/freeze_modifier.gd` | same |
+| `systems/modifiers_system/free_ability_modifier.gd` | `is_useful()` — hides Primed when nothing is priced |
 | `systems/modifiers_system/resources/workshop_entry.gd` | **new** — a modifier plus its offer terms; `is_combined()` |
 | `systems/modifiers_system/resources/workshop_pool.gd` | **new** — weighted draw without replacement |
 | `systems/modifiers_system/workshop_modifier.gd` | **new** — answers all six hooks |
@@ -616,5 +661,5 @@ tick-rate drawback on a combined card — do what its card says.
 | `map/generation/map_generator.gd` | rename; `_apply_scene_uids()` |
 | `map/visuals/map_node.gd` | rename in `ROOM_ART` |
 | `autoloads/uids.gd` | workshop scene/pool/card + 12 modifier UIDs |
-| `debug/workshop_check.gd` + `WorkshopCheck.tscn` | **new** — 68-check headless harness |
+| `debug/workshop_check.gd` + `WorkshopCheck.tscn` | **new** — 74-check headless harness |
 | `room_scenes/room_scene.gd` | doc comment only |

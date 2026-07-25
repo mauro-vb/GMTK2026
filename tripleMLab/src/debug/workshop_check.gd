@@ -49,6 +49,47 @@ func _check_resources() -> void:
 	print("\n[ overlapping clock modifiers ]")
 	_check_rate_contributions()
 
+	print("\n[ dead picks ]")
+	_check_dead_picks(pool)
+
+
+## "Primed" refunds an ability's time cost, and abilities are free until
+## something prices them — so on a run with nothing priced it is a card that does
+## nothing at all. A bench must not offer it there.
+func _check_dead_picks(pool: WorkshopPool) -> void:
+	var primed: Modifier = load(UIDs.PRIMED_UID) as Modifier
+	var costly_dash: Modifier = load(UIDs.COSTLY_DASH_UID) as Modifier
+
+	var bare: ModifiersSystem = ModifiersSystem.new()
+	_check(not primed.is_useful(bare), "Primed is useless on a run with nothing priced")
+	_check(not _pool_can_offer(pool, primed.id, bare), "...so the bench won't lay it out")
+
+	# Kick Start is what normally brings Costly Dash along; adding the price
+	# directly is the same thing without needing a level to trigger in.
+	bare.modifiers.append(costly_dash)
+	_check(primed.is_useful(bare), "pricing an ability makes Primed useful")
+	_check(_pool_can_offer(pool, primed.id, bare), "...and the bench will offer it again")
+
+	# The escape hatch: with nobody to ask, a card is not hidden.
+	_check(primed.is_useful(null), "with no system to ask, nothing is hidden")
+
+	# Everything else is unconditional and must be unaffected by any of this.
+	var plain: Modifier = load(UIDs.SPARE_FUSE_UID) as Modifier
+	_check(plain.is_useful(bare) and plain.is_useful(null),
+		"an ordinary modifier is always useful")
+
+	bare.free()
+
+
+## Whether `id` survives the pool's availability filter for this run. Checked at
+## a depth past every gate so only usefulness can be the reason it's missing.
+func _pool_can_offer(pool: WorkshopPool, id: String, modifiers_system: ModifiersSystem) -> bool:
+	for entry: WorkshopEntry in pool.entries:
+		if entry != null and entry.modifier != null and entry.modifier.id == id:
+			return entry.is_available(99, modifiers_system)
+
+	return false
+
 
 ## Regression guard. Modifiers used to save and restore TimeSystem.tick_rate
 ## around themselves, which broke the moment two overlapped: a freeze (rate 0)
