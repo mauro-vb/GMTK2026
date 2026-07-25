@@ -21,7 +21,7 @@ func _place_player_at_spawn() -> void:
 		return
 	
 	player.global_position = player_spawn.global_position
-
+	
 
 func _on_exit_reached() -> void:
 	exit()

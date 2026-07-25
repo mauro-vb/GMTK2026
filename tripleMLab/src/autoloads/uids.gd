@@ -8,7 +8,7 @@ const LEVEL_HUD_SCENE_UID: String = "uid://4o0nmaeak4ns"
 # WORLD
 const MAP_SCENE_UID: String = "uid://ipmc68r6n333"
 const PLAYER_SCENE_UID: String = "uid://kwjq37d8yab5"
-const TEST_LEVEL_UID: String = "uid://bm4yugu5nagbx"
+const TEST_LEVEL_UID: String = "uid://dgclkxh6ouioi"
 
 # SYSTEMS
 const TIME_SYSTEM_UID: String = "uid://bjktioxpxjuo"
