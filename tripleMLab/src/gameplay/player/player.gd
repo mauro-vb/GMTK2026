@@ -1,7 +1,10 @@
 class_name Player
 extends CharacterBody2D
 
-const JUMP_THROUGH_PLATFORMS_LAYER: int = 9 
+const JUMP_THROUGH_PLATFORMS_LAYER: int = 9
+# Slack added on top of the per-frame fall distance, so a platform is picked up on
+# the frame before the feet reach it rather than exactly on contact
+const FLOOR_CHECK_LOOKAHEAD_MARGIN: float = 2.0
 
 @export var stats: PlayerStats
 
@@ -24,6 +27,9 @@ var air_jumps_used: int = 0
 # Tracks held direction keys in press order (most recent = last).
 var _direction_stack: Array[String] = []
 
+# FloorCheck's authored cast length, used whenever the look-ahead doesn't need more
+var _floor_check_reach: float = 0.0
+
 @onready var state_machine: PlayerStateMachine = %StateMachine
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 
@@ -32,6 +38,7 @@ var _direction_stack: Array[String] = []
 
 
 func _ready() -> void:
+	_floor_check_reach = floor_check.target_position.y
 	state_machine.setup(self, stats)
 
 
@@ -53,8 +60,9 @@ func _physics_process(delta: float) -> void:
 	_update_timers(delta)
 	_apply_gravity(delta)
 	update_facing()
-	_update_platform_collision()
 	state_machine.physics_update(delta)
+	# Runs last so the look-ahead sees the velocity move_and_slide will actually use
+	_update_platform_collision(delta)
 	move_and_slide()
 
 # Ticks the coyote-time and jump-buffer windows each physics frame:
@@ -156,7 +164,18 @@ func apply_horizontal_movement(delta: float) -> void:
 # false positives you get from checking velocity.y alone: a ray pointed
 # straight down can't be triggered by a platform's side edge, only by
 # something actually beneath the player's feet.
-func _update_platform_collision() -> void:
+#
+# The cast has to reach at least as far as the player will move this frame.
+# Its resting length only clears the feet by half a pixel, but a fall at
+# max_fall_speed covers 15px per physics tick — without the look-ahead the feet
+# step straight over that band, the mask never gets enabled, and the player
+# tunnels through the platform.
+func _update_platform_collision(delta: float) -> void:
+	var reach := _floor_check_reach
+	if velocity.y > 0.0:
+		reach = max(reach, velocity.y * delta + FLOOR_CHECK_LOOKAHEAD_MARGIN)
+	floor_check.target_position.y = reach
+
 	floor_check.force_shapecast_update()
 	set_collision_mask_value(JUMP_THROUGH_PLATFORMS_LAYER, floor_check.is_colliding())
 
