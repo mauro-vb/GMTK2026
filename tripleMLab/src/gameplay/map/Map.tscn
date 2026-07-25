@@ -2,8 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dpubotveeljh4" path="res://src/gameplay/map/generation/map_generator.gd" id="1_5tkdj"]
 [ext_resource type="Script" uid="uid://cmvrcwrbksum6" path="res://src/gameplay/map/map.gd" id="1_e5mg7"]
-
-[sub_resource type="CanvasTexture" id="CanvasTexture_v5ehn"]
+[ext_resource type="Texture2D" uid="uid://bkdrsuctcu22s" path="res://assets/art/map/background.png" id="2_bgmap"]
 
 [node name="Map" type="Node2D" unique_id=999007867]
 script = ExtResource("1_e5mg7")
@@ -24,13 +23,15 @@ unique_name_in_owner = true
 layer = -1
 
 [node name="Background" type="TextureRect" parent="CanvasLayer" unique_id=93764597]
-modulate = Color(1, 0.76862746, 1, 1)
+modulate = Color(0.6, 0.58, 0.66, 1)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = SubResource("CanvasTexture_v5ehn")
+texture = ExtResource("2_bgmap")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="MapGenerator" type="Node" parent="." unique_id=942355219]
 unique_name_in_owner = true
