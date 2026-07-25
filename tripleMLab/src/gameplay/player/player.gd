@@ -47,13 +47,25 @@ func _ready() -> void:
 	_floor_check_reach = floor_check.target_position.y
 	state_machine.setup(self, stats)
 
-# Clears carried-over motion and held input when the player leaves a room, so a
-# run isn't resumed mid-fall or still drifting. Called by MainGame.exit_room()
-func reset_physics() -> void:
+# Clears carried-over motion, ability state and held input, so a room never
+# starts mid-dash, mid-fall or still drifting. The player node is reused across
+# rooms (only re-parented, so _ready() doesn't run again) — every bit of state
+# that isn't reset here survives the swap. Called by MainGame.enter_level()
+func reset_for_new_room() -> void:
 	velocity = Vector2.ZERO
 	coyote_timer = 0.0
 	jump_buffer_timer = 0.0
+	is_jump_cut = false
+	pogo_buffer_timer = 0.0
+	pogo_grace_timer = 0.0
+	_is_whiffing = false
+	air_jumps_used = 0
+	is_dashing = false
+	dash_used = false
 	_direction_stack.clear()
+	# Last, so the state it enters sees the cleared flags — play_animation() is
+	# swallowed while _is_whiffing is still set
+	state_machine.reset()
 
 # Newly-pressed direction overrides already-held opposite direction, instead of canceling out
 func _unhandled_input(event: InputEvent) -> void:

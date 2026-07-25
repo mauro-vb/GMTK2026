@@ -148,6 +148,8 @@ func enter_level(level_uid: String) -> void:
 		return
 	
 	player_root.add_child(player)
+	# Before the modifiers run, so anything they apply to the player isn't wiped
+	player.reset_for_new_room()
 	modifiers_system.activate_modifiers(Modifier.Type.ENTER_LEVEL)
 	
 
@@ -194,7 +196,6 @@ func exit_room() -> void:
 	#       await _play_transition_out()
 	time_system.ticking = false
 	if _current_room is BaseLevel:
-		#player.reset_physics()
 		modifiers_system.activate_modifiers(Modifier.Type.EXIT_LEVEL)
 		player_root.remove_child(player)
 	unload_scene(SceneContainer.LEVEL)
