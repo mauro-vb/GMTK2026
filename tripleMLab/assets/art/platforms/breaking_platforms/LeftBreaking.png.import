@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c3pe7b1kunnsa"
-path="res://.godot/imported/LeftSideNormal.png-19d70f63451f923f6ce7c8fee110ba93.ctex"
+uid="uid://6115hhpbal7l"
+path="res://.godot/imported/LeftBreaking.png-3ad68e6153be688a4be51aa817f41e6e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/platforms/breaking_platforms/LeftSideNormal.png"
-dest_files=["res://.godot/imported/LeftSideNormal.png-19d70f63451f923f6ce7c8fee110ba93.ctex"]
+source_file="res://assets/art/platforms/breaking_platforms/LeftBreaking.png"
+dest_files=["res://.godot/imported/LeftBreaking.png-3ad68e6153be688a4be51aa817f41e6e.ctex"]
 
 [params]
 
