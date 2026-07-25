@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ConditionalTimeModifier" format=3 uid="uid://ch5rp9wtj4xzm"]
+
+[ext_resource type="Script" uid="uid://bx3mvp8ldz6te" path="res://src/gameplay/systems/modifiers_system/conditional_time_modifier.gd" id="1_bm001"]
+
+[resource]
+script = ExtResource("1_bm001")
+comparison = 1
+threshold_seconds = 15.0
+amount = 6.0
+type = 1
+modifier_name = "Barely Made It"
+id = "barely_made_it"
+description = "Clear a level in under 15 seconds and gain 6 seconds."
+metadata/_custom_type_script = "uid://bx3mvp8ldz6te"

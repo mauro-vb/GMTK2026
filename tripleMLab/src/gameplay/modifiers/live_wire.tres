@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MapTimeModifier" format=3 uid="uid://cw7dm2vqk9tbs"]
+
+[ext_resource type="Script" uid="uid://bp2vk6shd3wnq" path="res://src/gameplay/systems/modifiers_system/map_time_modifier.gd" id="1_lw001"]
+
+[resource]
+script = ExtResource("1_lw001")
+type = 1
+modifier_name = "Live Wire"
+id = "live_wire"
+description = "The fuse keeps burning while you study the map. Choose quickly."
+metadata/_custom_type_script = "uid://bp2vk6shd3wnq"

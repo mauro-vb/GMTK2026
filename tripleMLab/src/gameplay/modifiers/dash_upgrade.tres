@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="GrantAbilityModifier" format=3 uid="uid://cl6vb3mnp8wjx"]
+
+[ext_resource type="Script" uid="uid://dw7lz5crn4mtg" path="res://src/gameplay/systems/modifiers_system/grant_ability_modifier.gd" id="1_da001"]
+[ext_resource type="Resource" uid="uid://bv7ln4srj9tqc" path="res://src/gameplay/modifiers/costly_dash.tres" id="2_da002"]
+
+[resource]
+script = ExtResource("1_da001")
+ability = 0
+granted = true
+type = 2
+modifier_name = "Kick Start"
+id = "dash_upgrade"
+description = "You can dash - but the burst costs you a second every time."
+linked_modifier = ExtResource("2_da002")
+metadata/_custom_type_script = "uid://dw7lz5crn4mtg"

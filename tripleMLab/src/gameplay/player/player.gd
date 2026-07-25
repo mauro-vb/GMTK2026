@@ -6,12 +6,26 @@ const JUMP_THROUGH_PLATFORMS_LAYER: int = 9
 # the frame before the feet reach it rather than exactly on contact
 const FLOOR_CHECK_LOOKAHEAD_MARGIN: float = 2.0
 
+# Movement abilities a modifier can grant or take away (see GrantAbilityModifier)
+enum Ability { DASH, DOUBLE_JUMP, POGO }
+
 @export var stats: PlayerStats
 
 # abilities
 var has_pogo_ability: bool = true
 var has_double_jump_ability: bool = true
 var has_dash_ability: bool = true
+
+# Seconds charged to the TimeSystem each time an ability is used. Written by
+# AbilityCostModifier; a missing entry means that ability is free.
+var ability_time_costs: Dictionary[Ability, float] = {}
+
+# Ability uses that skip their time cost. Refilled at level start by the
+# "Primed" modifier (FreeAbilityModifier).
+var free_ability_uses: int = 0
+
+# While false the player is frozen in place — used by the "Cold Fuse" modifier.
+var can_move: bool = true
 
 # basic jump behavior
 var coyote_timer: float = 0.0
@@ -87,6 +101,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		play_pogo_whiff()
 
 func _physics_process(delta: float) -> void:
+	if not can_move:
+		velocity = Vector2.ZERO
+		move_and_slide()
+		return
+
 	_update_timers(delta)
 	_apply_gravity(delta)
 	update_facing()
@@ -157,7 +176,8 @@ func consume_pogo() -> void:
 	pogo_grace_timer = 0.0
 	pogo_buffer_timer = 0.0
 	is_jump_cut = false
-	
+	pay_ability_cost(Ability.POGO)
+
 func can_double_jump() -> bool:
 	log(has_double_jump_ability)
 	return has_double_jump_ability and not is_on_floor() and air_jumps_used < stats.max_air_jumps and jump_buffer_timer > 0.0
@@ -166,12 +186,27 @@ func consume_double_jump() -> void:
 	air_jumps_used += 1
 	jump_buffer_timer = 0.0
 	is_jump_cut = false
+	pay_ability_cost(Ability.DOUBLE_JUMP)
 
 func can_dash() -> bool:
 	return has_dash_ability and not dash_used
 
 func consume_dash() -> void:
 	dash_used = true
+	pay_ability_cost(Ability.DASH)
+
+# Charges the ability's time cost to the clock. Abilities are free unless a
+# modifier priced them, and "Primed" hands out a few uses that skip the bill.
+func pay_ability_cost(ability: Ability) -> void:
+	var cost: float = ability_time_costs.get(ability, 0.0)
+	if cost <= 0.0:
+		return
+	if free_ability_uses > 0:
+		free_ability_uses -= 1
+		return
+	if Global.main_game == null or Global.main_game.time_system == null:
+		return
+	Global.main_game.time_system.remove_time(cost)
 
 func get_dash_direction() -> float:
 	var direction := get_movement_direction()

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DetonateModifier" format=3 uid="uid://dr8kn3wqz5jvm"]
+
+[ext_resource type="Script" uid="uid://ck4hs7mzq9bwx" path="res://src/gameplay/systems/modifiers_system/detonate_modifier.gd" id="1_dt001"]
+
+[resource]
+script = ExtResource("1_dt001")
+type = 4
+modifier_name = "Detonate"
+id = "detonate"
+description = "Volatile. Touch a single hot orb and the whole fuse goes up at once."
+metadata/_custom_type_script = "uid://ck4hs7mzq9bwx"

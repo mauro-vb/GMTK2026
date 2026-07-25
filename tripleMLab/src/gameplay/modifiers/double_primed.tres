@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FreeAbilityModifier" format=3 uid="uid://bw2fj5nch7xkd"]
+
+[ext_resource type="Script" uid="uid://dn82kfvw6plq3" path="res://src/gameplay/systems/modifiers_system/free_ability_modifier.gd" id="1_dp001"]
+
+[resource]
+script = ExtResource("1_dp001")
+uses = 3
+type = 0
+modifier_name = "Double Primed"
+id = "double_primed"
+description = "The first 3 movement abilities you use each level are on the house."
+metadata/_custom_type_script = "uid://dn82kfvw6plq3"
