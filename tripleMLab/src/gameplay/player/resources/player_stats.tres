@@ -4,19 +4,19 @@
 
 [resource]
 script = ExtResource("1_cv0hb")
-move_speed = 63.0
+move_speed = 80.0
 acceleration = 420.0
-friction = 340.0
-jump_velocity = -200.0
-gravity = 620.0
-max_fall_speed = 210.0
+friction = 600.0
+jump_velocity = -180.0
+gravity = 500.0
+max_fall_speed = 180.0
 coyote_time = 0.12
 jump_buffer_time = 0.12
 ascend_gravity_mult = 1.15
 fall_gravity_mult = 1.35
 jump_hang_threshold = 40.0
-jump_hang_gravity_mult = 0.45
-jump_cut_gravity_mult = 2.0
+jump_hang_gravity_mult = 0.7
+jump_cut_gravity_mult = 2.5
 pogo_velocity = -215.0
 double_jump_velocity = -180.0
 dash_speed = 165.0

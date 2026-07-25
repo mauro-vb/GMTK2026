@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="OrbWindowModifier" format=3 uid="uid://cn9dh4prj2wsl"]
+[gd_resource type="Resource" script_class="OrbWindowModifier" format=3 uid="uid://coadh4prj2wsl"]
 
 [ext_resource type="Script" uid="uid://bt5r9djhk2mxe" path="res://src/gameplay/systems/modifiers_system/orb_window_modifier.gd" id="1_co001"]
 

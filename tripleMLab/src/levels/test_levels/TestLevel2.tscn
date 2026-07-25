@@ -63,7 +63,7 @@ position = Vector2(96, 112)
 size = 5
 
 [node name="DropThroughPlatform" parent="." unique_id=1394827510 instance=ExtResource("9_dt1k4")]
-position = Vector2(136, 140)
+position = Vector2(72, 112)
 size = 4
 
 [node name="Orb" parent="." unique_id=1840351593 instance=ExtResource("8_ve225")]
