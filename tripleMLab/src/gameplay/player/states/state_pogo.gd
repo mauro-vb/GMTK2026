@@ -12,5 +12,9 @@ func enter() -> void:
 func physics_update(delta: float) -> void:
 	player.apply_horizontal_movement(delta)
 
+	if player.can_dash() and Input.is_action_just_pressed("dash"):
+		transitioned.emit(PlayerState.STATE_ID.DASH)
+		return
+		
 	if player.velocity.y >= 0:
 		transitioned.emit(PlayerState.STATE_ID.FALL)

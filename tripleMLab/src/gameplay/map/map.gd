@@ -52,7 +52,7 @@ func create_map() -> void:
 
 	# Final Room Needs Manual Spawning (once, not per row)
 	var middle: int = floori(MapGenerator.WIDTH * .5)
-	_add_map_node(map_data[MapGenerator.HEIGHT - 1][middle])
+	_add_map_node(map_data[MapGenerator.LENGTH - 1][middle])
 
 	_centre_visuals()
 

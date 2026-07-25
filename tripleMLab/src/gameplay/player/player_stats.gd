@@ -31,3 +31,7 @@ class_name PlayerStats
 # Double jump
 @export var double_jump_velocity: float = -360.0
 @export var max_air_jumps: int = 1
+
+# Dash
+@export var dash_speed: float = 600.0
+@export var dash_duration: float = 0.15

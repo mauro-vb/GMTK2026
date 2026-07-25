@@ -12,9 +12,22 @@
 [ext_resource type="Script" uid="uid://sicf3k0fekb2" path="res://src/gameplay/player/states/state_fall.gd" id="6_21ga0"]
 [ext_resource type="Script" uid="uid://ckgn0cpv58vxk" path="res://src/gameplay/player/states/state_pogo.gd" id="8_7og37"]
 [ext_resource type="Script" uid="uid://56g3dyfqc6ed" path="res://src/gameplay/player/states/state_double_jump.gd" id="9_vgqeu"]
+[ext_resource type="Script" uid="uid://n8mnvoaov5dv" path="res://src/gameplay/player/states/state_dash.gd" id="13_o6jv2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_w2ppj"]
 size = Vector2(12, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_adnpx"]
+atlas = ExtResource("4_o6jv2")
+region = Rect2(60, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2e0cw"]
+atlas = ExtResource("4_o6jv2")
+region = Rect2(90, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0igfg"]
+atlas = ExtResource("4_o6jv2")
+region = Rect2(150, 0, 30, 42)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_xxijo"]
 atlas = ExtResource("3_6dqrw")
@@ -44,10 +57,6 @@ region = Rect2(150, 0, 30, 42)
 atlas = ExtResource("3_6dqrw")
 region = Rect2(180, 0, 30, 42)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_woyon"]
-atlas = ExtResource("5_ypdxs")
-region = Rect2(120, 0, 30, 42)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_11xxe"]
 atlas = ExtResource("4_o6jv2")
 region = Rect2(0, 0, 30, 42)
@@ -56,21 +65,9 @@ region = Rect2(0, 0, 30, 42)
 atlas = ExtResource("4_o6jv2")
 region = Rect2(30, 0, 30, 42)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_adnpx"]
-atlas = ExtResource("4_o6jv2")
-region = Rect2(60, 0, 30, 42)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_2e0cw"]
-atlas = ExtResource("4_o6jv2")
-region = Rect2(90, 0, 30, 42)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_55st4"]
 atlas = ExtResource("4_o6jv2")
 region = Rect2(120, 0, 30, 42)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_0igfg"]
-atlas = ExtResource("4_o6jv2")
-region = Rect2(150, 0, 30, 42)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_rl7mo"]
 atlas = ExtResource("4_o6jv2")
@@ -92,6 +89,10 @@ region = Rect2(60, 0, 30, 42)
 atlas = ExtResource("5_ypdxs")
 region = Rect2(90, 0, 30, 42)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_woyon"]
+atlas = ExtResource("5_ypdxs")
+region = Rect2(120, 0, 30, 42)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_xgn5k"]
 atlas = ExtResource("5_ypdxs")
 region = Rect2(150, 0, 30, 42)
@@ -102,6 +103,23 @@ region = Rect2(180, 0, 30, 42)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_r4liw"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_adnpx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2e0cw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0igfg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_adnpx")
+}],
+"loop": 0,
+"name": &"dash",
+"speed": 14.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_xxijo")
@@ -146,9 +164,6 @@ animations = [{
 "speed": 14.0
 }, {
 "frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_woyon")
-}, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_b1yrm")
 }],
@@ -255,8 +270,7 @@ shape = SubResource("RectangleShape2D_w2ppj")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=162606036]
 position = Vector2(2, 10)
 sprite_frames = SubResource("SpriteFrames_r4liw")
-animation = &"run"
-frame_progress = 0.5477125
+animation = &"idle"
 
 [node name="StateMachine" type="Node" parent="." unique_id=90990164]
 unique_name_in_owner = true
@@ -280,6 +294,10 @@ script = ExtResource("8_7og37")
 [node name="StateDoubleJump" type="Node" parent="StateMachine" unique_id=1346345358]
 script = ExtResource("9_vgqeu")
 metadata/_custom_type_script = "uid://56g3dyfqc6ed"
+
+[node name="StateDash" type="Node" parent="StateMachine" unique_id=1230562847]
+script = ExtResource("13_o6jv2")
+metadata/_custom_type_script = "uid://n8mnvoaov5dv"
 
 [node name="PogoDetector" type="Area2D" parent="." unique_id=1963245913]
 position = Vector2(1, 8)
