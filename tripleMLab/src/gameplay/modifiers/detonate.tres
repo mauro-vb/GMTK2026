@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="DetonateModifier" format=3 uid="uid://dr8kn3wqz5jvm"]
+[gd_resource type="Resource" script_class="DetonateModifier" format=3 uid="uid://dr8kn3wq05jvm"]
 
 [ext_resource type="Script" uid="uid://ck4hs7mzq9bwx" path="res://src/gameplay/systems/modifiers_system/detonate_modifier.gd" id="1_dt001"]
 

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="MapTimeModifier" format=3 uid="uid://cw7dm2vqk9tbs"]
+[gd_resource type="Resource" script_class="MapTimeModifier" format=3 uid="uid://cw7dm2vqlatbs"]
 
 [ext_resource type="Script" uid="uid://bp2vk6shd3wnq" path="res://src/gameplay/systems/modifiers_system/map_time_modifier.gd" id="1_lw001"]
 

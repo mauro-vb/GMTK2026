@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GainModifierModifier" format=3 uid="uid://cz3jq8vpk6mrt"]
+[gd_resource type="Resource" script_class="GainModifierModifier" format=3 uid="uid://c03jq8vpk6mrt"]
 
 [ext_resource type="Script" uid="uid://dh6qw2nrk8vsy" path="res://src/gameplay/systems/modifiers_system/gain_modifier_modifier.gd" id="1_lf001"]
 [ext_resource type="Resource" uid="uid://bm5tc7xdw2nhk" path="res://src/gameplay/modifiers/fresh_fuse.tres" id="2_lf002"]
