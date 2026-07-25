@@ -35,3 +35,7 @@ class_name PlayerStats
 # Dash
 @export var dash_speed: float = 600.0
 @export var dash_duration: float = 0.15
+
+# Drop through (jump + down on a drop-through platform)
+@export var drop_through_velocity: float = 80.0  # nudge downward so the drop reads instantly
+@export var drop_through_time: float = 0.2       # how long the platform is ignored for

@@ -8,6 +8,7 @@
 [ext_resource type="TileSet" uid="uid://buff046vfej1g" path="res://src/levels/tilesets/level_tileset.tres" id="6_fb54y"]
 [ext_resource type="PackedScene" uid="uid://gc2ml1e5xwrm" path="res://src/levels/level_objects/platforms/normal/NormalPlatform.tscn" id="7_w5dcc"]
 [ext_resource type="PackedScene" uid="uid://vfgbeafbho51" path="res://src/levels/level_objects/orb/Orb.tscn" id="8_ve225"]
+[ext_resource type="PackedScene" uid="uid://d1nnx3b3ntv5n" path="res://src/levels/level_objects/platforms/dropthrough_platforms/DropThroughPlatform.tscn" id="9_dt1k4"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_po2kx"]
 
@@ -60,6 +61,10 @@ size = 1
 [node name="NormalPlatform2" parent="." unique_id=355285607 instance=ExtResource("7_w5dcc")]
 position = Vector2(96, 112)
 size = 5
+
+[node name="DropThroughPlatform" parent="." unique_id=1394827510 instance=ExtResource("9_dt1k4")]
+position = Vector2(136, 140)
+size = 4
 
 [node name="Orb" parent="." unique_id=1840351593 instance=ExtResource("8_ve225")]
 position = Vector2(96, 88)
