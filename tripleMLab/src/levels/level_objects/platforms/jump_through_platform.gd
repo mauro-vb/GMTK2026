@@ -4,7 +4,7 @@ extends AnimatableBody2D
 # Signals
 # Constants
 const COLLISION_LAYER: int = 9
-const ONE_WAY_COLLISION_MARGIN: float = 7.0
+const ONE_WAY_COLLISION_MARGIN: float = 10.0
 
 # Exports
 @export var size: int = 3
