@@ -29,9 +29,9 @@ func _ready() -> void:
 	
 	detection_area.body_entered.connect(_on_body_entered)
 	if break_on_jump:
-		center_sprite.texture = load("res://assets/art/platforms/breaking_platforms/CenterBreakonJump.png")
-		left_sprite.texture = load("res://assets/art/platforms/breaking_platforms/LeftBreakonJump.png")
-		right_sprite.texture = load("res://assets/art/platforms/breaking_platforms/RightBreakonJump.png")
+		center_sprite.texture = load("uid://cvoa5rv1cetmh")
+		left_sprite.texture = load("uid://dwcmt18hlk5cg")
+		right_sprite.texture = load("uid://dy3ws30u20ctr")
 		detection_area.body_exited.connect(_on_body_exited)
 
 # Private

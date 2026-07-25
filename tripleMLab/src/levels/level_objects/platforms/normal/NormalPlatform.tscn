@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://gc2ml1e5xwrm"]
+
+[ext_resource type="Script" uid="uid://cs13a5ffaep16" path="res://src/levels/level_objects/platforms/normal/normal_platform.gd" id="1_htxs7"]
+[ext_resource type="Texture2D" uid="uid://dw4ayya7cxxyg" path="res://assets/art/platforms/normal_platform/CenterNormal.png" id="2_i55ah"]
+[ext_resource type="Texture2D" uid="uid://dx8yloxgac77v" path="res://assets/art/platforms/normal_platform/LeftNormal.png" id="3_o6a6t"]
+[ext_resource type="Texture2D" uid="uid://bd3a2lsop2yjt" path="res://assets/art/platforms/normal_platform/RightNormal.png" id="4_u6ydo"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eb8ma"]
+resource_local_to_scene = true
+size = Vector2(24, 6)
+
+[node name="NormalPlatform" type="AnimatableBody2D" unique_id=791161608]
+script = ExtResource("1_htxs7")
+metadata/_custom_type_script = "uid://gidiyp0ynyat"
+
+[node name="Visuals" type="Node2D" parent="." unique_id=934712968]
+unique_name_in_owner = true
+
+[node name="CenterSprite" type="Sprite2D" parent="Visuals" unique_id=1351328026]
+unique_name_in_owner = true
+texture_repeat = 2
+position = Vector2(0, 3)
+texture = ExtResource("2_i55ah")
+region_enabled = true
+region_rect = Rect2(0, 0, 8, 6)
+
+[node name="LeftSprite" type="Sprite2D" parent="Visuals" unique_id=891080660]
+unique_name_in_owner = true
+position = Vector2(-8, 3)
+texture = ExtResource("3_o6a6t")
+region_enabled = true
+region_rect = Rect2(0, 0, 8, 6)
+
+[node name="RightSprite" type="Sprite2D" parent="Visuals" unique_id=1915801777]
+unique_name_in_owner = true
+position = Vector2(8, 3)
+texture = ExtResource("4_u6ydo")
+region_enabled = true
+region_rect = Rect2(0, 0, 8, 6)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=686191349]
+unique_name_in_owner = true
+visible = false
+position = Vector2(0, 3)
+shape = SubResource("RectangleShape2D_eb8ma")
+one_way_collision = true

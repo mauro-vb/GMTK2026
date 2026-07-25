@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c2g85bh61el1e"]
 
-[ext_resource type="Script" uid="uid://mrij1w8mbngl" path="res://src/levels/level_objects/platforms/breaking_platforms/breaking_platform.gd" id="1_k40yn"]
+[ext_resource type="Script" uid="uid://mrij1w8mbngl" path="res://src/levels/level_objects/platforms/breaking/breaking_platform.gd" id="1_k40yn"]
 [ext_resource type="Texture2D" uid="uid://qujh4lhakq2d" path="res://assets/art/platforms/breaking_platforms/CenterBreaking.png" id="2_p53o3"]
 [ext_resource type="Texture2D" uid="uid://6115hhpbal7l" path="res://assets/art/platforms/breaking_platforms/LeftBreaking.png" id="3_84f7s"]
 [ext_resource type="Texture2D" uid="uid://ufqsngqvyrt7" path="res://assets/art/platforms/breaking_platforms/RightBreaking.png" id="4_n4eca"]
