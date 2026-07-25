@@ -1,6 +1,11 @@
 [gd_scene format=3 uid="uid://gkjr0jw35tlv"]
 
 [ext_resource type="Script" uid="uid://dp4wolcchrafv" path="res://src/levels/level_objects/player_spawn/player_spawn.gd" id="1_fcirr"]
+[ext_resource type="Texture2D" uid="uid://brb226n072qet" path="res://assets/art/level_elements/EntranceDoor.png" id="2_qluac"]
 
 [node name="PlayerSpawn" type="Node2D" unique_id=1373603790]
 script = ExtResource("1_fcirr")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=652955692]
+position = Vector2(0, -0.5)
+texture = ExtResource("2_qluac")
