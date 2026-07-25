@@ -8,16 +8,24 @@
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_y5cp6"]
 texture = ExtResource("1_8ieel")
 texture_margin_left = 2.0
-texture_margin_top = 2.0
+texture_margin_top = 4.0
 texture_margin_right = 2.0
 texture_margin_bottom = 3.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_t0lsh"]
 texture = ExtResource("2_cotu6")
 texture_margin_left = 2.0
-texture_margin_top = 2.0
+texture_margin_top = 4.0
 texture_margin_right = 2.0
 texture_margin_bottom = 7.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cotu6"]
+texture = ExtResource("1_8ieel")
+texture_margin_left = 2.0
+texture_margin_top = 4.0
+texture_margin_right = 2.0
+texture_margin_bottom = 3.0
+modulate_color = Color(0.52906674, 0.5290667, 0.5290667, 1)
 
 [resource]
 Button/colors/font_color = Color(0.88235295, 0.93333334, 0.84705883, 1)
@@ -25,6 +33,7 @@ Button/font_sizes/font_size = 12
 Button/fonts/font = ExtResource("1_cotu6")
 Button/styles/hover = SubResource("StyleBoxTexture_y5cp6")
 Button/styles/normal = SubResource("StyleBoxTexture_t0lsh")
+Button/styles/pressed = SubResource("StyleBoxTexture_cotu6")
 TooltipPanel/colors/title_color = Color(0.16862746, 0.16078432, 0.28235295, 1)
 TooltipPanel/font_sizes/title_font_size = 6
 TooltipPanel/fonts/title_font = ExtResource("1_2i2tj")

@@ -7,6 +7,9 @@
 [node name="Map" type="Node2D" unique_id=999007867]
 script = ExtResource("1_e5mg7")
 
+[node name="Camera2D" type="Camera2D" parent="." unique_id=602085225]
+unique_name_in_owner = true
+
 [node name="Visuals" type="Node2D" parent="." unique_id=1914238985]
 unique_name_in_owner = true
 
