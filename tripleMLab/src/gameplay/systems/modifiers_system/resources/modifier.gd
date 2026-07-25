@@ -66,6 +66,40 @@ func blocks_orb(_orb_trigger: Type) -> bool:
 func modify_orb_value(_orb_trigger: Type, value: float) -> float:
 	return value
 
+# Workshop hooks. Same shape as the orb hooks above: the workshop asks every
+# held modifier to adjust its numbers before it lays the bench out, so a
+# modifier changes what a workshop *is* without the workshop knowing it exists.
+# All of them are pass-through by default; see WorkshopModifier for the ones
+# that actually answer.
+
+## How many modifiers get laid out on the bench.
+func modify_workshop_offers(count: int) -> int:
+	return count
+
+## How many of those the player is allowed to walk away with.
+func modify_workshop_picks(count: int) -> int:
+	return count
+
+## How many times the bench can be swept and re-laid.
+func modify_workshop_rerolls(count: int) -> int:
+	return count
+
+## Rebalances the draw — the hook behind "offers skew rare". Called once per
+## candidate entry, with that entry's own weight.
+func modify_workshop_offer_weight(weight: float, _tier: Rarity.Tier) -> float:
+	return weight
+
+## Seconds paid out for walking away from the bench without taking anything.
+func modify_workshop_skip_bonus(seconds: float) -> float:
+	return seconds
+
+## Called on every held modifier once a workshop visit ends. Return true to be
+## dropped — that's how a one-shot workshop perk spends itself. `picks_taken` is
+## what the player actually left with, so a perk can decline to be spent on a
+## visit where it did nothing.
+func on_workshop_visited(_picks_taken: int) -> bool:
+	return false
+
 func get_description() -> String:
 	return description
 

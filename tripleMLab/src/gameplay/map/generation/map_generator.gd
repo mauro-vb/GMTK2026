@@ -19,12 +19,12 @@ const PATHS: int = 3
 
 # Room type distribution
 const LEVEL_ROOM_WEIGHT: float = 10.0
-const SHOP_ROOM_WEIGHT: float = 2.5
+const WORKSHOP_ROOM_WEIGHT: float = 2.5
 const HEAL_ROOM_WEIGHT: float = 4.0
 
 var random_node_type_total_weights: Dictionary[Room.Type, float] = {
 	Room.Type.LEVEL: 0.0,
-	Room.Type.SHOP: 0.0,
+	Room.Type.WORKSHOP: 0.0,
 	Room.Type.HEAL: 0.0,
 }
 
@@ -44,7 +44,8 @@ func generate_map() -> Array[Array]:
 	_setup_final_node()
 	_setup_random_node_weights()
 	_setup_node_types()
-	
+	_apply_scene_uids()
+
 	return map_data
 	
 func _generate_initial_grid() -> Array[Array]:
@@ -133,9 +134,9 @@ func _setup_final_node() -> void:
 func _setup_random_node_weights() -> void:
 	random_node_type_total_weights[Room.Type.LEVEL] = LEVEL_ROOM_WEIGHT
 	random_node_type_total_weights[Room.Type.HEAL] = LEVEL_ROOM_WEIGHT + HEAL_ROOM_WEIGHT
-	random_node_type_total_weights[Room.Type.SHOP] = LEVEL_ROOM_WEIGHT + HEAL_ROOM_WEIGHT + SHOP_ROOM_WEIGHT
+	random_node_type_total_weights[Room.Type.WORKSHOP] = LEVEL_ROOM_WEIGHT + HEAL_ROOM_WEIGHT + WORKSHOP_ROOM_WEIGHT
 	
-	random_node_type_total_weight = random_node_type_total_weights[Room.Type.SHOP]
+	random_node_type_total_weight = random_node_type_total_weights[Room.Type.WORKSHOP]
 	
 func _setup_node_types() -> void:
 	var set_full_row: Callable = func(y: int, type: Room.Type) -> void:
@@ -154,6 +155,13 @@ func _setup_node_types() -> void:
 				if next_node.type == Room.Type.NOT_ASSIGNED:
 					_set_node_randomly(next_node)
 	
+## Types are picked first and the scene each one loads is resolved after, so a
+## room only has to be told what it is, never what file that means.
+func _apply_scene_uids() -> void:
+	for current_row: Array[Room] in map_data:
+		for node: Room in current_row:
+			node.apply_type_scene()
+
 func _set_node_randomly(node: Room) -> void:
 	var is_consecutive_type: Callable = func(candidate: Room.Type, type: Room.Type) -> bool:
 		return candidate == type and _node_has_parent_of_type(node, type)
@@ -163,19 +171,19 @@ func _set_node_randomly(node: Room) -> void:
 	var heal_before_4: bool = true
 	# No consecutive heals
 	var consecutive_heal: bool = true
-	# No consecutive shops
-	var consecutive_shop: bool = true
+	# No consecutive workshops
+	var consecutive_workshop: bool = true
 	# No heals after specified row (that is forced to be heal)
 	var heal_on_specific_row: bool = true
 
 	var type_candidate: Room.Type = Room.Type.NOT_ASSIGNED
 	
-	while heal_before_4 or consecutive_heal or consecutive_shop or heal_on_specific_row:
+	while heal_before_4 or consecutive_heal or consecutive_workshop or heal_on_specific_row:
 		type_candidate = _get_random_node_type_by_weight()
 		
 		heal_before_4 = type_candidate == Room.Type.HEAL and node.coordinates.y < 3
 		consecutive_heal = is_consecutive_type.call(type_candidate, Room.Type.HEAL)
-		consecutive_shop = is_consecutive_type.call(type_candidate, Room.Type.SHOP)
+		consecutive_workshop = is_consecutive_type.call(type_candidate, Room.Type.WORKSHOP)
 		heal_on_specific_row = type_candidate == Room.Type.HEAL and node.coordinates.y == floori(LENGTH * .5) + 1
 		
 	node.type = type_candidate

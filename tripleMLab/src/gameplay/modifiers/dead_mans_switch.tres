@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ConditionalTimeModifier" format=3 uid="uid://cn5wj8kzr3mqv"]
+
+[ext_resource type="Script" uid="uid://bx3mvp8ldz6te" path="res://src/gameplay/systems/modifiers_system/conditional_time_modifier.gd" id="1_dm001"]
+[ext_resource type="Resource" uid="uid://dh7bq2nvx9kwl" path="res://src/gameplay/modifiers/punctured_tank.tres" id="2_dm002"]
+
+[resource]
+script = ExtResource("1_dm001")
+comparison = 1
+threshold_seconds = 10.0
+amount = 14.0
+type = 1
+modifier_name = "Dead Man's Switch"
+id = "dead_mans_switch"
+description = "In and out before it notices you were there. Clear a level in under 10 seconds and gain 14."
+linked_modifier = ExtResource("2_dm002")
+metadata/_custom_type_script = "uid://bx3mvp8ldz6te"

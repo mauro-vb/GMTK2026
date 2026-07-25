@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="WorkshopModifier" format=3 uid="uid://dw9qt6mnb4xks"]
+
+[ext_resource type="Script" uid="uid://cv9jm4pkt7bzn" path="res://src/gameplay/systems/modifiers_system/workshop_modifier.gd" id="1_bp001"]
+[ext_resource type="Resource" uid="uid://dv3nb8kxm6qwl" path="res://src/gameplay/modifiers/cluttered_bench.tres" id="2_bp002"]
+
+[resource]
+script = ExtResource("1_bp001")
+common_weight_scale = 0.5
+rare_weight_scale = 1.8
+exotic_weight_scale = 3.0
+type = 2
+modifier_name = "Blueprints"
+id = "blueprints"
+description = "You know exactly what to ask for. Workshops turn up better tools - on a smaller bench."
+linked_modifier = ExtResource("2_bp002")
+metadata/_custom_type_script = "uid://cv9jm4pkt7bzn"

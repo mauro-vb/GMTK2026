@@ -10,6 +10,11 @@ const MODIFIER_DISPLAY_SCENE_UID: String = "uid://dv6ct8mkr3jqw"
 const MAP_SCENE_UID: String = "uid://ipmc68r6n333"
 const PLAYER_SCENE_UID: String = "uid://kwjq37d8yab5"
 const TEST_LEVEL_UID: String = "res://src/levels/initial_levels/InitialLevel1.tscn"
+const WORKSHOP_SCENE_UID: String = "uid://bkq7wn3vxm2td"
+
+# WORKSHOP
+const WORKSHOP_DEFAULT_POOL_UID: String = "uid://cm2vj7xkq9nsw"
+const WORKSHOP_CARD_SCENE_UID: String = "uid://dp5nt8crj4wxb"
 
 # SYSTEMS
 const TIME_SYSTEM_UID: String = "uid://bjktioxpxjuo"
@@ -47,3 +52,17 @@ const DOUBLE_JUMP_UPGRADE_UID: String = "uid://dq2xs7wkh4mtb"
 const COSTLY_DASH_UID: String = "uid://bv7ln4srj9tqc"
 const COSTLY_POGO_UID: String = "uid://cx2qm8wbk5nhd"
 const BIGGER_TANK_UID: String = "uid://dm6ts3xvp7cwl"
+const WET_WICK_UID: String = "uid://bk2mv7xqc5nrt"
+const FROST_GRIP_UID: String = "uid://cq8vn3mtx7bkw"
+const COLD_STORAGE_UID: String = "uid://bw3nk6vqm8trx"
+const DEAD_MANS_SWITCH_UID: String = "uid://cn5wj8kzr3mqv"
+const PUNCTURED_TANK_UID: String = "uid://dh7bq2nvx9kwl"
+const CHAIN_REACTION_UID: String = "uid://dg4kw9pnb2vsm"
+
+# MODIFIERS - workshop terms
+const SECOND_SET_OF_HANDS_UID: String = "uid://bs4mv9xkq7ntd"
+const OPEN_BENCH_UID: String = "uid://cd7nk3wvx5rmp"
+const CLUTTERED_BENCH_UID: String = "uid://dv3nb8kxm6qwl"
+const BLUEPRINTS_UID: String = "uid://dw9qt6mnb4xks"
+const SCRAP_HEAP_UID: String = "uid://bh5jx2vwc8ntr"
+const UNION_BREAK_UID: String = "uid://ck6mw4rzq9vbt"

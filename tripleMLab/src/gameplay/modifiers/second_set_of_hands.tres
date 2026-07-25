@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WorkshopModifier" format=3 uid="uid://bs4mv9xkq7ntd"]
+
+[ext_resource type="Script" uid="uid://cv9jm4pkt7bzn" path="res://src/gameplay/systems/modifiers_system/workshop_modifier.gd" id="1_ss001"]
+
+[resource]
+script = ExtResource("1_ss001")
+extra_picks = 1
+consume_on_use = true
+type = 2
+modifier_name = "Second Set of Hands"
+id = "second_set_of_hands"
+description = "Someone else holds the ladder while you rummage. Take two modifiers from a workshop instead of one."
+metadata/_custom_type_script = "uid://cv9jm4pkt7bzn"

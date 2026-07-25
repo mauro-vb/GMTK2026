@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FreezeModifier" format=3 uid="uid://bw3nk6vqm8trx"]
+
+[ext_resource type="Script" uid="uid://cq7wn3xmv1a4k" path="res://src/gameplay/systems/modifiers_system/freeze_modifier.gd" id="1_cs001"]
+
+[resource]
+script = ExtResource("1_cs001")
+freeze_seconds = 3.0
+type = 0
+modifier_name = "Cold Storage"
+id = "cold_storage"
+description = "Everything in here is stiff, including you. The first 3 seconds of a level are spent thawing out."
+metadata/_custom_type_script = "uid://cq7wn3xmv1a4k"
