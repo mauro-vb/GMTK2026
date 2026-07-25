@@ -18,6 +18,8 @@ func enter() -> void:
 
 func exit() -> void:
 	player.is_dashing = false
+	var carry_speed: float = stats.move_speed
+	player.velocity.x = clamp(player.velocity.x, -carry_speed, carry_speed)
 
 func physics_update(delta: float) -> void:
 	_dash_timer -= delta
