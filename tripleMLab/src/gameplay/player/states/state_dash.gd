@@ -14,8 +14,8 @@ func enter() -> void:
 	player.velocity.y = 0.0 
 	player.velocity.x = stats.dash_speed * _dash_direction
 	player.consume_dash()
-	player.play_animation("dash")
-
+	player.play_dash_animation()
+	
 func exit() -> void:
 	player.is_dashing = false
 	var carry_speed: float = stats.move_speed
