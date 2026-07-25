@@ -14,13 +14,13 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 process_mode = 1
 
-[node name="PlayerRoot" type="Node2D" parent="World" unique_id=11877546]
-unique_name_in_owner = true
-
 [node name="LevelRoot" type="Node2D" parent="World" unique_id=1081947092]
 unique_name_in_owner = true
 
 [node name="EntityRoot" type="Node2D" parent="World" unique_id=146542494]
+unique_name_in_owner = true
+
+[node name="PlayerRoot" type="Node2D" parent="World" unique_id=11877546]
 unique_name_in_owner = true
 
 [node name="VisualEffectsRoot" type="Node2D" parent="World" unique_id=1264653061]

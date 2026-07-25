@@ -8,12 +8,6 @@
 [ext_resource type="TileSet" uid="uid://buff046vfej1g" path="res://src/levels/tilesets/level_tileset.tres" id="6_8gqqd"]
 [ext_resource type="PackedScene" uid="uid://gc2ml1e5xwrm" path="res://src/levels/level_objects/platforms/normal/NormalPlatform.tscn" id="7_hgpkl"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_munyu"]
-size = Vector2(386.5, 27)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hphrt"]
-size = Vector2(20, 83)
-
 [sub_resource type="CircleShape2D" id="CircleShape2D_o7p7h"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_munyu"]
@@ -23,11 +17,11 @@ script = ExtResource("1_01rr6")
 
 [node name="PlayerSpawn" parent="." unique_id=1140908321 instance=ExtResource("2_t75tf")]
 unique_name_in_owner = true
-position = Vector2(24, 240)
+position = Vector2(24, 248)
 
 [node name="LevelExit" parent="." unique_id=167028476 instance=ExtResource("3_01rr6")]
 unique_name_in_owner = true
-position = Vector2(453, 310)
+position = Vector2(432, 328)
 
 [node name="BreakingPlatform" parent="." unique_id=242398333 instance=ExtResource("5_w2ppj")]
 position = Vector2(408, 200)
