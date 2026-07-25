@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AddTimeModifier" format=3 uid="uid://bk9wv3mqn6xtc"]
+
+[ext_resource type="Script" uid="uid://cupqjl1qe32nd" path="res://src/gameplay/systems/modifiers_system/add_time_modifier.gd" id="1_hazard_p"]
+[ext_resource type="Resource" uid="uid://dh7bq2nvx9kwl" path="res://src/gameplay/modifiers/punctured_tank.tres" id="2_hazard_p"]
+
+[resource]
+script = ExtResource("1_hazard_p")
+amount = 6
+type = 1
+modifier_name = "Hazard Pay"
+id = "hazard_pay"
+description = "Danger money, paid per job. Gain 6 seconds every time a level is completed."
+linked_modifier = ExtResource("2_hazard_p")
+metadata/_custom_type_script = "uid://cupqjl1qe32nd"

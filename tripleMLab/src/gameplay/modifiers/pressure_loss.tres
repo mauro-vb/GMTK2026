@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AddTimeModifier" format=3 uid="uid://bn3kw7vqx2mtd"]
+
+[ext_resource type="Script" uid="uid://cupqjl1qe32nd" path="res://src/gameplay/systems/modifiers_system/add_time_modifier.gd" id="1_pressure"]
+
+[resource]
+script = ExtResource("1_pressure")
+amount = -5
+type = 1
+modifier_name = "Pressure Loss"
+id = "pressure_loss"
+description = "The seals weep. Lose 5 seconds at the end of every level."
+metadata/_custom_type_script = "uid://cupqjl1qe32nd"

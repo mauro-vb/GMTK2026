@@ -41,8 +41,8 @@ var _motion_tween: Tween
 @onready var visual: Control = %Visual
 @onready var glow: Panel = %Glow
 @onready var frame: PanelContainer = %Frame
-@onready var ribbon: PanelContainer = %Ribbon
-@onready var rarity_label: Label = %RarityLabel
+@onready var seam: PanelContainer = %Seam
+@onready var seam_label: Label = %SeamLabel
 @onready var plinth: PanelContainer = %Plinth
 @onready var icon_rect: TextureRect = %Icon
 @onready var name_label: Label = %NameLabel
@@ -183,14 +183,20 @@ func _apply_entry() -> void:
 	name_label.text = modifier.modifier_name
 	WorkshopStyle.apply_text(name_label, WorkshopStyle.FONT_DISPLAY, WorkshopStyle.SIZE_CARD_NAME, WorkshopStyle.PARCHMENT)
 
-	rarity_label.text = Rarity.display_name(entry.tier)
-	WorkshopStyle.apply_text(rarity_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_RIBBON, WorkshopStyle.ribbon_text_color(entry.tier))
-	ribbon.add_theme_stylebox_override(&"panel", WorkshopStyle.card_ribbon(entry.tier))
-	ribbon.custom_minimum_size.y = WorkshopStyle.RIBBON_HEIGHT
+	# The seam names what the card costs, taken straight from the trade-off it
+	# links — so a combined card can never advertise a drawback it doesn't grant.
+	# A plain card has no seam at all and gives the space back to its own name.
+	var combined: bool = entry.is_combined()
+	seam.visible = combined
+	if combined:
+		seam_label.text = modifier.linked_modifier.modifier_name.to_upper()
+		WorkshopStyle.apply_text(seam_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_SEAM, WorkshopStyle.CAUTION)
+		seam.add_theme_stylebox_override(&"panel", WorkshopStyle.card_seam())
+		seam.custom_minimum_size.y = WorkshopStyle.SEAM_HEIGHT
 
-	glow.add_theme_stylebox_override(&"panel", WorkshopStyle.card_glow(entry.tier))
+	glow.add_theme_stylebox_override(&"panel", WorkshopStyle.card_glow(combined))
 
-	WorkshopStyle.apply_text(taken_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_RIBBON, WorkshopStyle.SPARK)
+	WorkshopStyle.apply_text(taken_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_SEAM, WorkshopStyle.SPARK)
 	taken_overlay.visible = false
 	taken_overlay.modulate.a = 0.0
 
@@ -212,7 +218,7 @@ func _apply_emphasis(value: float) -> void:
 	if entry == null:
 		return
 
-	frame.add_theme_stylebox_override(&"panel", WorkshopStyle.card_frame(entry.tier, value))
+	frame.add_theme_stylebox_override(&"panel", WorkshopStyle.card_frame(entry.is_combined(), value))
 	glow.modulate.a = value
 
 	if not taken:

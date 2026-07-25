@@ -5,12 +5,11 @@
 
 [resource]
 script = ExtResource("1_bp001")
-common_weight_scale = 0.5
-rare_weight_scale = 1.8
-exotic_weight_scale = 3.0
+clean_weight_scale = 2.0
+combined_weight_scale = 0.25
 type = 2
 modifier_name = "Blueprints"
 id = "blueprints"
-description = "You know exactly what to ask for. Workshops turn up better tools - on a smaller bench."
+description = "You read the small print before signing. Workshops mostly lay out tools with no catch - on a smaller bench."
 linked_modifier = ExtResource("2_bp002")
 metadata/_custom_type_script = "uid://cv9jm4pkt7bzn"

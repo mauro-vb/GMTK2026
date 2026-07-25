@@ -69,6 +69,7 @@ stretch_mode = 5
 
 [node name="NameLabel" type="Label" parent="Visual/Frame/Body"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 19)
 layout_mode = 2
 mouse_filter = 2
 text = "Modifier"
@@ -76,20 +77,17 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Ribbon" type="PanelContainer" parent="Visual"]
+[node name="Seam" type="PanelContainer" parent="Visual/Frame/Body"]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 9.0
-grow_horizontal = 2
+visible = false
+layout_mode = 2
 mouse_filter = 2
 
-[node name="RarityLabel" type="Label" parent="Visual/Ribbon"]
+[node name="SeamLabel" type="Label" parent="Visual/Frame/Body/Seam"]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
-text = "COMMON"
+text = "DRAWBACK"
 horizontal_alignment = 1
 vertical_alignment = 1
 clip_text = true

@@ -26,7 +26,7 @@ func draw(count: int, depth: int, modifiers_system: ModifiersSystem) -> Array[Wo
 	for entry: WorkshopEntry in entries:
 		if entry == null or not entry.is_available(depth, modifiers_system):
 			continue
-		var weight: float = entry.get_draw_weight(depth, modifiers_system)
+		var weight: float = entry.get_draw_weight(modifiers_system)
 		if weight <= 0.0:
 			continue
 

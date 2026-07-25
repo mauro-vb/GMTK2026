@@ -64,6 +64,37 @@ func _check_entries(pool: WorkshopPool) -> void:
 		seen[entry.modifier.id] = true
 
 	_check(broken == 0, "every entry resolves a named, uniquely-ided modifier")
+	_check_combined(pool)
+
+
+## The invariant that makes combined cards safe to author: a drawback is only
+## ever reachable as the second half of something else. If one ever leaks into
+## the pool as its own entry, the workshop would offer the player a pure penalty.
+func _check_combined(pool: WorkshopPool) -> void:
+	var offered: Dictionary[String, bool] = {}
+	for entry: WorkshopEntry in pool.entries:
+		if entry != null and entry.modifier != null:
+			offered[entry.modifier.id] = true
+
+	var combined: int = 0
+	var leaked: Array[String] = []
+	for entry: WorkshopEntry in pool.entries:
+		if entry == null or entry.modifier == null:
+			continue
+		if not entry.is_combined():
+			continue
+
+		combined += 1
+		var drawback: Modifier = entry.modifier.linked_modifier
+		if offered.has(drawback.id):
+			leaked.append(drawback.id)
+		# The seam and the detail panel both print this, so it has to be there.
+		if drawback.modifier_name.is_empty() or drawback.get_description().is_empty():
+			leaked.append(entry.modifier.id)
+
+	_check(combined > 0, "the pool offers combined cards (%d of %d)" % [combined, pool.entries.size()])
+	_check(leaked.is_empty(), "no drawback is offered on its own %s" % ("" if leaked.is_empty() else leaked))
+	_check(combined < pool.entries.size(), "and not every card is combined")
 
 
 ## The draw is the part with real logic in it: weighted, without replacement, and
@@ -103,16 +134,23 @@ func _check_hooks() -> void:
 		"Union Break pays 8 seconds for walking away")
 
 	var blueprints: Modifier = load(UIDs.BLUEPRINTS_UID) as Modifier
-	var common: float = blueprints.modify_workshop_offer_weight(1.0, Rarity.Tier.COMMON)
-	var exotic: float = blueprints.modify_workshop_offer_weight(1.0, Rarity.Tier.EXOTIC)
-	_check(common < 1.0 and exotic > 1.0, "Blueprints skews the draw away from commons")
+	_check(blueprints.modify_workshop_offer_weight(1.0, false) > 1.0
+		and blueprints.modify_workshop_offer_weight(1.0, true) < 1.0,
+		"Blueprints tilts the bench toward cards with no catch")
 	_check(blueprints.linked_modifier != null, "Blueprints drags its trade-off along")
+
+	var danger_money: Modifier = load(UIDs.DANGER_MONEY_UID) as Modifier
+	_check(danger_money.modify_workshop_offer_weight(1.0, true) > 1.0
+		and danger_money.modify_workshop_offer_weight(1.0, false) < 1.0,
+		"Danger Money tilts it the other way")
 
 	# The whole point of putting the hooks on Modifier is that everything else
 	# inherits a "changes nothing" answer for free.
 	var plain: Modifier = load(UIDs.SPARE_FUSE_UID) as Modifier
 	_check(plain.modify_workshop_offers(3) == 3 and plain.modify_workshop_picks(1) == 1,
 		"a non-workshop modifier changes nothing about a bench")
+	_check(is_equal_approx(plain.modify_workshop_offer_weight(1.0, true), 1.0),
+		"...including the draw")
 
 
 # --- The real thing ----------------------------------------------------------
@@ -184,6 +222,44 @@ func _check_live_workshop() -> void:
 	_check(modifiers.modifiers.size() > held_before - 1, "the run came out of the bench richer")
 
 	await _check_sweep_and_leave(game, modifiers)
+	await _check_combined_pick(game, modifiers)
+
+
+## Taking a combined card has to land *both* halves — that is the whole promise
+## the card's seam makes.
+func _check_combined_pick(game: MainGame, modifiers: ModifiersSystem) -> void:
+	print("\n[ taking a combined card ]")
+
+	# Danger Money makes the bench overwhelmingly two-edged, so a combined card
+	# is almost certainly on it; the loop below still copes if one isn't.
+	modifiers.add_modifier(load(UIDs.DANGER_MONEY_UID))
+	game.enter_room(UIDs.WORKSHOP_SCENE_UID, Room.Type.WORKSHOP)
+	var workshop: Workshop = game.get("_current_room") as Workshop
+	if not _check(workshop != null, "a third workshop opens"):
+		return
+
+	await get_tree().create_timer(1.5).timeout
+
+	var target: WorkshopCard = null
+	for card: WorkshopCard in workshop.get("_cards"):
+		if card.entry.is_combined():
+			target = card
+			break
+
+	if not _check(target != null, "Danger Money put a combined card on the bench"):
+		return
+
+	var bonus: Modifier = target.entry.modifier
+	var drawback: Modifier = bonus.linked_modifier
+	_check(target.seam.visible, "the combined card wears its seam")
+	_check(target.seam_label.text == drawback.modifier_name.to_upper(),
+		"the seam names the drawback ('%s')" % target.seam_label.text)
+
+	workshop._on_card_chosen(target)
+	await get_tree().create_timer(1.2).timeout
+
+	_check(modifiers.has_modifier(bonus.id), "the bonus half landed ('%s')" % bonus.id)
+	_check(modifiers.has_modifier(drawback.id), "the drawback half landed too ('%s')" % drawback.id)
 
 
 ## Second visit, with the other two perks on: sweeping the bench, and walking out

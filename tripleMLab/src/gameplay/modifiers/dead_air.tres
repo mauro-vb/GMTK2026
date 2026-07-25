@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://dm6bq4nwx8ktv"]
+
+[ext_resource type="Script" uid="uid://cj9xt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_dead_air"]
+[ext_resource type="Resource" uid="uid://dk5nw9xbm3qvr" path="res://src/gameplay/modifiers/open_circuit.tres" id="2_dead_air"]
+
+[resource]
+script = ExtResource("1_dead_air")
+multiplier = 0.0
+type = 0
+modifier_name = "Dead Air"
+id = "dead_air"
+description = "No draught, no burn. Time does not tick at all in the next level."
+duration = 1
+duration_levels = 1
+linked_modifier = ExtResource("2_dead_air")
+metadata/_custom_type_script = "uid://cj9xt4bvm7dpl"

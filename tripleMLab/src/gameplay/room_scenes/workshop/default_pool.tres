@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="WorkshopPool" load_steps=59 format=3 uid="uid://cm2vj7xkq9nsw"]
+[gd_resource type="Resource" script_class="WorkshopPool" load_steps=79 format=3 uid="uid://cm2vj7xkq9nsw"]
 
 [ext_resource type="Script" uid="uid://bq5xt2nhw8crd" path="res://src/gameplay/systems/modifiers_system/resources/workshop_pool.gd" id="1_pool"]
 [ext_resource type="Script" uid="uid://dk7pv3mzr9jwq" path="res://src/gameplay/systems/modifiers_system/resources/workshop_entry.gd" id="2_entry"]
@@ -30,11 +30,20 @@
 [ext_resource type="Resource" uid="uid://bs4mv9xkq7ntd" path="res://src/gameplay/modifiers/second_set_of_hands.tres" id="m25_second_set_o"]
 [ext_resource type="Resource" uid="uid://dv8ks3mqb7ntw" path="res://src/gameplay/modifiers/speedrunners_prize.tres" id="m26_speedrunners"]
 [ext_resource type="Resource" uid="uid://dg4kw9pnb2vsm" path="res://src/gameplay/modifiers/chain_reaction.tres" id="m27_chain_reacti"]
+[ext_resource type="Resource" uid="uid://cn2vw8kqx4mrb" path="res://src/gameplay/modifiers/short_fuse.tres" id="m28_short_fuse"]
+[ext_resource type="Resource" uid="uid://bk9wv3mqn6xtc" path="res://src/gameplay/modifiers/hazard_pay.tres" id="m29_hazard_pay"]
+[ext_resource type="Resource" uid="uid://bv8mn4kwq3xrt" path="res://src/gameplay/modifiers/cash_advance.tres" id="m30_cash_advance"]
+[ext_resource type="Resource" uid="uid://cq6wb9nxm5vkt" path="res://src/gameplay/modifiers/cold_snap.tres" id="m31_cold_snap"]
+[ext_resource type="Resource" uid="uid://bq7xm3nvk9wtd" path="res://src/gameplay/modifiers/overpressure.tres" id="m32_overpressure"]
+[ext_resource type="Resource" uid="uid://cw5nq8vbm2xkr" path="res://src/gameplay/modifiers/loose_wiring.tres" id="m33_loose_wiring"]
+[ext_resource type="Resource" uid="uid://dn4vm7kqx8wbr" path="res://src/gameplay/modifiers/time_and_a_half.tres" id="m34_time_and_a_h"]
+[ext_resource type="Resource" uid="uid://dt3kx6nwq9vmb" path="res://src/gameplay/modifiers/overcharge.tres" id="m35_overcharge"]
+[ext_resource type="Resource" uid="uid://dm6bq4nwx8ktv" path="res://src/gameplay/modifiers/dead_air.tres" id="m36_dead_air"]
+[ext_resource type="Resource" uid="uid://bh2wq6nvx4mkt" path="res://src/gameplay/modifiers/danger_money.tres" id="m37_danger_money"]
 
 [sub_resource type="Resource" id="Resource_e00"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m00_spare_fuse")
-tier = 0
 weight = 1.0
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -42,7 +51,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e01"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m01_primed")
-tier = 0
 weight = 1.0
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -50,7 +58,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e02"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m02_jerry_can")
-tier = 0
 weight = 1.0
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -58,7 +65,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e03"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m03_warm_catch")
-tier = 0
 weight = 1.0
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -66,7 +72,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e04"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m04_coating")
-tier = 0
 weight = 1.0
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -74,7 +79,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e05"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m05_lucky_break")
-tier = 0
 weight = 1.0
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -82,7 +86,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e06"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m06_wet_wick")
-tier = 0
 weight = 1.0
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -90,7 +93,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e07"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m07_overtime")
-tier = 0
 weight = 1.0
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -98,7 +100,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e08"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m08_barely_made_")
-tier = 0
 weight = 1.0
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -106,7 +107,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e09"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m09_lucky_damp_f")
-tier = 0
 weight = 0.8
 min_depth = 1
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -114,7 +114,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e10"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m10_scrap_heap")
-tier = 0
 weight = 0.8
 min_depth = 1
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -122,7 +121,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e11"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m11_union_break")
-tier = 0
 weight = 0.8
 min_depth = 1
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -130,7 +128,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e12"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m12_bigger_tank")
-tier = 1
 weight = 1.0
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -138,7 +135,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e13"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m13_adrenaline")
-tier = 1
 weight = 1.0
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -146,7 +142,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e14"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m14_dash_upgrade")
-tier = 1
 weight = 1.2
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -154,7 +149,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e15"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m15_double_jump_")
-tier = 1
 weight = 1.2
 min_depth = 0
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -162,7 +156,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e16"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m16_frost_grip")
-tier = 1
 weight = 1.0
 min_depth = 1
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -170,7 +163,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e17"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m17_open_bench")
-tier = 1
 weight = 1.0
 min_depth = 1
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -178,7 +170,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e18"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m18_fresh_fuse")
-tier = 1
 weight = 1.0
 min_depth = 2
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -186,7 +177,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e19"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m19_slow_burn")
-tier = 1
 weight = 1.0
 min_depth = 2
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -194,7 +184,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e20"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m20_double_prime")
-tier = 1
 weight = 1.0
 min_depth = 2
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -202,7 +191,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e21"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m21_damp_fuse")
-tier = 1
 weight = 0.9
 min_depth = 2
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -210,7 +198,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e22"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m22_dead_mans_sw")
-tier = 1
 weight = 1.0
 min_depth = 2
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -218,7 +205,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e23"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m23_lucky_find")
-tier = 1
 weight = 1.0
 min_depth = 2
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -226,7 +212,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e24"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m24_blueprints")
-tier = 1
 weight = 0.9
 min_depth = 2
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -234,7 +219,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e25"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m25_second_set_o")
-tier = 2
 weight = 1.2
 min_depth = 3
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -242,7 +226,6 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e26"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m26_speedrunners")
-tier = 2
 weight = 1.0
 min_depth = 3
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
@@ -250,12 +233,81 @@ metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 [sub_resource type="Resource" id="Resource_e27"]
 script = ExtResource("2_entry")
 modifier = ExtResource("m27_chain_reacti")
-tier = 2
 weight = 1.0
 min_depth = 4
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 
+[sub_resource type="Resource" id="Resource_e28"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m28_short_fuse")
+weight = 1.0
+min_depth = 1
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e29"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m29_hazard_pay")
+weight = 1.0
+min_depth = 1
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e30"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m30_cash_advance")
+weight = 1.0
+min_depth = 1
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e31"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m31_cold_snap")
+weight = 1.0
+min_depth = 2
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e32"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m32_overpressure")
+weight = 1.0
+min_depth = 2
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e33"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m33_loose_wiring")
+weight = 1.0
+min_depth = 2
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e34"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m34_time_and_a_h")
+weight = 1.0
+min_depth = 2
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e35"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m35_overcharge")
+weight = 1.0
+min_depth = 3
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e36"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m36_dead_air")
+weight = 0.9
+min_depth = 3
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e37"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m37_danger_money")
+weight = 0.8
+min_depth = 2
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
 [resource]
 script = ExtResource("1_pool")
-entries = Array[WorkshopEntry]([SubResource("Resource_e00"), SubResource("Resource_e01"), SubResource("Resource_e02"), SubResource("Resource_e03"), SubResource("Resource_e04"), SubResource("Resource_e05"), SubResource("Resource_e06"), SubResource("Resource_e07"), SubResource("Resource_e08"), SubResource("Resource_e09"), SubResource("Resource_e10"), SubResource("Resource_e11"), SubResource("Resource_e12"), SubResource("Resource_e13"), SubResource("Resource_e14"), SubResource("Resource_e15"), SubResource("Resource_e16"), SubResource("Resource_e17"), SubResource("Resource_e18"), SubResource("Resource_e19"), SubResource("Resource_e20"), SubResource("Resource_e21"), SubResource("Resource_e22"), SubResource("Resource_e23"), SubResource("Resource_e24"), SubResource("Resource_e25"), SubResource("Resource_e26"), SubResource("Resource_e27")])
+entries = Array[WorkshopEntry]([SubResource("Resource_e00"), SubResource("Resource_e01"), SubResource("Resource_e02"), SubResource("Resource_e03"), SubResource("Resource_e04"), SubResource("Resource_e05"), SubResource("Resource_e06"), SubResource("Resource_e07"), SubResource("Resource_e08"), SubResource("Resource_e09"), SubResource("Resource_e10"), SubResource("Resource_e11"), SubResource("Resource_e12"), SubResource("Resource_e13"), SubResource("Resource_e14"), SubResource("Resource_e15"), SubResource("Resource_e16"), SubResource("Resource_e17"), SubResource("Resource_e18"), SubResource("Resource_e19"), SubResource("Resource_e20"), SubResource("Resource_e21"), SubResource("Resource_e22"), SubResource("Resource_e23"), SubResource("Resource_e24"), SubResource("Resource_e25"), SubResource("Resource_e26"), SubResource("Resource_e27"), SubResource("Resource_e28"), SubResource("Resource_e29"), SubResource("Resource_e30"), SubResource("Resource_e31"), SubResource("Resource_e32"), SubResource("Resource_e33"), SubResource("Resource_e34"), SubResource("Resource_e35"), SubResource("Resource_e36"), SubResource("Resource_e37")])
 metadata/_custom_type_script = "uid://bq5xt2nhw8crd"

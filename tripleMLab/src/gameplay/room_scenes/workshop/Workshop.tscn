@@ -38,14 +38,14 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 4
+theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_bottom = 5
 
 [node name="Column" type="VBoxContainer" parent="CanvasLayer/UI/Layout"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = 6
 
 [node name="Strip" type="HBoxContainer" parent="CanvasLayer/UI/Layout/Column"]
 layout_mode = 2
@@ -64,6 +64,19 @@ layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
+[node name="Location" type="Label" parent="CanvasLayer/UI/Layout/Column/Strip"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+text = "WORKSHOP"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer2" type="Control" parent="CanvasLayer/UI/Layout/Column/Strip"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
 [node name="CarryRow" type="HBoxContainer" parent="CanvasLayer/UI/Layout/Column/Strip"]
 unique_name_in_owner = true
 clip_contents = true
@@ -76,14 +89,7 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="Label" parent="CanvasLayer/UI/Layout/Column/Header"]
-unique_name_in_owner = true
-layout_mode = 2
-mouse_filter = 2
-text = "WORKSHOP"
-horizontal_alignment = 1
-
-[node name="Subtitle" type="Label" parent="CanvasLayer/UI/Layout/Column/Header"]
+[node name="Instruction" type="Label" parent="CanvasLayer/UI/Layout/Column/Header"]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
@@ -134,6 +140,13 @@ vertical_alignment = 1
 
 [node name="DetailBody" type="Label" parent="CanvasLayer/UI/Layout/Column/Detail/DetailBox"]
 unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+autowrap_mode = 3
+
+[node name="DetailCost" type="Label" parent="CanvasLayer/UI/Layout/Column/Detail/DetailBox"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2

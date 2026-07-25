@@ -8,6 +8,10 @@ the player is carrying. Every number it runs on is a question put to the modifie
 themselves, so a modifier that widens the bench or buys a second pick is **a `.tres` file,
 not a change to the workshop**.
 
+Some cards are **combined**: a bonus that drags a drawback along with it — "+30s
+max time, but −5s at the end of every level". That is authoring rather than code
+too, and §1.4 explains why it needed no new mechanism at all.
+
 This document covers that extension point, the offer pool and its draw, the room's flow,
 the UI's design language, and why each makes the choices it does.
 
@@ -35,8 +39,8 @@ func modify_workshop_offers(count: int) -> int:                        return co
 func modify_workshop_picks(count: int) -> int:                         return count
 ## How many times the bench can be swept and re-laid.
 func modify_workshop_rerolls(count: int) -> int:                       return count
-## Rebalances the draw — the hook behind "offers skew rare".
-func modify_workshop_offer_weight(w: float, _t: Rarity.Tier) -> float: return w
+## Rebalances the draw, by whether a card carries a trade-off.
+func modify_workshop_offer_weight(w: float, _combined: bool) -> float:  return w
 ## Seconds paid out for walking away without taking anything.
 func modify_workshop_skip_bonus(seconds: float) -> float:              return seconds
 ## Return true to be dropped — how a one-shot perk spends itself.
@@ -78,9 +82,8 @@ single modifier often wants two of them at once (a wider bench that skews cheap)
 | `extra_picks` | 0 | how many may be taken. **This is the pick-two perk.** |
 | `extra_rerolls` | 0 | sweeps of the bench |
 | `skip_bonus_seconds` | 0.0 | paid for leaving empty-handed |
-| `common_weight_scale` | 1.0 | multiplier on commons' share of the draw |
-| `rare_weight_scale` | 1.0 | …on rares' |
-| `exotic_weight_scale` | 1.0 | …on exotics' |
+| `clean_weight_scale` | 1.0 | multiplier on plain cards' share of the draw |
+| `combined_weight_scale` | 1.0 | …on trade-off cards' |
 | `consume_on_use` | false | spend itself after a visit the player took from |
 
 Nothing here triggers. `trigger_modifier()` is left as the base no-op — these are answered
@@ -89,21 +92,42 @@ passively, the same way Coating answers orb hooks.
 **`consume_on_use` only fires when `picks_taken > 0`.** Walking away empty-handed doesn't
 burn a one-shot perk, because it didn't do anything.
 
-### 1.4 `Rarity`
+### 1.4 Combined cards need no mechanism
 
-A dependency-free namespace (`RefCounted`, never instantiated) holding the shared
-vocabulary: the `Tier` enum, its display names, its colours, and the base/depth draw
-weights.
+A **combined card** is one modifier that grants a bonus and drags a drawback
+along with it — "+30s max time, but −5s at the end of every level".
 
-It exists as its own class because of a **cyclic dependency**. `WorkshopEntry` needs a
-`Modifier`; `Modifier`'s weight hook needs a rarity type. If the enum lived on
-`WorkshopEntry`, the two scripts would reference each other and GDScript would refuse to
-compile either. `Rarity` depends on nothing, so both can depend on it.
+There is no `ComboModifier`, no `bonus`/`drawback` pair, and no new field. A card
+is combined **iff its modifier carries a `linked_modifier`**:
 
-> The static accessors are named `display_name()` / `display_color()`, not `get_name()` /
-> `get_color()`. A static `get_name` on a class is shadowed by GDScript's own `get_name`
-> on the script object — it resolves at parse time and fails at runtime with an
-> argument-count error. This cost an hour; don't rename them back.
+```gdscript
+func is_combined() -> bool:
+    return modifier != null and modifier.linked_modifier != null
+```
+
+`linked_modifier` already meant "gaining this also grants that", and
+`ModifiersSystem.add_modifier()` already follows it one level deep. Kick Start
+(dash, plus Costly Dash) was shipping on this before the workshop existed — it
+became a combined card the moment the UI learned to read the link, without its
+`.tres` being touched.
+
+The consequences are worth stating plainly, because they are the whole reason
+for doing it this way:
+
+- **Authoring a combined card is writing two `.tres` files**, one pointing at the
+  other. No code.
+- **A card can never lie.** The seam prints `linked_modifier.modifier_name` and
+  the detail panel prints its description, so what's advertised is exactly what
+  gets granted.
+- **Both halves are ordinary modifiers** — separate durations, separate
+  `chance`, separate entries in the modifier display. A drawback on a `LEVELS`
+  duration expires on its own schedule.
+- **Drawbacks are never offered alone.** They aren't in the pool; the only way to
+  meet one is through the card that carries it. `workshop_check` asserts this.
+
+`chance` covers the "some bonus, but a risk of losing time" shape with no new
+work either: a drawback with `chance = 0.3` and `type = EXIT_LEVEL` is a 30%
+chance of a penalty at each level's end.
 
 ---
 
@@ -113,8 +137,7 @@ compile either. `Rarity` depends on nothing, so both can depend on it.
 
 ```gdscript
 @export var modifier: Modifier
-@export var tier: Rarity.Tier = Rarity.Tier.COMMON
-@export var weight: float = 1.0   # relative draw weight *within* the tier
+@export var weight: float = 1.0   # relative draw weight
 @export var min_depth: int = 0    # map row before which this never appears
 ```
 
@@ -126,21 +149,20 @@ terms have no say over.
 `is_available(depth, system)` filters out anything gated deeper than the current row, and
 anything the player already holds unless the modifier is `stackable`.
 
-### 2.2 Depth scaling
+### 2.2 Pacing without rarity
 
-Draw weight is `entry.weight × Rarity.depth_weight(tier, depth)`, then run past the
-player's own modifiers via `get_workshop_offer_weight()`.
+There are no rarity tiers. A card is not "rare" — it is either available at this
+depth or it isn't, and it either draws often or it doesn't. Two numbers per
+entry carry all of it:
 
-| tier | base share | per-row gain | at row 0 | at row 8 |
-|---|---|---|---|---|
-| COMMON | 1.00 | −0.045 | 1.00 | 0.64 |
-| RARE | 0.50 | +0.05 | 0.50 | 0.70 |
-| EXOTIC | 0.15 | +0.14 | 0.15 | 0.32 |
+- **`min_depth`** gates anything that reads as a payoff. Run-defining modifiers
+  sit at rows 2–4; the plain time cards are available from row 0.
+- **`weight`** tunes how often something turns up among what's available.
 
-Commons thin out slowly while the good stuff climbs, so a late bench reads as a reward for
-getting there rather than as the same bench with different names on it. Commons never
-vanish (`MIN_WEIGHT = 0.02`) — a bench with nothing plain on it has no floor for the rare
-things to stand out against.
+Then the player's own modifiers get a say, by whether a card carries a trade-off
+— the only axis the draw has, and the interesting one. **Blueprints** multiplies
+plain cards ×2.0 and trade-off cards ×0.25; **Danger Money** does the reverse
+(×0.35 / ×2.5). One buys safety, the other buys power at a price.
 
 ### 2.3 The draw
 
@@ -153,10 +175,10 @@ failing, and pushes a warning. Asking for zero returns empty rather than errorin
 
 ### 2.4 `default_pool.tres`
 
-28 entries — 12 common, 13 rare, 3 exotic.
+38 entries, 13 of which are combined cards.
 
-Only upgrades and sideways trades are in the pool. **Pure downgrades are not offered**;
-they reach the player as `linked_modifier` trade-offs attached to something strong, which
+Only upgrades and two-edged trades are in the pool. **Pure downgrades are never
+offered**; they reach the player only as the second half of a combined card, which
 is the convention "Kick Start" already established.
 
 ---
@@ -269,16 +291,24 @@ display face closes up, and reads as the workshop's paperwork.
 is a row of blurred pixels on a 6× screen. The hover lift is `roundf`-ed for the same
 reason.
 
-### 4.3 Rarity is never colour alone
+### 4.3 Two kinds of card, one distinction
 
-| tier | colour | word |
+The palette has exactly one job on the bench: say whether a card costs you
+something.
+
+| kind | edge & glow | seam |
 |---|---|---|
-| COMMON | slate | `COMMON` |
-| RARE | brass | `RARE` |
-| EXOTIC | fuse-green | `EXOTIC` |
+| plain | `EDGE` — slate | none |
+| combined | `CAUTION` — dusty red | red strip naming the drawback |
 
-Brass and fuse-green are close enough for a red-green colourblind player that the word has
-to be on the ribbon too. It is, on every card.
+`CAUTION` is deliberately kept clear of `EMBER`, the run's accent. Ember means
+"this is what you're here to do" — it's on the instruction at the top of the
+screen. Red means "this one bites". They must never read as the same colour.
+
+The seam is a **ruled line over a wash**, not a filled block: the drawback
+belongs to the card, it isn't a second card stuck underneath it. And it is never
+colour alone — the drawback's name is printed in it, and repeated in full in the
+description panel.
 
 ### 4.4 `WorkshopCard`
 
@@ -293,7 +323,7 @@ about which one it is. That single state rides on `_emphasis` (0 at rest, 1 lit)
 
 ```gdscript
 func _apply_emphasis(value: float) -> void:
-    frame.add_theme_stylebox_override(&"panel", WorkshopStyle.card_frame(entry.tier, value))
+    frame.add_theme_stylebox_override(&"panel", WorkshopStyle.card_frame(entry.is_combined(), value))
     glow.modulate.a = value
     visual.position.y = -roundf(WorkshopStyle.HOVER_LIFT * value)
     visual.scale = Vector2.ONE * lerpf(1.0, WorkshopStyle.HOVER_SCALE, value)
@@ -331,72 +361,117 @@ The panel is the one part of the column allowed to absorb the screen's spare ver
 space, and it never changes size as the player moves along the bench. A box that resized
 per card would be the twitchiest thing on screen.
 
-It also prints the small print in the order it matters — rarity, then chance, then
-duration, then `STACKS` — and, critically:
+It prints the small print in the order it matters — chance, then duration, then
+`STACKS` — and, for a combined card, gives the cost **its own line in its own
+colour**:
 
 ```gdscript
-if modifier.linked_modifier != null:
-    text += "\nComes with: %s." % modifier.linked_modifier.modifier_name
+detail_cost.visible = entry.is_combined()
+if entry.is_combined():
+    detail_cost.text = "%s: %s" % [
+        modifier.linked_modifier.modifier_name,
+        modifier.linked_modifier.get_description(),
+    ]
 ```
 
-A modifier that drags a trade-off along has to say so **on the bench**. Finding out
-afterwards is a gotcha, not a decision.
+Not appended to the description: on a combined card the cost is half the
+decision, and it must not read as a footnote to the good half. Finding out
+afterwards would be a gotcha, not a decision.
 
-### 4.6 Vertical budget
+### 4.6 Layout: the bench spans the column
+
+Cards do **not** have a computed width. Each one is `SIZE_EXPAND_FILL`, so the
+`HBoxContainer` divides the full column between them:
+
+```gdscript
+card.custom_minimum_size = Vector2(WorkshopStyle.CARD_MIN_WIDTH, WorkshopStyle.CARD_HEIGHT)
+card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+card.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+```
+
+That is what makes the bench's outer edges land **exactly on the description
+panel's**, at any bench size — they're siblings in the same `VBoxContainer`, so
+they inherit the same span. A fixed width left the row floating inset inside the
+panel below it, which was the single biggest thing making the screen look
+cramped. Three cards get ~97px each, five get ~58px, and the alignment holds
+either way.
+
+Vertically the cards keep the height they were drawn at rather than stretching
+into the row's slack. Every card reserves two lines for its name, so a name that
+wraps doesn't shove that one card's icon out of line with its neighbours.
 
 | band | px |
 |---|---|
-| margins (4 top, 4 bottom) | 8 |
-| strip — clock + carried modifiers | 16 |
-| title + subtitle | ~22 |
-| card row | 54 |
-| description panel (minimum; absorbs slack) | 44 |
+| margins (5 top, 5 bottom) | 10 |
+| strip — clock, room name, carried modifiers | 12 |
+| instruction | ~13 |
+| card row | 56 |
+| description panel (minimum; absorbs slack) | 40 |
 | footer — Sweep / Leave | ~21 |
-| separations (2 × 5) | 10 |
-| **total** | **~175 of 180** |
+| separations (6 × 4) | 24 |
+| **total** | **~176 of 180** |
 
-Card width is computed from the bench size, floored to whole pixels:
-
-```gdscript
-static func card_width(count: int, available: float) -> float:
-    var each: float = (available - CARD_GAP * (count - 1)) / count
-    return floorf(clampf(each, CARD_MIN_WIDTH, CARD_MAX_WIDTH))
-```
-
-Three cards sit at the 84px cap; five give ground to 55px — which is itself the visual tell
-that the bench got bigger. Cards are `SIZE_SHRINK_CENTER` so they keep their drawn
-proportions instead of stretching into whatever slack the row has.
+The status strip carries the clock, the room's name and the carried-modifier row;
+the **instruction** ("TAKE ONE", "TAKE 2 · 1 LEFT") is the header, in ember. The
+thing that changes and that the player has to act on is the biggest text on the
+screen; the room's name is a quiet tag. That reordering is also what stopped a
+lifted card's glow from colliding with the line above it.
 
 ---
 
 ## 5. New modifiers
 
-12 new `.tres`. Only one needed a new script; the rest reuse existing modifier classes.
+28 new `.tres`. Exactly one needed a new script (`WorkshopModifier`); everything
+else reuses modifier classes that already existed.
 
 ### 5.1 Workshop terms
 
-| name | id | effect | tier |
-|---|---|---|---|
-| Second Set of Hands | `second_set_of_hands` | **take two instead of one**, spent on use | EXOTIC |
-| Open Bench | `open_bench` | **+2 options**, permanent | RARE |
-| Blueprints | `blueprints` | draw skews rare (×0.5 / ×1.8 / ×3.0); links Cluttered Bench | RARE |
-| Cluttered Bench | `cluttered_bench` | −1 option — trade-off partner, not offered directly | — |
-| Scrap Heap | `scrap_heap` | one sweep of the bench per workshop | COMMON |
-| Union Break | `union_break` | +8s for leaving empty-handed | COMMON |
+| name | id | effect |
+|---|---|---|
+| Second Set of Hands | `second_set_of_hands` | **take two instead of one**, spent on use |
+| Open Bench | `open_bench` | **+2 options**, permanent |
+| Blueprints | `blueprints` | bench favours plain cards (×2.0 / ×0.25); links Cluttered Bench |
+| Danger Money | `danger_money` | bench favours trade-off cards (×0.35 / ×2.5) |
+| Cluttered Bench | `cluttered_bench` | −1 option — trade-off partner, not offered directly |
+| Scrap Heap | `scrap_heap` | one sweep of the bench per workshop |
+| Union Break | `union_break` | +8s for leaving empty-handed |
 
-### 5.2 General
+### 5.2 Combined cards
 
-| name | class reused | effect | tier |
-|---|---|---|---|
-| Frost Grip | `OrbWindowModifier` | cold orbs worth 4s for a level's first 6s; links Cold Storage | RARE |
-| Chain Reaction | `GainModifierModifier` | 6% chance per cold orb of a new modifier | EXOTIC |
-| Wet Wick | `TickRateModifier` | 40% slower for 2 levels | COMMON |
-| Dead Man's Switch | `ConditionalTimeModifier` | clear under 10s → +14s; links Punctured Tank | RARE |
-| Cold Storage | `FreezeModifier` | frozen 3s at level start — trade-off partner | — |
-| Punctured Tank | `AddMaxTimeModifier` | −10s max time — trade-off partner | — |
+Each is a bonus `.tres` whose `linked_modifier` points at a drawback `.tres`.
 
-Frost Grip and Chain Reaction fill genuine gaps: nothing previously touched cold orbs, and
-**nothing at all used the `COLD_ORB_TOUCHED` trigger**.
+| card | bonus | drawback it carries |
+|---|---|---|
+| **Overpressure** | +30s max time | *Pressure Loss* — −5s at every level's end |
+| **Short Fuse** | +10s right now | *Racing Wick* — next level burns at double speed |
+| **Dead Air** | clock doesn't tick at all next level | *Open Circuit* — it burns on the map for 2 levels |
+| **Hazard Pay** | +6s every level cleared | *Punctured Tank* — −10s max time |
+| **Loose Wiring** | 20% slower burn, permanently | *Sparking Contact* — 30% chance of −8s at level end |
+| **Overcharge** | first 3 abilities each level are free | *Cold Storage* — 3s frozen at level start |
+| **Cash Advance** | +25s right now | *Cluttered Bench* — every future workshop shows one fewer option |
+| **Cold Snap** | cold orbs worth 4s for a level's first 8s | *Thin Skin* — hot orbs burn 4s in that window |
+| **Time and a Half** | +8s if a level takes over 30s | *Docked Pay* — −8s if it takes under 15s |
+| **Kick Start** | *(pre-existing)* you can dash | *Costly Dash* — every dash burns 1s |
+
+Kick Start is in that list without having been edited: it already carried a
+`linked_modifier`, so it became a combined card for free when the UI learned to
+read the link. That is the architecture working.
+
+Three drawbacks are reused rather than written (`punctured_tank`,
+`cold_storage`, `cluttered_bench`); six are new (`pressure_loss`, `racing_wick`,
+`open_circuit`, `sparking_contact`, `thin_skin`, `docked_pay`).
+
+### 5.3 Plain additions
+
+| name | class reused | effect |
+|---|---|---|
+| Frost Grip | `OrbWindowModifier` | cold orbs worth 4s for a level's first 6s; links Cold Storage |
+| Chain Reaction | `GainModifierModifier` | 6% chance per cold orb of a new modifier |
+| Wet Wick | `TickRateModifier` | 40% slower for 2 levels |
+| Dead Man's Switch | `ConditionalTimeModifier` | clear under 10s → +14s; links Punctured Tank |
+
+Frost Grip and Chain Reaction fill genuine gaps: nothing previously touched cold
+orbs, and **nothing at all used the `COLD_ORB_TOUCHED` trigger**.
 
 ---
 
@@ -413,14 +488,14 @@ Frost Grip and Chain Reaction fill genuine gaps: nothing previously touched cold
 
 `MapGenerator.WORKSHOP_ROOM_WEIGHT` is 2.5 against levels' 10.0 — see §8.
 
-Per-entry pacing lives in `default_pool.tres` (`tier`, `weight`, `min_depth`); global
-rarity pacing in `Rarity.BASE_WEIGHT` / `DEPTH_GAIN`; everything visual in `WorkshopStyle`.
+Per-entry pacing lives in `default_pool.tres` (`weight`, `min_depth`); everything
+visual in `WorkshopStyle`.
 
 ---
 
 ## 7. Verified behaviour
 
-`src/debug/WorkshopCheck.tscn` — 50 checks, all passing:
+`src/debug/WorkshopCheck.tscn` — 61 checks, all passing:
 
 ```
 godot --headless res://src/debug/WorkshopCheck.tscn
@@ -432,17 +507,19 @@ visits.
 
 | group | covers |
 |---|---|
-| pool | all 28 entries resolve a named, uniquely-ided modifier; both scenes load |
+| pool | all 38 entries resolve a named, uniquely-ided modifier; both scenes load |
+| combined | the pool offers combined cards but not only combined cards; **no drawback is offered on its own**; every drawback has a name and a description to print |
 | draw | 3 offers at depths 0/4/8, no duplicates, nothing gated deeper leaks through, zero-draw is empty not an error, oversized draw caps at pool size |
 | hooks | each perk's arithmetic; one-shot spends on a pick but keeps on an empty exit; a plain modifier changes nothing |
 | live visit 1 | Open Bench + Second Set of Hands → 5 cards, 2 picks; take one (bench stays open) then the second (bench closes); modifiers granted; one-shot spent; permanent kept |
 | live visit 2 | Scrap Heap's sweep lays a genuinely different bench and is spent; leaving empty-handed pays Union Break's 8s (30.0 → 38.0) |
+| live visit 3 | Danger Money puts a combined card on the bench; its seam names the drawback; taking it grants **both** halves |
 
 The layout was also rendered at a true 320×180 and inspected at three, five and taken-card
 states, including the worst-case description (a body plus a `Comes with:` line).
 
 **Five real bugs were caught this way**, all fixed: a `const Dictionary` built from an
-autoload member; `Rarity.get_name` shadowed by a built-in; `Label.clip_text` zeroing the
+autoload member; a static `get_name` shadowed by a built-in; `Label.clip_text` zeroing the
 card name's minimum size so names never rendered; the subtitle reading "THE BENCH IS BARE"
 during the opening fade; and the map HUD overlapping the bench.
 
@@ -463,6 +540,14 @@ during the opening fade; and the map HUD overlapping the bench.
 - **A sweep re-rolls the whole bench**, including slots whose cards were already taken.
   Already-taken modifiers can't reappear (the draw filters held non-stackables), so this is
   safe — just worth knowing it isn't a partial re-roll.
+- **Combined halves expire independently.** Both are ordinary modifiers, so a
+  bonus on a `LEVELS` duration can run out while its drawback is still running,
+  or the reverse. Where that matters the two are authored with matching
+  durations, but nothing enforces it — worth a look if a pairing feels wrong.
+- **Dead Air's drawback needs a playtest, not a check.** `MapTimeModifier`'s
+  on/off timing is entangled with `exit_room`'s ordering (see the note in that
+  script), and a `LEVELS` duration on top of it is not something the headless
+  harness can judge the feel of.
 - **No sound.** Signals and animation seams are in place for it; nothing is wired.
 - **All visuals are procedural placeholders.** Every stylebox that a sprite should replace
   is marked `## ART:` in `workshop_style.gd`. A modifier with its `icon` set already renders
@@ -476,19 +561,18 @@ during the opening fade; and the map HUD overlapping the bench.
 |---|---|
 | `systems/modifiers_system/resources/modifier.gd` | **+6 workshop hooks**, all pass-through |
 | `systems/modifiers_system/modifiers_system.gd` | **+6 aggregators**, incl. `notify_workshop_visited()` |
-| `systems/modifiers_system/resources/rarity.gd` | **new** — tiers, colours, names, depth weights |
-| `systems/modifiers_system/resources/workshop_entry.gd` | **new** — a modifier plus its offer terms |
+| `systems/modifiers_system/resources/workshop_entry.gd` | **new** — a modifier plus its offer terms; `is_combined()` |
 | `systems/modifiers_system/resources/workshop_pool.gd` | **new** — weighted draw without replacement |
 | `systems/modifiers_system/workshop_modifier.gd` | **new** — answers all six hooks |
 | `room_scenes/workshop/workshop.gd` + `.tscn` | **new** — the room and its flow |
 | `room_scenes/workshop/default_pool.tres` | **new** — 28 weighted entries |
 | `ui/workshop/workshop_style.gd` | **new** — palette, metrics, timings, styleboxes |
 | `ui/workshop/workshop_card.gd` + `WorkshopCard.tscn` | **new** — the card |
-| `gameplay/modifiers/*.tres` | **12 new** modifiers (§5) |
+| `gameplay/modifiers/*.tres` | **28 new** modifiers (§5), incl. 9 combined pairs |
 | `core/main_game/main_game.gd` | `enter_shop` → `enter_workshop`, implemented; HUD unload |
 | `map/generation/room.gd` | `SHOP` → `WORKSHOP`; `apply_type_scene()` |
 | `map/generation/map_generator.gd` | rename; `_apply_scene_uids()` |
 | `map/visuals/map_node.gd` | rename in `ROOM_ART` |
 | `autoloads/uids.gd` | workshop scene/pool/card + 12 modifier UIDs |
-| `debug/workshop_check.gd` + `WorkshopCheck.tscn` | **new** — 50-check headless harness |
+| `debug/workshop_check.gd` + `WorkshopCheck.tscn` | **new** — 61-check headless harness |
 | `room_scenes/room_scene.gd` | doc comment only |

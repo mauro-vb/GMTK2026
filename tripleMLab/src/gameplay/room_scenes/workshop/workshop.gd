@@ -64,14 +64,15 @@ var _detail_tween: Tween
 @onready var backdrop: ColorRect = %Backdrop
 @onready var time_label: Label = %TimeLabel
 @onready var carry_row: HBoxContainer = %CarryRow
-@onready var title_label: Label = %Title
-@onready var subtitle_label: Label = %Subtitle
+@onready var location_label: Label = %Location
+@onready var instruction_label: Label = %Instruction
 @onready var card_row: HBoxContainer = %CardRow
 @onready var detail_panel: PanelContainer = %Detail
 @onready var detail_box: VBoxContainer = %DetailBox
 @onready var detail_name: Label = %DetailName
 @onready var detail_meta: Label = %DetailMeta
 @onready var detail_body: Label = %DetailBody
+@onready var detail_cost: Label = %DetailCost
 @onready var reroll_button: Button = %RerollButton
 @onready var leave_button: Button = %LeaveButton
 
@@ -137,13 +138,16 @@ func _lay_out_bench() -> void:
 		leave_button.grab_focus()
 		return
 
-	var width: float = WorkshopStyle.card_width(entries.size(), _row_width())
 	for entry: WorkshopEntry in entries:
 		var card: WorkshopCard = WorkshopCard.new_card(entry)
-		card.custom_minimum_size = Vector2(width, WorkshopStyle.CARD_HEIGHT)
-		# Shrink-centred: the row absorbs whatever vertical slack the screen has
-		# left over, and the cards keep the proportions they were drawn at
-		# instead of stretching to fill it.
+		card.custom_minimum_size = Vector2(WorkshopStyle.CARD_MIN_WIDTH, WorkshopStyle.CARD_HEIGHT)
+		# Every card claims an equal share of the row, so the bench spans the full
+		# column and its outer edges land exactly on the description panel's. A
+		# fixed width would leave the row floating inside the panel below it, and
+		# a wider bench would shrink away from it rather than divide it.
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		# Vertically the cards keep the height they were drawn at rather than
+		# stretching into whatever slack the row has.
 		card.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		card.chosen.connect(_on_card_chosen)
 		card.highlighted.connect(_on_card_highlighted)
@@ -229,10 +233,11 @@ func _style_chrome() -> void:
 	backdrop.color.a = WorkshopStyle.BACKDROP_ALPHA
 
 	WorkshopStyle.apply_text(time_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_BODY, WorkshopStyle.MUTED)
-	WorkshopStyle.apply_text(title_label, WorkshopStyle.FONT_DISPLAY, WorkshopStyle.SIZE_TITLE, WorkshopStyle.PARCHMENT)
-	WorkshopStyle.apply_text(subtitle_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_SUBTITLE, WorkshopStyle.EMBER)
+	WorkshopStyle.apply_text(location_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_SEAM, WorkshopStyle.MUTED)
+	WorkshopStyle.apply_text(instruction_label, WorkshopStyle.FONT_DISPLAY, WorkshopStyle.SIZE_TITLE, WorkshopStyle.EMBER)
 	WorkshopStyle.apply_text(detail_name, WorkshopStyle.FONT_DISPLAY, WorkshopStyle.SIZE_CARD_NAME, WorkshopStyle.PARCHMENT)
-	WorkshopStyle.apply_text(detail_meta, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_RIBBON, WorkshopStyle.MUTED)
+	WorkshopStyle.apply_text(detail_meta, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_SEAM, WorkshopStyle.MUTED)
+	WorkshopStyle.apply_text(detail_cost, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_BODY, WorkshopStyle.CAUTION)
 	WorkshopStyle.apply_text(detail_body, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_BODY, WorkshopStyle.MUTED)
 
 	detail_panel.add_theme_stylebox_override(&"panel", WorkshopStyle.detail_panel())
@@ -278,9 +283,11 @@ func _add_carried(modifier: Modifier) -> void:
 	icon.setup(modifier, texture if texture != null else ModifierDisplay.PLACEHOLDER_ICON)
 
 
+## The instruction is the header, not the room's name: it is the thing that
+## changes, and the thing the player is here to act on.
 func _refresh_header() -> void:
-	title_label.text = "WORKSHOP"
-	subtitle_label.text = _subtitle_text()
+	location_label.text = "WORKSHOP"
+	instruction_label.text = _subtitle_text()
 
 
 func _subtitle_text() -> String:
@@ -331,14 +338,24 @@ func _write_detail(entry: WorkshopEntry) -> void:
 	var modifier: Modifier = entry.modifier
 	detail_name.text = modifier.modifier_name
 	detail_meta.text = _meta_text(entry)
-	detail_meta.add_theme_color_override(&"font_color", Rarity.display_color(entry.tier))
-	detail_body.text = _body_text(modifier)
+	detail_meta.add_theme_color_override(&"font_color", WorkshopStyle.card_accent(entry.is_combined()))
+	detail_body.text = modifier.get_description()
+
+	# The cost gets its own line in its own colour rather than being tacked onto
+	# the end of the description — on a combined card it is half the decision,
+	# and it should not read as a footnote to the good half.
+	detail_cost.visible = entry.is_combined()
+	if entry.is_combined():
+		detail_cost.text = "%s: %s" % [
+			modifier.linked_modifier.modifier_name,
+			modifier.linked_modifier.get_description(),
+		]
 
 
-## The small print, in the order it matters: how rare, how likely, how long.
+## The small print, in the order it matters: how likely, how long, how it stacks.
 func _meta_text(entry: WorkshopEntry) -> String:
 	var modifier: Modifier = entry.modifier
-	var parts: Array[String] = [Rarity.display_name(entry.tier)]
+	var parts: Array[String] = []
 
 	if modifier.chance < 1.0:
 		parts.append("%d%%" % roundi(modifier.chance * 100.0))
@@ -356,20 +373,11 @@ func _meta_text(entry: WorkshopEntry) -> String:
 	return "  ·  ".join(parts)
 
 
-## A modifier that drags a trade-off along with it has to say so on the bench.
-## Finding out afterwards is a gotcha, not a decision.
-func _body_text(modifier: Modifier) -> String:
-	var text: String = modifier.get_description()
-	if modifier.linked_modifier != null:
-		text += "\nComes with: %s." % modifier.linked_modifier.modifier_name
-
-	return text
-
-
 func _clear_detail() -> void:
 	detail_name.text = ""
 	detail_meta.text = ""
 	detail_body.text = "Pick something up to read it."
+	detail_cost.visible = false
 
 
 func _show_empty_bench() -> void:
@@ -377,6 +385,7 @@ func _show_empty_bench() -> void:
 	detail_name.text = "Nothing on the bench"
 	detail_meta.text = ""
 	detail_body.text = "You already have everything this workshop had to offer."
+	detail_cost.visible = false
 
 
 # --- Helpers -----------------------------------------------------------------
@@ -391,18 +400,13 @@ func _focus_first_available() -> void:
 	leave_button.grab_focus()
 
 
-## How far into the run this bench is, which is what tilts the draw toward the
-## rarer end (see [Rarity]).
+## How far into the run this bench is. Entries use it to hold themselves back
+## until the run has earned them (see [WorkshopEntry.min_depth]).
 func _depth() -> int:
 	if Global.main_game == null or Global.main_game.map == null:
 		return 0
 
 	return Global.main_game.map.progress
-
-
-## Pixels of row the cards have to share.
-func _row_width() -> float:
-	return get_viewport_rect().size.x - WorkshopStyle.ROW_MARGIN * 2.0
 
 
 func _wait(seconds: float) -> void:

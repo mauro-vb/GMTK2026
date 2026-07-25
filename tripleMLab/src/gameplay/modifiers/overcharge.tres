@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="FreeAbilityModifier" format=3 uid="uid://dt3kx6nwq9vmb"]
+
+[ext_resource type="Script" uid="uid://dn82kfvw6plq3" path="res://src/gameplay/systems/modifiers_system/free_ability_modifier.gd" id="1_overchar"]
+[ext_resource type="Resource" uid="uid://bw3nk6vqm8trx" path="res://src/gameplay/modifiers/cold_storage.tres" id="2_overchar"]
+
+[resource]
+script = ExtResource("1_overchar")
+uses = 3
+type = 0
+modifier_name = "Overcharge"
+id = "overcharge"
+description = "Everything is wound tight. The first 3 movement abilities you use each level are free."
+linked_modifier = ExtResource("2_overchar")
+metadata/_custom_type_script = "uid://dn82kfvw6plq3"

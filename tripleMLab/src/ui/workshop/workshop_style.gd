@@ -12,6 +12,10 @@ extends RefCounted
 ## Sized against the 320x180 viewport. Every number here is whole pixels on
 ## purpose: the project renders at integer scale, and a half-pixel margin is a
 ## row of blurred pixels on a 6x screen.
+##
+## Cards come in exactly two kinds — plain, and carrying a trade-off. That single
+## distinction is all the palette below has to carry, and it is the only thing a
+## player has to read off a card at a glance.
 
 # Constants
 
@@ -20,67 +24,68 @@ extends RefCounted
 const INK: Color = Color(0.043, 0.039, 0.078)
 ## Card and panel fill, one step up from the ink.
 const PANEL: Color = Color(0.106, 0.098, 0.169)
-## Ribbons and plinths, one step up again.
+## Plinths and raised areas, one step up again.
 const PANEL_RAISED: Color = Color(0.149, 0.137, 0.227)
 ## Body text. Matches the button font colour already in main_theme.tres, so the
 ## workshop and the rest of the game are speaking the same off-white.
 const PARCHMENT: Color = Color(0.882, 0.933, 0.847)
 ## Secondary text — labels that shouldn't compete with what they describe.
 const MUTED: Color = Color(0.541, 0.549, 0.639)
-## The run's accent: burning fuse. Reserved for the thing the player is about to
-## do, never for decoration.
+## The run's accent: burning fuse. Reserved for the instruction at the top of the
+## screen — the thing the player is here to do — never for decoration.
 const EMBER: Color = Color(0.964, 0.529, 0.235)
 ## The hot core of the ember, for flashes.
 const SPARK: Color = Color(1.0, 0.898, 0.612)
+
+## The edge of an ordinary card.
+const EDGE: Color = Color(0.360, 0.380, 0.463)
+## The edge and seam of a card that costs you something. A dusty red, kept clear
+## of EMBER so "this is what you're here for" and "this one bites" never read as
+## the same colour on the same screen.
+const CAUTION: Color = Color(0.855, 0.361, 0.333)
 
 ## How dark the bench goes over whatever is behind it. Not fully opaque: the
 ## workshop is a moment in the run, not a different screen.
 const BACKDROP_ALPHA: float = 0.88
 
 # --- Metrics -----------------------------------------------------------------
-## Cards shrink to fit as the bench widens (see [method card_width]). Below the
-## minimum a card can no longer hold a readable name, so the row would rather
-## crowd its gaps than go narrower.
-const CARD_MAX_WIDTH: float = 84.0
-const CARD_MIN_WIDTH: float = 48.0
-## Only as tall as ribbon + icon + a two-line name needs. A taller card on a
-## 180px screen is dead space inside a frame, and it pushes the description
-## panel off the bottom.
-const CARD_HEIGHT: float = 54.0
+## Cards fill the row rather than sitting at a fixed width — see the
+## `size_flags_horizontal` set in Workshop._lay_out_bench(). That is what makes a
+## bench line up edge-for-edge with the description panel under it, and it means
+## a wider bench divides the same span instead of drifting inside it. The value
+## below is only a floor, for a bench wide enough to reach it.
+const CARD_MIN_WIDTH: float = 44.0
+const CARD_HEIGHT: float = 56.0
 const CARD_GAP: float = 6.0
-## Screen edge to the outermost card.
-const ROW_MARGIN: float = 8.0
 
-## Rarity ribbon across the top of a card.
-const RIBBON_HEIGHT: float = 9.0
+## Strip along the bottom of a combined card, naming what it costs. A plain card
+## has no seam and gives the space back to its own name.
+const SEAM_HEIGHT: float = 11.0
 ## Card padding, inside the frame.
-const CARD_PADDING: float = 3.0
+const CARD_PADDING: float = 4.0
 const ICON_SIZE: Vector2 = Vector2(16, 16)
 ## The lit plinth the icon sits on, so a 16px icon doesn't float in the middle of
 ## an empty card while the art is still a placeholder.
 const PLINTH_SIZE: Vector2 = Vector2(22, 22)
 
-## Floor for the description panel: the name row plus three wrapped lines, which
-## is the longest thing on offer (a description with a "Comes with" trade-off on
-## the end). The panel is the one part of the column allowed to take up whatever
-## vertical slack the screen has spare — text is what benefits from the room, and
-## it never changes size as the player moves along the bench, so nothing jitters.
-const DETAIL_HEIGHT: float = 44.0
-const FOOTER_HEIGHT: float = 16.0
+## Floor for the description panel; it takes whatever vertical slack the screen
+## has spare on top of this. Text is what benefits from the room, and the panel
+## never changes size as the player moves along the bench, so nothing jitters.
+const DETAIL_HEIGHT: float = 40.0
 ## Clock and carried-modifier strip along the top.
-const STRIP_HEIGHT: float = 16.0
+const STRIP_HEIGHT: float = 12.0
 
 # --- Type --------------------------------------------------------------------
 ## Display face: headings, card names, buttons. Already the theme's button font.
 const FONT_DISPLAY: Font = preload("uid://bn7xy5s6ubsuj")
-## Text face: descriptions, ribbons, counters. A mono holds its shape at 6-7px
+## Text face: descriptions, seams, counters. A mono holds its shape at 6-7px
 ## where the display face closes up, and reads as the workshop's paperwork.
 const FONT_TEXT: Font = preload("uid://dumnwgfl70q28")
 
 const SIZE_TITLE: int = 10
 const SIZE_SUBTITLE: int = 7
 const SIZE_CARD_NAME: int = 8
-const SIZE_RIBBON: int = 6
+const SIZE_SEAM: int = 6
 const SIZE_BODY: int = 7
 
 # --- Timings -----------------------------------------------------------------
@@ -91,7 +96,7 @@ const DEAL_DURATION: float = 0.26
 const DEAL_RISE: float = 10.0
 
 const HOVER_DURATION: float = 0.10
-const HOVER_LIFT: float = 3.0
+const HOVER_LIFT: float = 2.0
 const HOVER_SCALE: float = 1.06
 
 ## Taking a modifier borrows the map's detonation language — punch out, flash at
@@ -110,17 +115,10 @@ const FADE_DURATION: float = 0.18
 const SPENT_MODULATE: Color = Color(0.45, 0.45, 0.52, 0.75)
 
 # Static
-## How wide each card is on a bench of `count`, given `available` pixels of row.
-## A three-card bench sits at the cap; widening it to five is what makes the
-## cards give ground, which is the visual tell that the bench got bigger.
-## Floored to whole pixels — a fractional card width smears every border on it.
-static func card_width(count: int, available: float) -> float:
-	if count <= 0:
-		return CARD_MAX_WIDTH
-
-	var gaps: float = CARD_GAP * float(count - 1)
-	var each: float = (available - gaps) / float(count)
-	return floorf(clampf(each, CARD_MIN_WIDTH, CARD_MAX_WIDTH))
+## The colour a card is edged and lit in. Asked for by hand rather than looked up
+## in a table: there are two kinds of card, and there will only ever be two.
+static func card_accent(is_combined: bool) -> Color:
+	return CAUTION if is_combined else EDGE
 
 # --- Styleboxes --------------------------------------------------------------
 ## The card body. `emphasis` runs 0 (at rest) to 1 (hovered or focused) and is
@@ -129,14 +127,13 @@ static func card_width(count: int, available: float) -> float:
 ##
 ## ART: replace with a StyleBoxTexture over a nine-sliced card frame; keep the
 ## content margins so the layout inside doesn't move.
-static func card_frame(tier: Rarity.Tier, emphasis: float) -> StyleBoxFlat:
+static func card_frame(is_combined: bool, emphasis: float) -> StyleBoxFlat:
 	var box: StyleBoxFlat = StyleBoxFlat.new()
 	box.bg_color = PANEL.lerp(PANEL_RAISED, emphasis)
 	box.set_border_width_all(1)
-	box.border_color = Rarity.display_color(tier) * Color(1, 1, 1, lerpf(0.55, 1.0, emphasis))
+	box.border_color = card_accent(is_combined) * Color(1, 1, 1, lerpf(0.6, 1.0, emphasis))
 	box.set_corner_radius_all(1)
 	box.set_content_margin_all(CARD_PADDING)
-	box.content_margin_top = RIBBON_HEIGHT + CARD_PADDING
 
 	# A real shadow rather than a darker outline: it is what separates a lifted
 	# card from the ones still lying on the bench.
@@ -146,21 +143,25 @@ static func card_frame(tier: Rarity.Tier, emphasis: float) -> StyleBoxFlat:
 	return box
 
 
-## The aura behind a lifted card. Sits in the rarity's own colour so a rare card
-## lights the bench differently to a common one.
-static func card_glow(tier: Rarity.Tier) -> StyleBoxFlat:
+## The aura behind a lifted card, in that card's own accent — so a trade-off card
+## lights the bench a different colour to a plain one.
+static func card_glow(is_combined: bool) -> StyleBoxFlat:
 	var box: StyleBoxFlat = StyleBoxFlat.new()
-	box.bg_color = Rarity.display_color(tier) * Color(1, 1, 1, 0.16)
+	box.bg_color = card_accent(is_combined) * Color(1, 1, 1, 0.16)
 	box.set_corner_radius_all(2)
 	return box
 
 
-## Rarity band across the top of a card.
-static func card_ribbon(tier: Rarity.Tier) -> StyleBoxFlat:
+## The strip along the bottom of a combined card. A ruled line over a wash rather
+## than a solid block: the drawback belongs to the card, it isn't a second card
+## stuck underneath it.
+static func card_seam() -> StyleBoxFlat:
 	var box: StyleBoxFlat = StyleBoxFlat.new()
-	box.bg_color = Rarity.display_color(tier) * Color(1, 1, 1, 0.85)
-	box.corner_radius_top_left = 1
-	box.corner_radius_top_right = 1
+	box.bg_color = CAUTION * Color(1, 1, 1, 0.14)
+	box.border_width_top = 1
+	box.border_color = CAUTION * Color(1, 1, 1, 0.55)
+	box.content_margin_left = 2
+	box.content_margin_right = 2
 	return box
 
 
@@ -183,12 +184,6 @@ static func detail_panel() -> StyleBoxFlat:
 	box.set_corner_radius_all(1)
 	box.set_content_margin_all(4)
 	return box
-
-
-## Text on a card ribbon reads against the rarity colour, not the card, so it
-## gets the ink rather than the parchment.
-static func ribbon_text_color(tier: Rarity.Tier) -> Color:
-	return INK.lerp(Rarity.display_color(tier), 0.12)
 
 
 ## Applies a face, size and colour to a label in one call. Labels have no entry

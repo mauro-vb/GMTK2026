@@ -12,16 +12,21 @@ extends Resource
 @export var modifier: Modifier
 
 @export_group("Terms")
-@export var tier: Rarity.Tier = Rarity.Tier.COMMON
-## Relative draw weight *within* the tier, before rarity and depth are folded in.
-## Leave at 1.0 unless a modifier should be notably more or less common than its
-## tier-mates.
+## Relative draw weight. 1.0 is the norm; drop it for something that should be a
+## treat, raise it for something the run wants seen often.
 @export var weight: float = 1.0
 ## Map row before which this never appears. Use it for anything that reads as a
-## payoff — offering a run-defining modifier on the first bench spends it.
+## payoff — offering a run-defining modifier on the first bench spends it. With
+## no rarity tiers, this and `weight` are the whole of the pool's pacing.
 @export var min_depth: int = 0
 
 # Public
+## A card is combined when its modifier drags a trade-off along with it. Nothing
+## marks this in the data: carrying a `linked_modifier` *is* what being combined
+## means, so an entry can never disagree with the modifier it points at.
+func is_combined() -> bool:
+	return modifier != null and modifier.linked_modifier != null
+
 ## Whether a workshop this deep into a run may offer this at all. Modifiers the
 ## player already holds are filtered out too, unless the modifier stacks.
 func is_available(depth: int, modifiers_system: ModifiersSystem) -> bool:
@@ -34,11 +39,11 @@ func is_available(depth: int, modifiers_system: ModifiersSystem) -> bool:
 
 	return true
 
-## Weight this entry draws with on a bench that deep into the run, after the
-## player's own modifiers have had their say (see "Blueprints").
-func get_draw_weight(depth: int, modifiers_system: ModifiersSystem) -> float:
-	var value: float = maxf(weight, 0.0) * Rarity.depth_weight(tier, depth)
+## Weight this entry draws with, after the player's own modifiers have had their
+## say — which is how a perk tilts a bench toward or away from trade-off cards.
+func get_draw_weight(modifiers_system: ModifiersSystem) -> float:
+	var value: float = maxf(weight, 0.0)
 	if modifiers_system != null:
-		value = modifiers_system.get_workshop_offer_weight(value, tier)
+		value = modifiers_system.get_workshop_offer_weight(value, is_combined())
 
 	return value

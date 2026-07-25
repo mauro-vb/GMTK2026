@@ -28,11 +28,14 @@ extends Modifier
 @export var skip_bonus_seconds: float = 0.0
 
 @export_group("Odds")
-## Multipliers on each tier's share of the draw. 1.0 leaves the tier alone;
-## dropping commons and lifting exotics is what "skews rare" means in practice.
-@export var common_weight_scale: float = 1.0
-@export var rare_weight_scale: float = 1.0
-@export var exotic_weight_scale: float = 1.0
+## Multipliers on a card's share of the draw, split by whether it carries a
+## trade-off. 1.0 leaves that kind alone; 0.0 keeps it off the bench entirely.
+##
+## This is the only axis the draw has now that rarity is gone, and it is the
+## interesting one: a player can buy their way toward the safe, plain cards or
+## toward the big two-edged ones.
+@export var clean_weight_scale: float = 1.0
+@export var combined_weight_scale: float = 1.0
 
 @export_group("Extras")
 ## One-shot perks spend themselves on the first workshop the player actually
@@ -62,8 +65,8 @@ func modify_workshop_rerolls(count: int) -> int:
 	return count + extra_rerolls
 
 
-func modify_workshop_offer_weight(weight: float, tier: Rarity.Tier) -> float:
-	return weight * _scale_for(tier)
+func modify_workshop_offer_weight(weight: float, is_combined: bool) -> float:
+	return weight * (combined_weight_scale if is_combined else clean_weight_scale)
 
 
 func modify_workshop_skip_bonus(seconds: float) -> float:
@@ -80,13 +83,5 @@ func get_description() -> String:
 	return description
 
 # Private
-func _scale_for(tier: Rarity.Tier) -> float:
-	match tier:
-		Rarity.Tier.RARE:
-			return rare_weight_scale
-		Rarity.Tier.EXOTIC:
-			return exotic_weight_scale
-		_:
-			return common_weight_scale
 
 # Callbacks

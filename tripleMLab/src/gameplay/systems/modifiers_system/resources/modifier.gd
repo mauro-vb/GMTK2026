@@ -84,9 +84,9 @@ func modify_workshop_picks(count: int) -> int:
 func modify_workshop_rerolls(count: int) -> int:
 	return count
 
-## Rebalances the draw — the hook behind "offers skew rare". Called once per
-## candidate entry, with that entry's own weight.
-func modify_workshop_offer_weight(weight: float, _tier: Rarity.Tier) -> float:
+## Rebalances the draw. Called once per candidate entry, with that entry's own
+## weight and whether the card it would become carries a trade-off.
+func modify_workshop_offer_weight(weight: float, _is_combined: bool) -> float:
 	return weight
 
 ## Seconds paid out for walking away from the bench without taking anything.

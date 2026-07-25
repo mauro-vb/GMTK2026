@@ -164,9 +164,9 @@ func get_workshop_rerolls(base: int) -> int:
 	return maxi(count, 0)
 
 
-func get_workshop_offer_weight(weight: float, tier: Rarity.Tier) -> float:
+func get_workshop_offer_weight(weight: float, is_combined: bool) -> float:
 	for modifier: Modifier in modifiers:
-		weight = modifier.modify_workshop_offer_weight(weight, tier)
+		weight = modifier.modify_workshop_offer_weight(weight, is_combined)
 
 	return maxf(weight, 0.0)
 

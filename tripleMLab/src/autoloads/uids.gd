@@ -59,6 +59,25 @@ const DEAD_MANS_SWITCH_UID: String = "uid://cn5wj8kzr3mqv"
 const PUNCTURED_TANK_UID: String = "uid://dh7bq2nvx9kwl"
 const CHAIN_REACTION_UID: String = "uid://dg4kw9pnb2vsm"
 
+# MODIFIERS - combined cards (a bonus with a drawback linked to it)
+const OVERPRESSURE_UID: String = "uid://bq7xm3nvk9wtd"
+const SHORT_FUSE_UID: String = "uid://cn2vw8kqx4mrb"
+const DEAD_AIR_UID: String = "uid://dm6bq4nwx8ktv"
+const HAZARD_PAY_UID: String = "uid://bk9wv3mqn6xtc"
+const LOOSE_WIRING_UID: String = "uid://cw5nq8vbm2xkr"
+const OVERCHARGE_UID: String = "uid://dt3kx6nwq9vmb"
+const CASH_ADVANCE_UID: String = "uid://bv8mn4kwq3xrt"
+const COLD_SNAP_UID: String = "uid://cq6wb9nxm5vkt"
+const TIME_AND_A_HALF_UID: String = "uid://dn4vm7kqx8wbr"
+
+# MODIFIERS - drawbacks, only ever reached as the second half of a combined card
+const PRESSURE_LOSS_UID: String = "uid://bn3kw7vqx2mtd"
+const RACING_WICK_UID: String = "uid://cr8mv4nkq6wzt"
+const OPEN_CIRCUIT_UID: String = "uid://dk5nw9xbm3qvr"
+const SPARKING_CONTACT_UID: String = "uid://bw6qt3nkc8mxv"
+const THIN_SKIN_UID: String = "uid://ch4mb8wvn5rkt"
+const DOCKED_PAY_UID: String = "uid://dv9nk2xqm7bwt"
+
 # MODIFIERS - workshop terms
 const SECOND_SET_OF_HANDS_UID: String = "uid://bs4mv9xkq7ntd"
 const OPEN_BENCH_UID: String = "uid://cd7nk3wvx5rmp"
@@ -66,3 +85,4 @@ const CLUTTERED_BENCH_UID: String = "uid://dv3nb8kxm6qwl"
 const BLUEPRINTS_UID: String = "uid://dw9qt6mnb4xks"
 const SCRAP_HEAP_UID: String = "uid://bh5jx2vwc8ntr"
 const UNION_BREAK_UID: String = "uid://ck6mw4rzq9vbt"
+const DANGER_MONEY_UID: String = "uid://bh2wq6nvx4mkt"
