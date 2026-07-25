@@ -12,10 +12,13 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_87wup")
 
-[node name="TextureRect" type="TextureRect" parent="." unique_id=796589997]
-layout_mode = 0
-offset_right = 320.0
-offset_bottom = 180.0
+[node name="Background" type="TextureRect" parent="." unique_id=1597142964]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("2_qanne")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=78074955]
