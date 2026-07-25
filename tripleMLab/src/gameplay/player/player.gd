@@ -84,6 +84,7 @@ func _update_timers(delta: float) -> void:
 		
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = stats.jump_buffer_time
+
 	else:
 		jump_buffer_timer = max(jump_buffer_timer - delta, 0.0)
 	
