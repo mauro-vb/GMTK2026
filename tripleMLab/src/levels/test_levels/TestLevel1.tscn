@@ -42,4 +42,11 @@ unique_name_in_owner = true
 position = Vector2(453, 310)
 
 [node name="BreakingPlatform" parent="." unique_id=242398333 instance=ExtResource("5_w2ppj")]
-position = Vector2(239, 280)
+position = Vector2(350, 254)
+break_on_jump = true
+size = 15
+
+[node name="BreakingPlatform2" parent="." unique_id=392995269 instance=ExtResource("5_w2ppj")]
+position = Vector2(204, 286)
+break_on_jump = true
+size = 6

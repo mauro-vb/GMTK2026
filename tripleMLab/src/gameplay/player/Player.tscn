@@ -13,7 +13,7 @@
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_munyu"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oelj7"]
-size = Vector2(18, 0.5)
+size = Vector2(18, 1)
 
 [node name="Player" type="CharacterBody2D" unique_id=2129440237]
 collision_layer = 2
@@ -48,5 +48,5 @@ script = ExtResource("6_21ga0")
 unique_name_in_owner = true
 position = Vector2(0, 15)
 shape = SubResource("RectangleShape2D_oelj7")
-target_position = Vector2(0, 1)
+target_position = Vector2(0, 2)
 collision_mask = 256

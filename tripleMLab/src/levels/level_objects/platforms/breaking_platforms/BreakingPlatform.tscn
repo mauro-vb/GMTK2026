@@ -1,12 +1,16 @@
 [gd_scene format=3 uid="uid://c2g85bh61el1e"]
 
 [ext_resource type="Script" uid="uid://mrij1w8mbngl" path="res://src/levels/level_objects/platforms/breaking_platforms/breaking_platform.gd" id="1_k40yn"]
-[ext_resource type="Texture2D" uid="uid://dhjkxl1vsjcly" path="res://assets/art/platforms/BreakingPlatform.png" id="2_0d35n"]
+[ext_resource type="Texture2D" uid="uid://cx1jersaod76k" path="res://assets/art/platforms/breaking_platforms/CenterNormal.png" id="2_07ro8"]
+[ext_resource type="Texture2D" uid="uid://c3pe7b1kunnsa" path="res://assets/art/platforms/breaking_platforms/LeftSideNormal.png" id="3_p53o3"]
+[ext_resource type="Texture2D" uid="uid://c7kwe8b211qgx" path="res://assets/art/platforms/breaking_platforms/RightNormal.png" id="4_84f7s"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_w2ppj"]
-size = Vector2(1, 24)
+resource_local_to_scene = true
+size = Vector2(24, 1)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8og1h"]
+resource_local_to_scene = true
 size = Vector2(24, 6)
 
 [sub_resource type="Animation" id="Animation_p78sj"]
@@ -14,7 +18,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/path = NodePath("Visuals:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -29,8 +33,8 @@ resource_name = "break"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:modulate")
-tracks/0/interp = 2
+tracks/0/path = NodePath("Visuals:modulate")
+tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 1),
@@ -45,8 +49,8 @@ length = 0.15
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:modulate")
-tracks/0/interp = 2
+tracks/0/path = NodePath("Visuals:modulate")
+tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.15),
@@ -61,8 +65,8 @@ length = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:modulate")
-tracks/0/interp = 2
+tracks/0/path = NodePath("Visuals:modulate")
+tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.1),
@@ -76,8 +80,8 @@ resource_name = "reconstruct"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:modulate")
-tracks/0/interp = 2
+tracks/0/path = NodePath("Visuals:modulate")
+tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 1),
@@ -101,26 +105,48 @@ collision_mask = 0
 script = ExtResource("1_k40yn")
 metadata/_custom_type_script = "uid://mrij1w8mbngl"
 
+[node name="Visuals" type="Node2D" parent="." unique_id=2122665918]
+unique_name_in_owner = true
+
+[node name="CenterSprite" type="Sprite2D" parent="Visuals" unique_id=1324203973]
+unique_name_in_owner = true
+texture_repeat = 2
+position = Vector2(0, 3)
+texture = ExtResource("2_07ro8")
+region_enabled = true
+region_rect = Rect2(0, 0, 8, 6)
+
+[node name="LeftSprite" type="Sprite2D" parent="Visuals" unique_id=496894776]
+unique_name_in_owner = true
+position = Vector2(-8, 3)
+texture = ExtResource("3_p53o3")
+region_enabled = true
+region_rect = Rect2(0, 0, 8, 6)
+
+[node name="RightSprite" type="Sprite2D" parent="Visuals" unique_id=2035516097]
+unique_name_in_owner = true
+position = Vector2(8, 3)
+texture = ExtResource("4_84f7s")
+region_enabled = true
+region_rect = Rect2(0, 0, 8, 6)
+
 [node name="Area2D" type="Area2D" parent="." unique_id=699376990]
 unique_name_in_owner = true
+visible = false
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=952822185]
+[node name="DetectionCollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=952822185]
+unique_name_in_owner = true
 position = Vector2(5.9604645e-08, -0.5)
-rotation = 1.5707964
 shape = SubResource("RectangleShape2D_w2ppj")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1228450852]
 unique_name_in_owner = true
+visible = false
 position = Vector2(0, 3)
 shape = SubResource("RectangleShape2D_8og1h")
 one_way_collision = true
-
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1324203973]
-unique_name_in_owner = true
-position = Vector2(0, 3)
-texture = ExtResource("2_0d35n")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=114196741]
 unique_name_in_owner = true
