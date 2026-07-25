@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://bz5hw9nkq4jrm"]
+[gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://b05hxankq4jrm"]
 
 [ext_resource type="Script" uid="uid://cj9xt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_ad001"]
 
