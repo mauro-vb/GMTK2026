@@ -7,6 +7,7 @@ func get_state_id() -> PlayerState.STATE_ID:
 func enter() -> void:
 	player.velocity.y = stats.jump_velocity
 	player.consume_jump()
+	player.play_animation("jump")
 
 func physics_update(delta: float) -> void:
 	player.apply_horizontal_movement(delta)
