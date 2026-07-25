@@ -43,6 +43,8 @@ var air_jumps_used: int = 0
 # dash behavior
 var is_dashing: bool = false
 var dash_used: bool = false
+var _is_dash_animating: bool = false
+var _dash_anim_token: int = 0
 
 # drop-through behavior
 var _drop_through_timer: float = 0.0
@@ -130,7 +132,7 @@ func _update_timers(delta: float) -> void:
 		dash_used = false
 	else:
 		coyote_timer = max(coyote_timer - delta, 0.0)
-		
+
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = stats.jump_buffer_time
 
@@ -277,6 +279,8 @@ func get_movement_direction() -> float:
 func play_animation(anim_name: String) -> void:
 	if _is_whiffing and anim_name != "pogo":
 		return
+	if _is_dash_animating and anim_name != "dash":
+		return
 	if sprite.animation != anim_name:
 		sprite.play(anim_name)
 
@@ -287,6 +291,16 @@ func play_pogo_whiff() -> void:
 	_is_whiffing = false
 	_resume_state_animation()
 
+func play_dash_animation() -> void:
+	_dash_anim_token += 1
+	var token := _dash_anim_token
+	_is_dash_animating = true
+	play_animation("dash")
+	await sprite.animation_finished
+	if token == _dash_anim_token:
+		_is_dash_animating = false
+		_resume_state_animation()
+	
 func _resume_state_animation() -> void:
 	var state_name: String = PlayerState.STATE_ID.find_key(state_machine.current_state.get_state_id())
 	play_animation(state_name.to_lower())
