@@ -6,6 +6,11 @@ extends Node2D
 ## positions and burns from the first to the second at any angle, so the map can
 ## be reoriented without touching this file.
 ##
+## Layering note: the whole fuse sits under the room icons (Map.tscn lifts
+## MapNodes to z_index 5), so cords vanish under a crate instead of stopping at
+## its edge and the spark burrows in. The one exception is ArrivalBurst at
+## z_index 8: the shower on landing is the payoff and has to read on top.
+##
 ## Drawing note: [member unburnt] always keeps its full [code][from, to][/code]
 ## points and is never re-pointed. A tiled [Line2D] anchors its texture at its
 ## first point, so shrinking the unburnt line from the front would make the rope
@@ -30,9 +35,10 @@ const MIN_BURN_DURATION: float = 0.25
 ## would otherwise crawl for nearly 2.5 seconds.
 const MAX_BURN_DURATION: float = 1.1
 
-## Slightly dimmed and slightly transparent, so a dead cord sinks toward the
-## background instead of competing with the live ones.
-const DUD_MODULATE: Color = Color(0.92, 0.9, 0.89, 0.85)
+## Pushed well down: the dud cord texture is a pale grey, and against the map's
+## dark dirt an undimmed one reads brighter than the live tan cords beside it,
+## which is exactly backwards for a road that closed.
+const DUD_MODULATE: Color = Color(0.5, 0.47, 0.46, 0.8)
 const HINT_MODULATE: Color = Color(1.35, 1.18, 0.95, 1.0)
 const HINT_PERIOD: float = 1.1
 

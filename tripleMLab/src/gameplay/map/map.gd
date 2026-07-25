@@ -54,18 +54,31 @@ func create_map() -> void:
 	var middle: int = floori(MapGenerator.WIDTH * .5)
 	_add_map_node(map_data[MapGenerator.HEIGHT - 1][middle])
 
-	# Map Visuals Placement (also once): centre the whole tree on screen. The
-	# run spans one extra step on x because the final room sits past the last
-	# row, and PLACEMENT_RANDOMNESS only ever pushes nodes positive, so half of
-	# it is taken back here to keep the tree optically centred.
-	var map_size: Vector2 = Vector2(
-		MapGenerator.STEP_DIST * MapGenerator.HEIGHT,
-		MapGenerator.LANE_DIST * (MapGenerator.WIDTH - 1),
-	) + Vector2.ONE * MapGenerator.PLACEMENT_RANDOMNESS
-	visuals.position = ((get_viewport_rect().size - map_size) * .5).floor()
+	_centre_visuals()
 
 	# Rebuilding a map mid-run: everything already cut off stays a dud.
 	_refresh_dud_fuses()
+
+## Centres on the rooms that actually exist rather than on the nominal grid.
+## Paths only drift one lane per step, so a run's five paths routinely leave
+## whole lanes of the grid empty; centring on the grid would then pin a
+## perfectly good tree against one edge with dead dirt opposite it.
+func _centre_visuals() -> void:
+	var children: Array[Node] = nodes.get_children()
+	if children.is_empty():
+		return
+
+	var top_left: Vector2 = (children[0] as MapNode).position
+	var bottom_right: Vector2 = top_left
+	for map_node: MapNode in children:
+		top_left = top_left.min(map_node.position)
+		bottom_right = bottom_right.max(map_node.position)
+
+	# Positions are icon centres, so the occupied rect is a half-icon wider on
+	# every side. That cancels out of the centring, but it is what guarantees
+	# the tree clears the edges of the screen.
+	var occupied: Vector2 = bottom_right - top_left
+	visuals.position = (((get_viewport_rect().size - occupied) * .5) - top_left).floor()
 
 func show_map() -> void:
 	show()
@@ -82,9 +95,14 @@ func unlock_row(row: int = progress) -> void:
 
 	_refresh_path_hints()
 
+## Called when the player comes back from a room, which is the one moment the
+## map knows that room is finished — so it is also where the charge goes off
+## and the room swaps to its blown-up face.
 func unlock_next_nodes() -> void:
 	if last_room == null:
 		return
+
+	_seal_room(last_room)
 
 	for map_node: MapNode in nodes.get_children():
 		if last_room.next_nodes.has(map_node.room):
@@ -99,7 +117,7 @@ func _add_map_node(room: Room) -> void:
 	_connect_fuses(room)
 
 	if room.selected and room.coordinates.y < progress:
-		new_map_node.show_selected()
+		new_map_node.show_spent()
 
 func _connect_fuses(room: Room) -> void:
 	if room.next_nodes.size() < 1:
@@ -150,6 +168,15 @@ func _on_node_selected(room: Room) -> void:
 	progress += 1
 	_refresh_dud_fuses()
 	selected.emit(room)
+
+func _seal_room(room: Room) -> void:
+	if room == null:
+		return
+
+	for map_node: MapNode in nodes.get_children():
+		if map_node.room == room:
+			map_node.detonate()
+			return
 
 func _burn_to(room: Room) -> void:
 	# The opening pick has nothing behind it to burn: row 0 has no parents.
