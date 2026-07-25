@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="PlayerStats" format=3 uid="uid://fv33ejv1y52o"]
+
+[ext_resource type="Script" uid="uid://cpr5a14lofg2m" path="res://src/gameplay/player/player_stats.gd" id="1_sjolb"]
+
+[resource]
+script = ExtResource("1_sjolb")
+move_speed = 75.0
+acceleration = 450.0
+friction = 550.0
+jump_velocity = -150.0
+gravity = 300.0
+max_fall_speed = 400.0
+ascend_gravity_mult = 1.2
+jump_hang_threshold = 20.0
+jump_cut_gravity_mult = 2.0
+pogo_velocity = -270.0
+double_jump_velocity = -230.0
+dash_speed = 220.0
+dash_duration = 0.17
+metadata/_custom_type_script = "uid://cpr5a14lofg2m"
