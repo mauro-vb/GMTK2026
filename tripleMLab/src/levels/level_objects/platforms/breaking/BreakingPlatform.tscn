@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://c2g85bh61el1e"]
 
-[ext_resource type="Script" uid="uid://mrij1w8mbngl" path="res://src/levels/level_objects/platforms/breaking_platforms/breaking_platform.gd" id="1_k40yn"]
-[ext_resource type="Texture2D" uid="uid://cx1jersaod76k" path="res://assets/art/platforms/breaking_platforms/CenterNormal.png" id="2_07ro8"]
-[ext_resource type="Texture2D" uid="uid://c3pe7b1kunnsa" path="res://assets/art/platforms/breaking_platforms/LeftSideNormal.png" id="3_p53o3"]
-[ext_resource type="Texture2D" uid="uid://c7kwe8b211qgx" path="res://assets/art/platforms/breaking_platforms/RightNormal.png" id="4_84f7s"]
+[ext_resource type="Script" uid="uid://mrij1w8mbngl" path="res://src/levels/level_objects/platforms/breaking/breaking_platform.gd" id="1_k40yn"]
+[ext_resource type="Texture2D" uid="uid://qujh4lhakq2d" path="res://assets/art/platforms/breaking_platforms/CenterBreaking.png" id="2_p53o3"]
+[ext_resource type="Texture2D" uid="uid://6115hhpbal7l" path="res://assets/art/platforms/breaking_platforms/LeftBreaking.png" id="3_84f7s"]
+[ext_resource type="Texture2D" uid="uid://ufqsngqvyrt7" path="res://assets/art/platforms/breaking_platforms/RightBreaking.png" id="4_n4eca"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_w2ppj"]
 resource_local_to_scene = true
@@ -112,21 +112,21 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 texture_repeat = 2
 position = Vector2(0, 3)
-texture = ExtResource("2_07ro8")
+texture = ExtResource("2_p53o3")
 region_enabled = true
 region_rect = Rect2(0, 0, 8, 6)
 
 [node name="LeftSprite" type="Sprite2D" parent="Visuals" unique_id=496894776]
 unique_name_in_owner = true
 position = Vector2(-8, 3)
-texture = ExtResource("3_p53o3")
+texture = ExtResource("3_84f7s")
 region_enabled = true
 region_rect = Rect2(0, 0, 8, 6)
 
 [node name="RightSprite" type="Sprite2D" parent="Visuals" unique_id=2035516097]
 unique_name_in_owner = true
 position = Vector2(8, 3)
-texture = ExtResource("4_84f7s")
+texture = ExtResource("4_n4eca")
 region_enabled = true
 region_rect = Rect2(0, 0, 8, 6)
 

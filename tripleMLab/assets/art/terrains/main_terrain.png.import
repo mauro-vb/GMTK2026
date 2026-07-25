@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c7kwe8b211qgx"
-path="res://.godot/imported/RightNormal.png-58e4a323054a97251c1bad1c5aa147fa.ctex"
+uid="uid://n4y35evg62dv"
+path="res://.godot/imported/main_terrain.png-698a3aee9b30923a25b777ab7a07958c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/platforms/breaking_platforms/RightNormal.png"
-dest_files=["res://.godot/imported/RightNormal.png-58e4a323054a97251c1bad1c5aa147fa.ctex"]
+source_file="res://assets/art/terrains/main_terrain.png"
+dest_files=["res://.godot/imported/main_terrain.png-698a3aee9b30923a25b777ab7a07958c.ctex"]
 
 [params]
 

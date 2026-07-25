@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cx1jersaod76k"
-path="res://.godot/imported/CenterNormal.png-7dc76ceb3c22eb0a088e23201ff76c09.ctex"
+uid="uid://bd3a2lsop2yjt"
+path="res://.godot/imported/RightNormal.png-f8d7ff5ce59ed30645aaae9b8e347664.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/platforms/breaking_platforms/CenterNormal.png"
-dest_files=["res://.godot/imported/CenterNormal.png-7dc76ceb3c22eb0a088e23201ff76c09.ctex"]
+source_file="res://assets/art/platforms/normal_platform/RightNormal.png"
+dest_files=["res://.godot/imported/RightNormal.png-f8d7ff5ce59ed30645aaae9b8e347664.ctex"]
 
 [params]
 
