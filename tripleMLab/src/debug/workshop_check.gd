@@ -46,6 +46,44 @@ func _check_resources() -> void:
 	print("\n[ hooks ]")
 	_check_hooks()
 
+	print("\n[ overlapping clock modifiers ]")
+	_check_rate_contributions()
+
+
+## Regression guard. Modifiers used to save and restore TimeSystem.tick_rate
+## around themselves, which broke the moment two overlapped: a freeze (rate 0)
+## running under a slow-burn meant the slow-burn had snapshotted 0, and putting
+## that back when it expired killed the clock for the rest of the run.
+##
+## Combined cards made that pairing common — Frost Grip carries a freeze, and
+## several cards carry tick-rate drawbacks — so it is worth a standing check.
+func _check_rate_contributions() -> void:
+	var clock: TimeSystem = TimeSystem.new()
+
+	clock.set_rate_contribution(&"slow_burn", 0.5)
+	_check(is_equal_approx(clock.tick_rate, 0.5), "one contribution sets the rate")
+
+	clock.set_rate_contribution(&"freeze", 0.0)
+	_check(is_zero_approx(clock.tick_rate), "a freeze on top of it stops the clock")
+
+	clock.clear_rate_contribution(&"freeze")
+	_check(is_equal_approx(clock.tick_rate, 0.5), "thawing gives the slow-burn back, not 1.0")
+
+	clock.set_rate_contribution(&"double_time", 2.0)
+	_check(is_equal_approx(clock.tick_rate, 1.0), "contributions multiply (0.5 x 2.0)")
+
+	# Dropped in the order they were added, which is the order that used to break.
+	clock.clear_rate_contribution(&"slow_burn")
+	_check(is_equal_approx(clock.tick_rate, 2.0), "dropping the older one leaves the newer")
+
+	clock.clear_rate_contribution(&"double_time")
+	_check(is_equal_approx(clock.tick_rate, 1.0), "the clock comes back to normal, never 0")
+
+	clock.clear_rate_contribution(&"never_registered")
+	_check(is_equal_approx(clock.tick_rate, 1.0), "clearing an unknown key is a no-op")
+
+	clock.free()
+
 
 func _check_entries(pool: WorkshopPool) -> void:
 	var seen: Dictionary[String, bool] = {}

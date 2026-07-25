@@ -14,7 +14,6 @@ extends Modifier
 
 # Private
 var _remaining: float = 0.0
-var _previous_tick_rate: float = 1.0
 # On Ready
 
 # Static
@@ -29,8 +28,10 @@ func trigger_modifier() -> void:
 		return
 
 	_remaining = freeze_seconds
-	_previous_tick_rate = time_system.tick_rate
-	time_system.tick_rate = 0.0
+	# A contribution of zero rather than an assignment of zero: a slow-burn
+	# running at the same time keeps its own contribution, and gets it back
+	# intact when this one thaws.
+	time_system.set_rate_contribution(_rate_key(), 0.0)
 	player.can_move = false
 
 
@@ -54,10 +55,14 @@ func tick(delta: float) -> void:
 func _thaw() -> void:
 	var time_system: TimeSystem = _get_time_system()
 	if time_system != null:
-		time_system.tick_rate = _previous_tick_rate
+		time_system.clear_rate_contribution(_rate_key())
 
 	var player: Player = _get_player()
 	if player != null:
 		player.can_move = true
+
+
+func _rate_key() -> StringName:
+	return StringName("freeze:%d" % get_instance_id())
 
 # Callbacks
