@@ -1,7 +1,7 @@
 extends Node
 class_name PlayerState
 
-enum STATE_ID { IDLE, RUN, JUMP, FALL, POGO }
+enum STATE_ID { IDLE, RUN, JUMP, FALL, POGO, DOUBLE_JUMP }
 
 @warning_ignore("unused_signal")
 signal transitioned(new_state_id: PlayerState.STATE_ID)

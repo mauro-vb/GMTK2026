@@ -12,10 +12,10 @@ size = Vector2(386.5, 27)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hphrt"]
 size = Vector2(20, 83)
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_o7p7h"]
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_ohakh"]
 radius = 30.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_o7p7h"]
 
 [node name="TestLevel1" type="Node2D" unique_id=694732243]
 script = ExtResource("1_01rr6")
@@ -61,20 +61,24 @@ size = 6
 collision_layer = 64
 collision_mask = 0
 
-[node name="PogoArea" type="Area2D" parent="." unique_id=916437870]
+[node name="PogoArea" type="Area2D" parent="." unique_id=2090241041]
+position = Vector2(267, 296)
+collision_layer = 64
+collision_mask = 0
 script = ExtResource("4_ohakh")
 metadata/_custom_type_script = "uid://dukhfaunyk7py"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PogoArea" unique_id=240126303]
-position = Vector2(358, 288)
-shape = SubResource("CircleShape2D_ohakh")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PogoArea" unique_id=1732356605]
+shape = SubResource("CircleShape2D_o7p7h")
 debug_color = Color(0.8862745, 0.09803922, 0.4117647, 1)
 
-[node name="PogoArea2" type="Area2D" parent="." unique_id=1707890770]
+[node name="PogoArea2" type="Area2D" parent="." unique_id=1955134093]
+position = Vector2(376, 270)
+collision_layer = 64
+collision_mask = 0
 script = ExtResource("4_ohakh")
 metadata/_custom_type_script = "uid://dukhfaunyk7py"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PogoArea2" unique_id=1732356605]
-position = Vector2(270, 283)
-shape = SubResource("CircleShape2D_o7p7h")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PogoArea2" unique_id=240126303]
+shape = SubResource("CircleShape2D_ohakh")
 debug_color = Color(0.8862745, 0.09803922, 0.4117647, 1)

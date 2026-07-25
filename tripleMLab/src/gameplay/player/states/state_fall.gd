@@ -17,3 +17,7 @@ func physics_update(delta: float) -> void:
 
 	if player.can_jump():
 		transitioned.emit(PlayerState.STATE_ID.JUMP)
+		return
+
+	if player.can_double_jump():
+		transitioned.emit(PlayerState.STATE_ID.DOUBLE_JUMP)

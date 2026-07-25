@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://cw13dl5h86vba" path="res://src/gameplay/player/states/state_jump.gd" id="5_vgqeu"]
 [ext_resource type="Script" uid="uid://sicf3k0fekb2" path="res://src/gameplay/player/states/state_fall.gd" id="6_21ga0"]
 [ext_resource type="Script" uid="uid://ckgn0cpv58vxk" path="res://src/gameplay/player/states/state_pogo.gd" id="8_7og37"]
+[ext_resource type="Script" uid="uid://56g3dyfqc6ed" path="res://src/gameplay/player/states/state_double_jump.gd" id="9_vgqeu"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_munyu"]
 
@@ -50,6 +51,10 @@ script = ExtResource("6_21ga0")
 
 [node name="StatePogo" type="Node" parent="StateMachine" unique_id=1526737315]
 script = ExtResource("8_7og37")
+
+[node name="StateDoubleJump" type="Node" parent="StateMachine" unique_id=1346345358]
+script = ExtResource("9_vgqeu")
+metadata/_custom_type_script = "uid://56g3dyfqc6ed"
 
 [node name="PogoDetector" type="Area2D" parent="." unique_id=1963245913]
 collision_layer = 0

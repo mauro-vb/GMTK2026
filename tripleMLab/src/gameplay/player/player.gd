@@ -5,12 +5,21 @@ const JUMP_THROUGH_PLATFORMS_LAYER: int = 9
 
 @export var stats: PlayerStats
 
+# abilities
+var has_pogo_ability: bool = true
+var has_double_jump_ability: bool = true
+
+# basic jump behavior
 var coyote_timer: float = 0.0
 var jump_buffer_timer: float = 0.0
 var is_jump_cut: bool = false
 
+# pogo behavior
 var pogo_buffer_timer: float = 0.0
 var pogo_grace_timer: float = 0.0
+
+# double jump behavior
+var air_jumps_used: int = 0
 
 # Tracks held direction keys in press order (most recent = last).
 var _direction_stack: Array[String] = []
@@ -50,8 +59,12 @@ func _physics_process(delta: float) -> void:
 # coyote_timer resets while grounded, jump_buffer_timer resets on jump press.
 # Both count down otherwise
 func _update_timers(delta: float) -> void:
-	coyote_timer = stats.coyote_time if is_on_floor() else max(coyote_timer - delta, 0.0)
-
+	if is_on_floor():
+		coyote_timer = stats.coyote_time
+		air_jumps_used = 0
+	else:
+		coyote_timer = max(coyote_timer - delta, 0.0)
+		
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = stats.jump_buffer_time
 	else:
@@ -94,11 +107,20 @@ func consume_jump() -> void:
 	is_jump_cut = false
 
 func can_pogo() -> bool:
-	return pogo_grace_timer > 0.0 and pogo_buffer_timer > 0.0
+	return has_pogo_ability and pogo_grace_timer > 0.0 and pogo_buffer_timer > 0.0
 
 func consume_pogo() -> void:
 	pogo_grace_timer = 0.0
 	pogo_buffer_timer = 0.0
+	is_jump_cut = false
+	
+func can_double_jump() -> bool:
+	log(has_double_jump_ability)
+	return has_double_jump_ability and not is_on_floor() and air_jumps_used < stats.max_air_jumps and jump_buffer_timer > 0.0
+
+func consume_double_jump() -> void:
+	air_jumps_used += 1
+	jump_buffer_timer = 0.0
 	is_jump_cut = false
 	
 func get_movement_direction() -> float:

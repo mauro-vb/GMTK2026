@@ -1,6 +1,7 @@
 extends Resource
 class_name PlayerStats
 
+# Basic movements
 @export var move_speed: float = 300.0
 @export var acceleration: float = 1500.0
 @export var friction: float = 1200.0
@@ -21,6 +22,11 @@ class_name PlayerStats
 @export var jump_hang_max_speed_mult: float = 1.1  # bonus max speed near apex
 @export var jump_cut_gravity_mult: float = 3.0 # prevents velocity snap when jump is released early
 
-# Pogo (bounce off objects on the "Pogoable" physics layer)
+# Pogo
+@export var pogo_velocity: float = -400.0
 @export var pogo_buffer_time: float = 0.1
 @export var pogo_grace_time: float = 0.1
+
+# Double jump
+@export var double_jump_velocity: float = -360.0
+@export var max_air_jumps: int = 1
