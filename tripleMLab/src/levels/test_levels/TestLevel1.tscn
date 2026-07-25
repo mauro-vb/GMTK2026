@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://gkjr0jw35tlv" path="res://src/levels/level_objects/player_spawn/PlayerSpawn.tscn" id="2_t75tf"]
 [ext_resource type="PackedScene" uid="uid://mhk2a54mwtho" path="res://src/levels/level_objects/level_exit/LevelExit.tscn" id="3_01rr6"]
 [ext_resource type="PackedScene" uid="uid://c2g85bh61el1e" path="res://src/levels/level_objects/platforms/breaking_platforms/BreakingPlatform.tscn" id="5_w2ppj"]
+[ext_resource type="Script" uid="uid://dukhfaunyk7py" path="res://src/components/pogo_area.gd" id="4_ohakh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_munyu"]
 size = Vector2(386.5, 27)
@@ -11,8 +12,10 @@ size = Vector2(386.5, 27)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hphrt"]
 size = Vector2(20, 83)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_r4liw"]
-radius = 24.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_ohakh"]
+radius = 30.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_o7p7h"]
 
 [node name="TestLevel1" type="Node2D" unique_id=694732243]
 script = ExtResource("1_01rr6")
@@ -58,7 +61,20 @@ size = 6
 collision_layer = 64
 collision_mask = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1073230873]
-position = Vector2(383, 290)
-shape = SubResource("CircleShape2D_r4liw")
-debug_color = Color(0.08627451, 0.59607846, 0.7176471, 1)
+[node name="PogoArea" type="Area2D" parent="." unique_id=916437870]
+script = ExtResource("4_ohakh")
+metadata/_custom_type_script = "uid://dukhfaunyk7py"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PogoArea" unique_id=240126303]
+position = Vector2(358, 288)
+shape = SubResource("CircleShape2D_ohakh")
+debug_color = Color(0.8862745, 0.09803922, 0.4117647, 1)
+
+[node name="PogoArea2" type="Area2D" parent="." unique_id=1707890770]
+script = ExtResource("4_ohakh")
+metadata/_custom_type_script = "uid://dukhfaunyk7py"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PogoArea2" unique_id=1732356605]
+position = Vector2(270, 283)
+shape = SubResource("CircleShape2D_o7p7h")
+debug_color = Color(0.8862745, 0.09803922, 0.4117647, 1)
