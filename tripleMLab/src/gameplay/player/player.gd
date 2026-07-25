@@ -25,6 +25,7 @@ var air_jumps_used: int = 0
 var _direction_stack: Array[String] = []
 
 @onready var state_machine: PlayerStateMachine = %StateMachine
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 @onready var pogo_detector: Area2D = $PogoDetector
 @onready var floor_check: ShapeCast2D = %FloorCheck
@@ -51,6 +52,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	_update_timers(delta)
 	_apply_gravity(delta)
+	update_facing()
 	_update_platform_collision()
 	state_machine.physics_update(delta)
 	move_and_slide()
@@ -128,7 +130,15 @@ func get_movement_direction() -> float:
 		return 0.0
 	return -1.0 if _direction_stack.back() == "left" else 1.0
 
+func play_animation(anim_name: String) -> void:
+	if sprite.animation != anim_name:
+		sprite.play(anim_name)
 
+func update_facing() -> void:
+	var direction := get_movement_direction()
+	if direction != 0:
+		sprite.flip_h = direction > 0
+		
 func apply_horizontal_movement(delta: float) -> void:
 	var direction := get_movement_direction()
 	var target_speed := direction * stats.move_speed

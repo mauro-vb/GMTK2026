@@ -7,6 +7,7 @@ func get_state_id() -> PlayerState.STATE_ID:
 func enter() -> void:
 	player.velocity.y = stats.pogo_velocity
 	player.consume_pogo()
+	player.play_animation("pogo")
 
 func physics_update(delta: float) -> void:
 	player.apply_horizontal_movement(delta)

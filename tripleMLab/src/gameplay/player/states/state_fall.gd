@@ -4,6 +4,9 @@ class_name StateFall
 func get_state_id() -> PlayerState.STATE_ID:
 	return PlayerState.STATE_ID.FALL
 
+func enter() -> void:
+	player.play_animation("fall")
+	
 func physics_update(delta: float) -> void:
 	player.apply_horizontal_movement(delta)
 
