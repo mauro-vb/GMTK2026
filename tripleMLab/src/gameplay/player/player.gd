@@ -5,12 +5,28 @@ const JUMP_THROUGH_PLATFORMS_LAYER: int = 9
 
 @export var stats: PlayerStats
 
+# abilities
+var has_pogo_ability: bool = true
+var has_double_jump_ability: bool = true
+
+# basic jump behavior
 var coyote_timer: float = 0.0
 var jump_buffer_timer: float = 0.0
+var is_jump_cut: bool = false
+
+# pogo behavior
+var pogo_buffer_timer: float = 0.0
+var pogo_grace_timer: float = 0.0
+
+# double jump behavior
+var air_jumps_used: int = 0
+
 # Tracks held direction keys in press order (most recent = last).
 var _direction_stack: Array[String] = []
 
 @onready var state_machine: PlayerStateMachine = %StateMachine
+
+@onready var pogo_detector: Area2D = $PogoDetector
 @onready var floor_check: ShapeCast2D = %FloorCheck
 
 
@@ -28,6 +44,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_pop_direction("left")
 	elif event.is_action_released("right"):
 		_pop_direction("right")
+	elif event.is_action_released("jump") and velocity.y < 0:
+		is_jump_cut = true
 
 
 func _physics_process(delta: float) -> void:
@@ -37,6 +55,45 @@ func _physics_process(delta: float) -> void:
 	state_machine.physics_update(delta)
 	move_and_slide()
 
+# Ticks the coyote-time and jump-buffer windows each physics frame:
+# coyote_timer resets while grounded, jump_buffer_timer resets on jump press.
+# Both count down otherwise
+func _update_timers(delta: float) -> void:
+	if is_on_floor():
+		coyote_timer = stats.coyote_time
+		air_jumps_used = 0
+	else:
+		coyote_timer = max(coyote_timer - delta, 0.0)
+		
+	if Input.is_action_just_pressed("jump"):
+		jump_buffer_timer = stats.jump_buffer_time
+	else:
+		jump_buffer_timer = max(jump_buffer_timer - delta, 0.0)
+	
+	var touching_pogoable := pogo_detector.has_overlapping_bodies() or pogo_detector.has_overlapping_areas()
+	pogo_grace_timer = stats.pogo_grace_time if touching_pogoable else max(pogo_grace_timer - delta, 0.0)
+
+	if Input.is_action_just_pressed("attack"):
+		pogo_buffer_timer = stats.pogo_buffer_time
+	else:
+		pogo_buffer_timer = max(pogo_buffer_timer - delta, 0.0)
+		
+# Falling gravity > rising gravity, and gravity is reduced near the jump apex
+# (jump_hang_threshold) for a brief "float" feeling. See PlayerStats for tuning
+func _apply_gravity(delta: float) -> void:
+	if is_on_floor():
+		return
+
+	var gravity_multiplier := 1.0
+
+	if is_jump_cut and velocity.y < 0:
+		gravity_multiplier = stats.jump_cut_gravity_mult
+	elif abs(velocity.y) < stats.jump_hang_threshold:
+		gravity_multiplier = stats.jump_hang_gravity_mult
+	elif velocity.y > 0:
+		gravity_multiplier = stats.fall_gravity_mult
+
+	velocity.y = min(velocity.y + stats.gravity * gravity_multiplier * delta, stats.max_fall_speed)
 
 # True only within both the coyote-time window (recently left ground)
 # AND the jump-buffer window (recently pressed jump) — see _update_timers().
@@ -47,8 +104,25 @@ func can_jump() -> bool:
 func consume_jump() -> void:
 	coyote_timer = 0.0
 	jump_buffer_timer = 0.0
+	is_jump_cut = false
 
+func can_pogo() -> bool:
+	return has_pogo_ability and pogo_grace_timer > 0.0 and pogo_buffer_timer > 0.0
 
+func consume_pogo() -> void:
+	pogo_grace_timer = 0.0
+	pogo_buffer_timer = 0.0
+	is_jump_cut = false
+	
+func can_double_jump() -> bool:
+	log(has_double_jump_ability)
+	return has_double_jump_ability and not is_on_floor() and air_jumps_used < stats.max_air_jumps and jump_buffer_timer > 0.0
+
+func consume_double_jump() -> void:
+	air_jumps_used += 1
+	jump_buffer_timer = 0.0
+	is_jump_cut = false
+	
 func get_movement_direction() -> float:
 	if _direction_stack.is_empty():
 		return 0.0
@@ -66,31 +140,6 @@ func apply_horizontal_movement(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, target_speed, accel * delta)
 	else:
 		velocity.x = move_toward(velocity.x, 0, stats.friction * delta)
-
-
-# Ticks the coyote-time and jump-buffer windows each physics frame:
-# coyote_timer resets while grounded, jump_buffer_timer resets on jump press.
-# Both count down otherwise
-func _update_timers(delta: float) -> void:
-	coyote_timer = stats.coyote_time if is_on_floor() else max(coyote_timer - delta, 0.0)
-	if Input.is_action_just_pressed("jump"):
-		jump_buffer_timer = stats.jump_buffer_time
-	else:
-		jump_buffer_timer = max(jump_buffer_timer - delta, 0.0)
-
-
-# Falling gravity > rising gravity, and gravity is reduced near the jump apex
-# (jump_hang_threshold) for a brief "float" feeling. See PlayerStats for tuning
-func _apply_gravity(delta: float) -> void:
-	if is_on_floor():
-		return
-	var gravity_multiplier := 1.0
-	if abs(velocity.y) < stats.jump_hang_threshold:
-		gravity_multiplier = stats.jump_hang_gravity_mult
-	elif velocity.y > 0:
-		gravity_multiplier = stats.fall_gravity_mult
-	velocity.y = min(velocity.y + stats.gravity * gravity_multiplier * delta, stats.max_fall_speed)
-
 
 # Only collides with jump-through platforms when a short raycast from the
 # feet detects one within landing range directly below. This avoids the
