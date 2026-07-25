@@ -6,8 +6,8 @@ extends Node
 ## is spaced by [constant STEP_DIST] on x, while the parallel branches within a
 ## row fan out down the screen, spaced by [constant LANE_DIST] on y. Both are
 ## sized so the whole tree fits one 640x360 screen without scrolling.
-const STEP_DIST: int = 42
-const LANE_DIST: int = 38
+const STEP_DIST: int = 21
+const LANE_DIST: int = 19
 ## Kept small: room icons are 26px and cords pass under them, so a big jitter
 ## would let neighbours touch and swallow the fuse between them.
 const PLACEMENT_RANDOMNESS: int = 4

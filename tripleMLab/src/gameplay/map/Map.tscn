@@ -17,9 +17,9 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 
 [node name="MapNodes" type="Node2D" parent="Visuals" unique_id=1813259470]
-y_sort_enabled = true
-z_index = 5
 unique_name_in_owner = true
+z_index = 5
+y_sort_enabled = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=212875366]
 layer = -1
