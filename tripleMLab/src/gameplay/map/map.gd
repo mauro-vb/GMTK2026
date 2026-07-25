@@ -3,13 +3,9 @@ extends Node2D
 
 signal selected(room: Room)
 
-## Which axis the camera scrolls along. The map may be reoriented later (a
-## horizontal, left-to-right layout is under consideration); this is the only
-## place in the fuse system that knows about orientation, so switching costs
-## one property here and nothing in [MapFuse].
-enum ScrollAxis { X = 0, Y = 1 }
-
-const SCROLL_SPEED: int = 15
+## The whole tree is laid out to fit one screen (see [MapGenerator]), so the
+## camera is parked at the viewport centre and never moves: no scrolling, and
+## no panning while a fuse burns. Only the arrival shake touches it.
 const MAP_FUSE: PackedScene = preload("res://src/gameplay/map/visuals/MapFuse.tscn")
 
 ## Every path converges on the final room, so those last cords are drawn a
@@ -20,8 +16,6 @@ const SHAKE_PIXELS: float = 2.0
 const SHAKE_DURATION: float = 0.15
 const SHAKE_STEPS: int = 3
 
-@export var scroll_axis: ScrollAxis = ScrollAxis.Y
-
 @onready var camera: Camera2D = %Camera2D
 @onready var visuals: Node2D = %Visuals
 @onready var lines: Node2D = %Lines
@@ -31,35 +25,17 @@ const SHAKE_STEPS: int = 3
 var map_data: Array[Array]
 var progress: int
 var last_room: Room
-var camera_edge_y: float
 
 var _fuses: Dictionary[Vector4i, MapFuse] = {}
-var _burning: bool = false
 
 
 func _ready() -> void:
-	camera.position = Vector2(get_viewport_rect().size.x * .5,get_viewport_rect().size.y * .5)
-	camera_edge_y = MapGenerator.Y_DIST * (MapGenerator.HEIGHT - 1)
-	# Start inside the same range scrolling is clamped to, so the first camera
-	# move is a pan rather than a jump into legal territory.
-	camera.position = _clamp_camera(camera.position)
+	# Centring the camera on the viewport makes the visible world rect exactly
+	# (0, 0)-(viewport), which is what create_map() lays the tree out against.
+	camera.position = get_viewport_rect().size * .5
 
 	generate_new_map()
 	unlock_row(0)
-
-
-func _input(event: InputEvent) -> void:
-	# Fighting the camera while the spark is travelling just loses the spark.
-	if _burning:
-		return
-
-	var target: Vector2 = camera.position
-	if event.is_action_pressed("scroll_up"):
-		target[scroll_axis] = target[scroll_axis] - SCROLL_SPEED
-	if event.is_action_pressed("scroll_down"):
-		target[scroll_axis] = target[scroll_axis] + SCROLL_SPEED
-
-	camera.position = _clamp_camera(target)
 
 func generate_new_map() -> void:
 	progress = 0
@@ -78,10 +54,15 @@ func create_map() -> void:
 	var middle: int = floori(MapGenerator.WIDTH * .5)
 	_add_map_node(map_data[MapGenerator.HEIGHT - 1][middle])
 
-	# Map Visuals Placement (also once)
-	var map_width_pixels: int = MapGenerator.X_DIST * (MapGenerator.WIDTH - 1)
-	visuals.position.x = (get_viewport_rect().size.x - map_width_pixels) / 2
-	visuals.position.y = 0
+	# Map Visuals Placement (also once): centre the whole tree on screen. The
+	# run spans one extra step on x because the final room sits past the last
+	# row, and PLACEMENT_RANDOMNESS only ever pushes nodes positive, so half of
+	# it is taken back here to keep the tree optically centred.
+	var map_size: Vector2 = Vector2(
+		MapGenerator.STEP_DIST * MapGenerator.HEIGHT,
+		MapGenerator.LANE_DIST * (MapGenerator.WIDTH - 1),
+	) + Vector2.ONE * MapGenerator.PLACEMENT_RANDOMNESS
+	visuals.position = ((get_viewport_rect().size - map_size) * .5).floor()
 
 	# Rebuilding a map mid-run: everything already cut off stays a dud.
 	_refresh_dud_fuses()
@@ -180,28 +161,13 @@ func _burn_to(room: Room) -> void:
 		push_warning("Map: no fuse between %s and %s" % [last_room.coordinates, room.coordinates])
 		return
 
-	_burning = true
 	_clear_path_hints()
-	_follow_camera(fuse)
+	# No camera work here: the spark is already on screen wherever it travels.
 	await fuse.burn()
 	await _shake_camera()
-	_burning = false
 
-## Pans to where the spark lands over exactly the burn's duration. The camera
-## is not spark-centred when the burn starts, so snapping onto the spark would
-## jerk; a linear pan keeps it on screen the whole way (an edge is ~30-50px
-## against a 360px viewport) and finishes centred on it.
-func _follow_camera(fuse: MapFuse) -> void:
-	var landing: Vector2 = _clamp_camera(to_local(fuse.to_global(fuse.get_end_position())))
-	var destination: Vector2 = camera.position
-	destination[scroll_axis] = landing[scroll_axis]
-
-	var tween: Tween = create_tween()
-	tween.set_trans(Tween.TRANS_LINEAR)
-	tween.tween_property(camera, ^"position", destination, fuse.get_burn_duration())
-
-## Shakes via offset rather than position so it cannot fight the pan or the
-## scroll clamp, and is awaited so the camera always settles back at zero.
+## Shakes via offset rather than position so the camera always settles back on
+## the centred map, and is awaited so the shake finishes before the level loads.
 func _shake_camera() -> void:
 	var step_time: float = SHAKE_DURATION / float(SHAKE_STEPS + 1)
 	var tween: Tween = create_tween()
@@ -257,11 +223,6 @@ func _refresh_path_hints() -> void:
 func _clear_path_hints() -> void:
 	for fuse: MapFuse in _fuses.values():
 		fuse.set_hinted(false)
-
-func _clamp_camera(value: Vector2) -> Vector2:
-	var result: Vector2 = value
-	result[scroll_axis] = clampf(result[scroll_axis], -camera_edge_y, 0.0)
-	return result
 
 static func _fuse_key(from_coordinates: Vector2i, to_coordinates: Vector2i) -> Vector4i:
 	return Vector4i(from_coordinates.x, from_coordinates.y, to_coordinates.x, to_coordinates.y)

@@ -2,8 +2,12 @@ class_name MapGenerator
 extends Node
 
 # Visual
-const X_DIST: int = 40
-const Y_DIST: int = 30
+## The map runs left to right: a row of the grid is one step along the run and
+## is spaced by [constant STEP_DIST] on x, while the parallel branches within a
+## row fan out down the screen, spaced by [constant LANE_DIST] on y. Both are
+## sized so the whole tree fits one 640x360 screen without scrolling.
+const STEP_DIST: int = 42
+const LANE_DIST: int = 36
 const PLACEMENT_RANDOMNESS: int = 8
 
 # Size
@@ -49,14 +53,15 @@ func _generate_initial_grid() -> Array[Array]:
 		for x: int in WIDTH:
 			var current_map_node: Room = Room.new()
 			var offset: Vector2 = Vector2(randf(), randf()) * PLACEMENT_RANDOMNESS
-			current_map_node.position = Vector2(x * X_DIST, y * -Y_DIST) + offset
+			current_map_node.position = Vector2(y * STEP_DIST, x * LANE_DIST) + offset
 			current_map_node.coordinates = Vector2i(x, y)
 			current_map_node.next_nodes = []
-			
-			# Final Room shouldn't be random
+
+			# Final Room shouldn't be random: it sits one step past the last row
+			# and dead centre of the lanes, so the master fuses visibly converge.
 			if y == HEIGHT - 1:
-				current_map_node.position.y = (y + 1) * -Y_DIST
-			
+				current_map_node.position = Vector2((y + 1) * STEP_DIST, (WIDTH - 1) * .5 * LANE_DIST)
+
 			adjacent_rooms.append(current_map_node)
 		result.append(adjacent_rooms)
 	return result

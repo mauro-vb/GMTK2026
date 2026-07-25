@@ -25,9 +25,9 @@ const CORD_DUD: Texture2D = preload("res://assets/art/map/fuse/fuse_cord_dud.png
 ## diagonal edges do not burn faster than short straight ones.
 const BURN_SPEED: float = 55.0
 const MIN_BURN_DURATION: float = 0.25
-## Grid hops are 30-50px and land well inside this. It only bites on the last
-## row, where every path converges on the castle from up to ~160px away and
-## would otherwise crawl for nearly 3 seconds.
+## Grid hops are 40-60px and land well inside this. It only bites on the last
+## row, where every path converges on the castle from up to ~135px away and
+## would otherwise crawl for nearly 2.5 seconds.
 const MAX_BURN_DURATION: float = 1.1
 
 ## Slightly dimmed and slightly transparent, so a dead cord sinks toward the
