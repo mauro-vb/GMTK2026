@@ -94,9 +94,13 @@ var _visuals_base_scale: Vector2 = Vector2.ONE
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
 
-static func new_map_node(node_data: Room) -> MapNode:
+## [param layout_position] is where [Map] wants the icon, which is the room's
+## generated position after the tree has been fitted to the framed dirt (see
+## [method Map._fit_layout]) — not [member Room.position] itself.
+static func new_map_node(node_data: Room, layout_position: Vector2) -> MapNode:
 	var map_node: MapNode = SCENE.instantiate()
 	map_node.room = node_data
+	map_node.position = layout_position
 	return map_node
 
 
@@ -166,9 +170,9 @@ func _on_mouse_exited() -> void:
 
 func _set_room(value: Room) -> void:
 	# Runs from new_map_node() before the node is in the tree, so it may only
-	# touch the node's own properties. Art is applied in _ready().
+	# touch the node's own properties. Art is applied in _ready(), and the
+	# position comes from Map rather than from the room itself.
 	room = value
-	position = room.position
 
 func _refresh_art() -> void:
 	# _set_available can fire before the node is in the tree.
@@ -227,11 +231,8 @@ func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> voi
 	if not available or not event.is_action_pressed("left_mouse"):
 		return
 
+	# Nothing plays here on purpose: the answer to the click is the spark
+	# leaving the last room and running down the cord to this one (see
+	# [method Map._burn_to]), which starts the moment this fires.
 	room.selected = true
-	animation_player.play("selected")
-	await animation_player.animation_finished
-	_on_map_room_selected()
-
-# Called from animation player
-func _on_map_room_selected() -> void:
 	selected.emit(room)

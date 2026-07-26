@@ -266,7 +266,7 @@ the player detonates, and `MainGame.end_run(false)` puts up the same `RunEndScre
 death in the game puts up. There is no retry logic in this room — `RunEndScreen` owns that
 choice, and `MainGame.restart_run()` answers it.
 
-### 5.1 The ending, and hard mode
+### 5.1 The ending, and the difficulty ladder
 
 A victory can only be reached one way — out the far side of this room (§5) — so `end_run(true)`
 is not "a run that went well", it is **the game being beaten**, and it is the only place in the
@@ -275,43 +275,69 @@ codebase where that happens. Both things hang off that:
 - The win screen says so. `RunEndScreen` headlines `YOU BEAT IT` and reports the barrage
   stopping with the player still standing, rather than the generic "made it out" it used when
   there was no last room to speak of.
-- It is where **hard mode** is unlocked, announced and offered. The moment it is earned is the
-  only moment the player is definitely looking at the screen.
+- It is where the next rung of the **difficulty ladder** is unlocked, announced and offered. The
+  moment a mode is earned is the only moment the player is definitely looking at the screen.
 
-**Hard mode is one number.** A run starts on `TimeSystem.STARTING_TIME * 0.5` — thirty seconds
-instead of sixty — and nothing else changes: same map, same rooms, same boss, same modifiers.
-`MainGame._apply_hard_mode()` sets it on the freshly built `TimeSystem` in `load_game()` rather
-than the constant being changed, so every modifier that adds, removes or scales time keeps
-working off the run's own maximum and none of them has to know which mode it is in.
+**The ladder is four rungs, each the one below plus one thing taken away.** Beating a mode
+unlocks the one above it, and nothing else does:
+
+| | | |
+|---|---|---|
+| `Difficulty.NORMAL` | the full minute | available from the start |
+| `Difficulty.HARD` | half the fuse | beat normal |
+| `Difficulty.XTREME` | …and no double jump | beat hard |
+| `Difficulty.DEATH_MARCH` | …and no dash | beat XTREME |
+
+Everything else is untouched at every rung: same map, same rooms, same boss, same modifiers.
+What a mode asks is *do all of that with less*, not *do a different game*.
+
+**How a mode is applied.** `MainGame._apply_difficulty()` runs in `load_game()` against the
+freshly built `TimeSystem` and the freshly built player:
+
+- The clock is `TimeSystem.STARTING_TIME * Global.time_scale()`, set on the system rather than
+  by changing the constant, so every modifier that adds, removes or scales time keeps working
+  off the run's own maximum and none of them has to know which mode it is in.
+- The abilities are taken via `Player.lock_ability()`, not by clearing `has_dash_ability` and
+  friends. Those flags belong to `GrantAbilityModifier`, and on death march a workshop card
+  granting dash would otherwise hand back the exact thing the mode *is*. A lock outranks any
+  grant and is never lifted, so `can_dash()` and `can_double_jump()` stay false for the run.
 
 **Where the state lives.** `MainGame._teardown_run()` frees every system, the player and the
-map between runs, so nothing a run owns can remember anything. The two flags therefore sit on
+map between runs, so nothing a run owns can remember anything. The two values therefore sit on
 the `Global` autoload:
 
 | | |
 |---|---|
-| `Global.hard_mode_unlocked` | ever beaten the game. Persisted to `user://progress.cfg`, set once, never cleared |
-| `Global.hard_mode` | whether the *next* run is on the short fuse. Per session, deliberately **not** persisted |
+| `Global.unlocked_difficulty` | the hardest mode earned. Persisted to `user://progress.cfg`; only ever climbs |
+| `Global.difficulty` | what the *next* run is set to. Per session, deliberately **not** persisted |
 
-The second is not saved on purpose: it is a choice made at the menu or off the win screen, and
-a game that silently reopens in hard mode is a game that looks broken.
+The second is not saved on purpose: it is a choice made at the menu or off the run-end screen,
+and a game that silently reopens on death march is a game that looks broken. The save also still
+reads and writes the old `hard_mode_unlocked` boolean, so a player who beat the game before the
+ladder existed opens with hard mode already earned.
 
-`Global.unlock_hard_mode()` returns true only the first time, which is how the win screen tells
-*you just unlocked this* (a reward: `HARD MODE UNLOCKED / Half the fuse. Same job.`) from *this
-was already yours* (a reminder: `Hard mode is still waiting.`). Winning a hard run gets its own
-line and no offer, because there is nothing left to offer.
+`Global.unlock_next_difficulty()` returns the mode this win newly unlocked, or `NORMAL` for
+nothing new — normal is the floor of the ladder, so it can never itself be an unlock, which
+makes it a sentinel nobody has to explain. That is how the win screen tells *you just unlocked
+this* (a reward: `XTREME UNLOCKED / Half the fuse. No second jump.`) from *this was already
+yours* (a reminder: `Death March is still waiting.`).
 
-**Two ways in.** A `Hard Mode` button on the win screen — and on the death screen too, since a
-player who has beaten this game and is now losing runs to it is exactly who the mode is for —
-which emits rather than acts, leaving `MainGame.restart_run_on_hard()` to set the flag and deal
-a fresh run. And a `Hard Mode: On/Off` toggle on the start menu, which is **absent** rather than
-greyed out until the unlock: a locked button on the title screen tells a first-time player they
-are missing something before they have played a single room. The state is spelled out in the
-label rather than left to the button's pressed styling — "is that button darker than the other
-one?" is not a readable answer at 320x180.
+**Beating death march is the end of the whole thing**, and reads as it: headline `NOTHING LEFT`,
+no unlock, no offer, and a closing line saying there is nothing harder left to give.
 
-Retry keeps the focus on both screens. Hard mode is always a thing you choose, never a thing
-you fall into by mashing the button that ended the last run.
+**Two ways in.** A button on the win screen — and on the death screen too, since a player who
+has beaten this game and is now losing runs to it is exactly who the ladder is for — offering
+the hardest mode earned, unless the run was already on it. It emits `difficulty_pressed` with
+*which* mode rather than acting, leaving `MainGame.restart_run_on()` to set it and deal a fresh
+run. And a `Difficulty: <name>` button on the start menu that cycles the earned modes, with the
+mode's tagline under it, both **absent** rather than greyed out until there is a second mode to
+pick: a locked button on the title screen tells a first-time player they are missing something
+before they have played a single room. The choice is spelled out in the label rather than left
+to any pressed styling — that could never say which of four modes is set, and the names above
+hard mode do not tell you what they cost.
+
+Retry keeps the focus on both screens. A harder mode is always a thing you choose, never a
+thing you fall into by mashing the button that ended the last run.
 
 ---
 

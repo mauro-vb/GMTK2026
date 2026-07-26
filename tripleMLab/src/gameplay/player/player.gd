@@ -32,6 +32,13 @@ var has_pogo_ability: bool = true
 var has_double_jump_ability: bool = true
 var has_dash_ability: bool = true
 
+# Abilities the run's difficulty has taken away for the whole run (see
+# Global.STRIPPED_ABILITIES). Separate from the has_*_ability flags because those
+# are a modifier's to write: on death march, a workshop card granting dash would
+# otherwise hand back the exact thing the mode is. A lock outranks any grant and
+# is never lifted, so what the mode took stays taken.
+var _locked_abilities: Dictionary[Ability, bool] = {}
+
 # Seconds charged to the TimeSystem each time an ability is used. Written by
 # AbilityCostModifier; a missing entry means that ability is free.
 var ability_time_costs: Dictionary[Ability, float] = {}
@@ -241,8 +248,27 @@ func _find_pogo_area() -> PogoArea:
 			return area
 	return null
 	
+## Takes an ability away for the rest of the run. Called once per run by
+## [method MainGame._apply_difficulty]; there is no unlock by design.
+func lock_ability(ability: Ability) -> void:
+	_locked_abilities[ability] = true
+
+	match ability:
+		Ability.DASH:
+			has_dash_ability = false
+		Ability.DOUBLE_JUMP:
+			has_double_jump_ability = false
+		Ability.POGO:
+			has_pogo_ability = false
+
+
+func is_ability_locked(ability: Ability) -> bool:
+	return _locked_abilities.get(ability, false)
+
+
 func can_double_jump() -> bool:
-	log(has_double_jump_ability)
+	if is_ability_locked(Ability.DOUBLE_JUMP):
+		return false
 	return has_double_jump_ability and not is_on_floor() and air_jumps_used < stats.max_air_jumps and jump_buffer_timer > 0.0
 
 func consume_double_jump() -> void:
@@ -296,6 +322,8 @@ func _get_platforms_underfoot() -> Array[DropThroughPlatform]:
 	return platforms
 
 func can_dash() -> bool:
+	if is_ability_locked(Ability.DASH):
+		return false
 	return has_dash_ability and not dash_used
 
 func consume_dash() -> void:

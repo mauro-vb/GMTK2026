@@ -12,6 +12,26 @@ const MAP_FUSE: PackedScene = preload("res://src/gameplay/map/visuals/MapFuse.ts
 ## little thicker: one braided master fuse feeding the castle.
 const MASTER_CORD_WIDTH: float = 6.0
 
+## The dirt inside the stone frame of assets/art/map/background.png, which is
+## the whole of where the tree belongs. Measured off the art on a 320x180 screen
+## and then pulled a pixel or two further in, so a room never sits half on the
+## stonework.
+##
+## Not a symmetric inset: the frame is not symmetric. The side pillars end at
+## x=17 and x=304 and the bottom course starts at y=166, but the top of the wall
+## is a deep band of rubble reaching down to y≈43 — three times the bottom. An
+## even margin therefore reads as the whole map sitting too high, so this is
+## measured against each edge's own masonry rather than one number applied four
+## times.
+const PLAY_AREA: Rect2 = Rect2(18, 32, 284, 138)
+
+## Half of the space one room icon occupies: icons are 20x26 at the largest, the
+## final room wears [constant MapNode.FINAL_SCALE] on top of that, and every one
+## of them carries a shadow a couple of pixels down and right. The tree is fitted
+## by node *centres*, so this is the slack that keeps the outermost icons clear
+## of the frame rather than merely their middles.
+const ICON_HALF_EXTENTS: Vector2 = Vector2(16, 16)
+
 const SHAKE_PIXELS: float = 2.0
 const SHAKE_DURATION: float = 0.15
 const SHAKE_STEPS: int = 3
@@ -27,6 +47,11 @@ var progress: int
 var last_room: Room
 
 var _fuses: Dictionary[Vector4i, MapFuse] = {}
+## What one grid unit of the generator's layout is worth on screen, per axis, so
+## that the whole grid lands inside [constant PLAY_AREA] — under 1 on x, which
+## the frame is too narrow for, and over 1 on y, which it has room to spare on.
+## See [method _fit_layout].
+var _layout_scale: Vector2 = Vector2.ONE
 
 
 func _ready() -> void:
@@ -45,24 +70,77 @@ func generate_new_map() -> void:
 func create_map() -> void:
 	_clear_map_visuals()
 
-	for current_row: Array in map_data:
-		for room: Room in current_row:
-			if room.next_nodes.size() > 0:
-				_add_map_node(room)
+	_fit_layout()
+	var drawn: Array[Room] = _drawn_rooms()
 
-	# Final Room Needs Manual Spawning (once, not per row)
-	var middle: int = floori(MapGenerator.WIDTH * .5)
-	_add_map_node(map_data[MapGenerator.LENGTH - 1][middle])
+	for room: Room in drawn:
+		_add_map_node(room)
 
 	_centre_visuals()
 
 	# Rebuilding a map mid-run: everything already cut off stays a dud.
 	_refresh_dud_fuses()
 
-## Centres on the rooms that actually exist rather than on the nominal grid.
-## Paths only drift one lane per step, so a run's five paths routinely leave
-## whole lanes of the grid empty; centring on the grid would then pin a
-## perfectly good tree against one edge with dead dirt opposite it.
+## Every room that ends up on screen, in draw order. A room with no outgoing
+## cords is one no path reaches, and the final room hangs off the end of the
+## grid rather than being connected out of it, so neither falls out of a plain
+## sweep of the rows.
+func _drawn_rooms() -> Array[Room]:
+	var drawn: Array[Room] = []
+
+	for current_row: Array in map_data:
+		for room: Room in current_row:
+			if room.next_nodes.size() > 0:
+				drawn.append(room)
+
+	# Final Room Needs Manual Spawning (once, not per row)
+	var middle: int = floori(MapGenerator.WIDTH * .5)
+	drawn.append(map_data[MapGenerator.LENGTH - 1][middle])
+
+	return drawn
+
+## Fits the generator's grid to the dirt, so a step and a lane are worth whatever
+## the frame has room for.
+##
+## [MapGenerator] lays rooms out on a grid of fixed pixel distances ([constant
+## MapGenerator.STEP_DIST] per step, [constant MapGenerator.LANE_DIST] per lane),
+## sized against the bare 320x180 screen — nine steps of which come to more than
+## the framed area, while the five lanes come to less than it. Rather than
+## re-tune those constants against the art every time either changes, the room
+## *positions* are scaled and the icons are left alone: scaling [member visuals]
+## instead would put every sprite on a fractional scale, and this is pixel art.
+##
+## Fitted against the nominal grid rather than against the rooms actually dealt,
+## and per axis. Against the grid, because a run whose paths only ever touch two
+## lanes would otherwise have those two lanes stretched to the full height of the
+## frame, and a map's spacing would change with its luck. Per axis, because the
+## two axes are wrong in opposite directions here, and one uniform number would
+## have to pick which of them to keep.
+func _fit_layout() -> void:
+	# What is left of the play area once a half-icon is set aside at each end,
+	# because what is being fitted is the span between icon *centres*.
+	var available: Vector2 = PLAY_AREA.size - ICON_HALF_EXTENTS * 2.0
+	# The grid at full extent: every step out to the final room, which sits one
+	# step past the last row, and every lane. Placement jitter rides on top of
+	# that (see MapGenerator.PLACEMENT_RANDOMNESS) and is counted so the shove it
+	# gives the outermost rooms cannot push them into the stonework.
+	var grid: Vector2 = Vector2(
+		MapGenerator.LENGTH * MapGenerator.STEP_DIST,
+		(MapGenerator.WIDTH - 1) * MapGenerator.LANE_DIST + MapGenerator.PLACEMENT_RANDOMNESS,
+	)
+
+	_layout_scale = available / grid
+
+## The on-screen position of a room, i.e. its generated position after
+## [method _fit_layout]. Floored so icons stay on whole pixels.
+func _layout_position(room: Room) -> Vector2:
+	return (room.position * _layout_scale).floor()
+
+## Centres on the rooms that actually exist rather than on the nominal grid, and
+## within the framed dirt rather than the whole screen. Paths only drift one lane
+## per step, so a run's five paths routinely leave whole lanes of the grid empty;
+## centring on the grid would then pin a perfectly good tree against one edge
+## with dead dirt opposite it.
 func _centre_visuals() -> void:
 	var children: Array[Node] = nodes.get_children()
 	if children.is_empty():
@@ -75,10 +153,10 @@ func _centre_visuals() -> void:
 		bottom_right = bottom_right.max(map_node.position)
 
 	# Positions are icon centres, so the occupied rect is a half-icon wider on
-	# every side. That cancels out of the centring, but it is what guarantees
-	# the tree clears the edges of the screen.
+	# every side. That cancels out of the centring, but it is what _fit_layout
+	# has already made room for.
 	var occupied: Vector2 = bottom_right - top_left
-	visuals.position = (((get_viewport_rect().size - occupied) * .5) - top_left).floor()
+	visuals.position = (PLAY_AREA.position + ((PLAY_AREA.size - occupied) * .5) - top_left).floor()
 
 func show_map() -> void:
 	show()
@@ -111,7 +189,7 @@ func unlock_next_nodes() -> void:
 	_refresh_path_hints()
 
 func _add_map_node(room: Room) -> void:
-	var new_map_node: MapNode = MapNode.new_map_node(room)
+	var new_map_node: MapNode = MapNode.new_map_node(room, _layout_position(room))
 	new_map_node.selected.connect(_on_node_selected)
 	new_map_node.hover_entered.connect(_on_node_hover_entered)
 	new_map_node.hover_exited.connect(_on_node_hover_exited)
@@ -126,7 +204,10 @@ func _connect_fuses(room: Room) -> void:
 		return
 
 	for next: Room in room.next_nodes:
-		var fuse: MapFuse = _add_fuse(room.coordinates, room.position, next.coordinates, next.position)
+		var fuse: MapFuse = _add_fuse(
+			room.coordinates, _layout_position(room),
+			next.coordinates, _layout_position(next),
+		)
 
 		if next.type == Room.Type.FINAL:
 			fuse.set_cord_width(MASTER_CORD_WIDTH)
@@ -162,8 +243,9 @@ func _on_node_selected(room: Room) -> void:
 		if map_node.room.coordinates.y == room.coordinates.y:
 			map_node.available = false
 
-	# The node's own 0.5s selected animation has already played, so the player
-	# reads it as: node reacts -> spark travels -> level loads.
+	# The click's whole answer: the spark leaves the last room, runs down the
+	# cord and the level loads where it lands. Nothing animates on the node
+	# itself first — that only delayed the one thing worth watching.
 	await _burn_to(room)
 
 	last_room = room

@@ -259,10 +259,11 @@ func _check_survival(game: MainGame, level: BossLevel) -> void:
 	if _check(screen != null, "the run-end screen is up"):
 		_check(screen.headline.text == "YOU BEAT IT",
 			"and it says the run was won ('%s')" % screen.headline.text)
-		# Surviving the barrage is the only thing in the game that unlocks hard
-		# mode, so getting here has to have done it — whether or not this run was
-		# the first one to.
-		_check(Global.hard_mode_unlocked, "...and hard mode is unlocked")
+		# Surviving the barrage is the only thing in the game that moves the
+		# difficulty ladder, so getting here has to have put the rung above the
+		# run's own mode within reach — whether or not this run was the first to.
+		_check(Global.unlocked_difficulty >= Global.next_difficulty(Global.difficulty),
+			"...and the next difficulty is unlocked")
 
 
 # --- Plumbing ----------------------------------------------------------------
