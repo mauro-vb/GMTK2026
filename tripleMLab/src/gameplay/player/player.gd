@@ -349,7 +349,18 @@ func apply_horizontal_movement(delta: float) -> void:
 # max_fall_speed covers several pixels per physics tick — without the look-ahead
 # the feet step straight over that band, the mask never gets enabled, and the
 # player tunnels through the platform.
+#
+# Rising is excluded outright. The cast box starts 2.5px inside the body rather
+# than at its lower edge, so on the way up a platform enters that band while it
+# still overlaps the player. Enabling the mask there hands move_and_slide an
+# already-overlapping one-way shape, and it resolves the overlap the only way it
+# can — upward — which reads as the player teleporting onto the platform.
+# You can't land on anything while moving up, so there is nothing to detect yet.
 func _update_platform_collision(delta: float) -> void:
+	if velocity.y < 0.0:
+		set_collision_mask_value(JUMP_THROUGH_PLATFORMS_LAYER, false)
+		return
+
 	var reach := _floor_check_reach
 	if velocity.y > 0.0:
 		reach = max(reach, velocity.y * delta + FLOOR_CHECK_LOOKAHEAD_MARGIN)
