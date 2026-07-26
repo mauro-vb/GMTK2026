@@ -93,8 +93,11 @@ func can_present() -> bool:
 	return super() and table.slices.size() == 2
 
 
+## Says the stake before the call: this chest is a clean "something or
+## nothing", so unlike the wheel and the board it's worth naming up front —
+## there's no wedge or bin sitting there doing the telling for it.
 func begin() -> void:
-	_announce("CALL IT")
+	_announce("CALL IT  ·  %s OR NOTHING" % _stake_label())
 	heads_button.grab_focus()
 
 # Private
@@ -115,6 +118,15 @@ func _build() -> void:
 	# screen and the mouse and the stick can't disagree about where it is.
 	heads_button.mouse_entered.connect(_on_side_hovered.bind(heads_button))
 	tails_button.mouse_entered.connect(_on_side_hovered.bind(tails_button))
+
+
+## The non-zero of the table's two faces — the number worth calling for.
+func _stake_label() -> String:
+	for slice: TreasureSlice in table.slices:
+		if not is_zero_approx(slice.seconds):
+			return slice.get_label()
+
+	return table.best_slice().get_label()
 
 
 ## Where the coin sits when it is not in the air: centred in the space the

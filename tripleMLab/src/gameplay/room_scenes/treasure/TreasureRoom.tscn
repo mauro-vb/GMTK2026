@@ -1,12 +1,15 @@
-[gd_scene load_steps=3 format=3 uid="uid://dn8kw3vqm7xbt"]
+[gd_scene load_steps=4 format=3 uid="uid://dn8kw3vqm7xbt"]
 
 [ext_resource type="Script" uid="uid://bk7vn4mxq9wtc" path="res://src/gameplay/room_scenes/treasure/treasure_room.gd" id="1_treasure"]
 [ext_resource type="Resource" uid="uid://bv8kq4nwm6xtr" path="res://src/gameplay/room_scenes/treasure/tables/good.tres" id="2_fallback"]
+[ext_resource type="Resource" path="res://src/gameplay/room_scenes/treasure/tables/good_coin.tres" id="3_fallback_coin"]
 
 [node name="TreasureRoom" type="Node2D"]
 script = ExtResource("1_treasure")
 should_tick_time = false
 fallback_table = ExtResource("2_fallback")
+fallback_coin_table = ExtResource("3_fallback_coin")
+fallback_corrupted = false
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

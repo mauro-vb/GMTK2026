@@ -22,6 +22,12 @@ var parents: Array[Room] = []
 ## lays on. Null on every other room type.
 var treasure: TreasureTable = null
 
+## The same chest, shaped for a coin flip instead: coin needs exactly two
+## outcomes, so it plays from its own table rather than [member treasure]
+## (which carries a third, middling outcome for the wheel and the board).
+## Null on every other room type.
+var treasure_coin: TreasureTable = null
+
 ## Whether this TREASURE room always bites (true) or always pays (false).
 ## Decided once, at map-gen time, by [method MapGenerator._assign_treasure_tables]
 ## — a chest's fate isn't a roll inside the room, it's a fact about the room

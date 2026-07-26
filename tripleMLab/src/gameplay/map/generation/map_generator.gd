@@ -167,7 +167,8 @@ func _setup_node_types() -> void:
 ## they are left out of the deal rather than eating a slot in it.
 func _assign_treasure_tables() -> void:
 	var treasure_set: TreasureSet = ResourceLoader.load(UIDs.TREASURE_SET_UID) as TreasureSet
-	if treasure_set == null or treasure_set.good_table == null or treasure_set.corrupted_table == null:
+	if treasure_set == null or treasure_set.good_table == null or treasure_set.corrupted_table == null \
+			or treasure_set.good_coin_table == null or treasure_set.corrupted_coin_table == null:
 		push_error("MapGenerator: no TreasureSet to deal chests from.")
 		return
 
@@ -181,6 +182,7 @@ func _assign_treasure_tables() -> void:
 		for index: int in chests.size():
 			chests[index].is_corrupted = dealt[index]
 			chests[index].treasure = treasure_set.table_for(dealt[index])
+			chests[index].treasure_coin = treasure_set.coin_table_for(dealt[index])
 
 ## Types are picked first and the scene each one loads is resolved after, so a
 ## room only has to be told what it is, never what file that means.
