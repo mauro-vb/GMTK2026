@@ -67,22 +67,22 @@ size = 7
 [node name="BreakOnJump" type="Node2D" parent="Platforms/Breaking" unique_id=150326491]
 
 [node name="BreakingPlatform" parent="Platforms/Breaking/BreakOnJump" unique_id=242398333 instance=ExtResource("4_h28xm")]
-position = Vector2(136, 48)
+position = Vector2(144, 48)
 break_on_jump = true
-size = 20
+size = 22
 
 [node name="Normal" type="Node2D" parent="Platforms/Breaking" unique_id=517218632]
 
 [node name="BreakingPlatform" parent="Platforms/Breaking/Normal" unique_id=1067826459 instance=ExtResource("4_h28xm")]
-position = Vector2(304, 112)
+position = Vector2(304, 116)
 size = 4
 
 [node name="BreakingPlatform2" parent="Platforms/Breaking/Normal" unique_id=1005844820 instance=ExtResource("4_h28xm")]
-position = Vector2(296, 80)
+position = Vector2(296, 92)
 size = 6
 
 [node name="BreakingPlatform3" parent="Platforms/Breaking/Normal" unique_id=1184058070 instance=ExtResource("4_h28xm")]
-position = Vector2(288, 48)
+position = Vector2(288, 68)
 size = 8
 
 [node name="Normal" type="Node2D" parent="Platforms" unique_id=1375409850]
