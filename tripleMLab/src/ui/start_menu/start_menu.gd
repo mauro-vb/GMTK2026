@@ -7,11 +7,18 @@ extends Control
 const BOB_PIXELS: float = 1.0
 const BOB_PERIOD: float = 2.4
 
+## The slider's own 0-1 range, mapped onto a dB span rather than fed straight
+## to the bus — a linear volume_db would make the bottom half of the slider
+## sound identical and the top half do all the work.
+const MIN_VOLUME_DB: float = -40.0
+const MAX_VOLUME_DB: float = 0.0
+
 # On Ready
 @onready var title: TextureRect = %Title
 @onready var play_button: Button = %PlayButton
 @onready var hard_mode_button: Button = %HardModeButton
 @onready var quit_button: Button = %QuitButton
+@onready var volume_slider: HSlider = %VolumeSlider
 
 # Lifecycle
 func _ready() -> void:
@@ -29,6 +36,11 @@ func _ready() -> void:
 	# title screen is the first thing a jam player clicks.
 	quit_button.visible = not OS.has_feature("web")
 	play_button.grab_focus()
+
+	# Reads MusicPlayer's own volume rather than assuming its default, so the
+	# slider always starts wherever the music actually is.
+	volume_slider.value = inverse_lerp(MIN_VOLUME_DB, MAX_VOLUME_DB, MusicPlayer.get_volume_db())
+	volume_slider.value_changed.connect(_on_volume_changed)
 
 	_start_bob()
 
@@ -65,3 +77,7 @@ func _on_hard_mode_toggled(pressed: bool) -> void:
 
 func _on_quit_button_pressed() -> void:
 	Global.main_game.quit_game()
+
+
+func _on_volume_changed(value: float) -> void:
+	MusicPlayer.set_volume_db(lerpf(MIN_VOLUME_DB, MAX_VOLUME_DB, value))

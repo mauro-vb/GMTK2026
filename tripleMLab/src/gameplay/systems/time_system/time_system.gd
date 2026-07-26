@@ -11,6 +11,19 @@ signal ticking_changed(ticking: bool)
 # Constants
 const STARTING_TIME: float = 60.0
 
+## Placeholder sfx from the team — single-note clips, looped here rather than
+## shipped pre-looped. clock_down doubles as the ambient tick (while [member
+## ticking]) and the quicker loss flourish (see [method remove_time]); there is
+## no ambient equivalent for a gain, so clock_up only ever plays the flourish.
+const TICK_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/clock_down.wav")
+const GAIN_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/clock_up.wav")
+const TICK_VOLUME_DB: float = -14.0
+const BURST_VOLUME_DB: float = -6.0
+## How long a burst's quicker flourish runs before dropping back to the ambient
+## tick (or, for a gain, back to silence).
+const BURST_DURATION: float = 0.5
+const BURST_PITCH: float = 1.6
+
 # Exports
 
 # Public
@@ -52,11 +65,23 @@ var _expired_emitted: bool = false
 ## adds or removes itself, and the rate is derived from whatever is left.
 var _rate_contributions: Dictionary[StringName, float] = {}
 
+## The ambient tick — playing for exactly as long as [member ticking] is true.
+var _tick_audio: AudioStreamPlayer
+## The quicker flourish layered over a loss or a gain. Two players rather than
+## one so a loss and a gain landing in the same frame don't cut each other off.
+var _loss_audio: AudioStreamPlayer
+var _gain_audio: AudioStreamPlayer
+## One counter per burst player, bumped on every (re)trigger — mirrors
+## Player._dash_anim_token: a stale delayed stop() checks its own number against
+## the current one and does nothing if a newer burst has already taken over.
+var _burst_tokens: Dictionary[AudioStreamPlayer, int] = {}
+
 # On Ready
 
 # Lifecycle
 func _ready() -> void:
 	current_time = max_time
+	_build_sfx_players()
 
 func _process(delta: float) -> void:
 	if not ticking:
@@ -69,9 +94,37 @@ func _process(delta: float) -> void:
 		ticking = false
 		time_expired.emit()
 
+## Built here rather than authored on TimeSystem.tscn, so the raw sfx can drop
+## straight in without an editor pass over the scene.
+func _build_sfx_players() -> void:
+	AudioUtil.configure_loop(TICK_SFX)
+	AudioUtil.configure_loop(GAIN_SFX)
+
+	_tick_audio = AudioStreamPlayer.new()
+	_tick_audio.stream = TICK_SFX
+	_tick_audio.volume_db = TICK_VOLUME_DB
+	add_child(_tick_audio)
+
+	_loss_audio = AudioStreamPlayer.new()
+	_loss_audio.stream = TICK_SFX
+	_loss_audio.volume_db = BURST_VOLUME_DB
+	_loss_audio.pitch_scale = BURST_PITCH
+	add_child(_loss_audio)
+
+	_gain_audio = AudioStreamPlayer.new()
+	_gain_audio.stream = GAIN_SFX
+	_gain_audio.volume_db = BURST_VOLUME_DB
+	_gain_audio.pitch_scale = BURST_PITCH
+	add_child(_gain_audio)
+
 # Public
 func add_time(amount: float) -> void:
 	current_time += amount
+	# Guarded rather than left to the burst itself: a whiffed treasure chest
+	# calls this with 0 and must stay silent, not play a "you gained something"
+	# flourish for nothing.
+	if amount > 0.0:
+		_play_burst(_gain_audio)
 
 func add_max_time(amount: float) -> void:
 	max_time = max_time + amount
@@ -79,6 +132,8 @@ func add_max_time(amount: float) -> void:
 
 func remove_time(amount: float) -> void:
 	current_time = max(current_time - amount, 0.0)
+	if amount > 0.0:
+		_play_burst(_loss_audio)
 
 ## Registers (or replaces) one modifier's multiplier on the clock. `key` must be
 ## unique per modifier *instance*, so two stacks of the same modifier each count.
@@ -111,6 +166,28 @@ func _refresh_tick_rate() -> void:
 func _set_ticking(value: bool) -> void:
 	ticking = value and not _expired_emitted
 	ticking_changed.emit(ticking)
+
+	if _tick_audio == null:
+		return
+	if ticking:
+		if not _tick_audio.playing:
+			_tick_audio.play()
+	else:
+		_tick_audio.stop()
+
+## Restarts rather than queues: a second loss landing mid-flourish is heard as
+## one longer flourish, not cut off by an earlier trigger's stop() firing
+## partway through the new one.
+func _play_burst(player: AudioStreamPlayer) -> void:
+	player.play()
+	var token: int = _burst_tokens.get(player, 0) + 1
+	_burst_tokens[player] = token
+
+	var timer: SceneTreeTimer = get_tree().create_timer(BURST_DURATION)
+	timer.timeout.connect(func() -> void:
+		if _burst_tokens.get(player, 0) == token:
+			player.stop()
+	, CONNECT_ONE_SHOT)
 	
 func _set_current_time(value: float) -> void:
 	value = clampf(value, 0.0, max_time)

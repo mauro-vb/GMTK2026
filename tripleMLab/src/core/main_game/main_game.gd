@@ -53,7 +53,8 @@ func _ready() -> void:
 		SceneContainer.PAUSE: pause_root,
 	}
 	load_scene(UIDs.START_MENU_SCENE_UID, SceneContainer.UI)
-	
+	MusicPlayer.play_ambient_track()
+
 
 
 func _input(event: InputEvent) -> void:
@@ -106,6 +107,9 @@ func load_game() -> void:
 	_apply_hard_mode()
 	_init_player()
 	time_system.time_expired.connect(_on_time_expired)
+	# The map is part of the run, not a break from it — the level track carries
+	# through both, and only a workshop or a chest interrupts it.
+	MusicPlayer.play_level_track()
 
 	change_scene(UIDs.MAP_HUD_SCENE_UID, SceneContainer.UI)
 	map = load_scene(UIDs.MAP_SCENE_UID) as Map
@@ -188,6 +192,7 @@ func enter_level(level_uid: String) -> void:
 ## puts the map HUD back on the way out.
 func enter_workshop(workshop_uid: String) -> void:
 	unload_scene(SceneContainer.UI)
+	MusicPlayer.play_ambient_track()
 
 	_current_room = load_scene(workshop_uid, SceneContainer.LEVEL) as Workshop
 	if _current_room == null:
@@ -208,6 +213,7 @@ func enter_event(_event_uid: String) -> void:
 ## map HUD comes down because the room carries its own clock and modifier strip.
 func enter_treasure(treasure_uid: String) -> void:
 	unload_scene(SceneContainer.UI)
+	MusicPlayer.play_ambient_track()
 
 	_current_room = load_scene(treasure_uid, SceneContainer.LEVEL) as TreasureRoom
 	if _current_room == null:
@@ -235,6 +241,10 @@ func exit_room() -> void:
 	if _in_final_room:
 		end_run(true)
 		return
+
+	# Back on the map either from a level (already playing) or a workshop/chest
+	# (was on the ambient track) — either way this is the run again.
+	MusicPlayer.play_level_track()
 
 	change_scene(UIDs.MAP_HUD_SCENE_UID, SceneContainer.UI)
 	world.add_child(map)
@@ -288,6 +298,7 @@ func restart_run_on_hard() -> void:
 
 func return_to_menu() -> void:
 	_teardown_run()
+	MusicPlayer.play_ambient_track()
 	change_scene(UIDs.START_MENU_SCENE_UID, SceneContainer.UI)
 
 
