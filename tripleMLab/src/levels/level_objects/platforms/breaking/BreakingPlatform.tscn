@@ -147,6 +147,7 @@ visible = false
 position = Vector2(0, 3)
 shape = SubResource("RectangleShape2D_8og1h")
 one_way_collision = true
+one_way_collision_margin = 7.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=114196741]
 unique_name_in_owner = true
@@ -154,4 +155,5 @@ libraries/ = SubResource("AnimationLibrary_lbf5c")
 
 [node name="Timer" type="Timer" parent="." unique_id=1104211612]
 unique_name_in_owner = true
+wait_time = 1.75
 one_shot = true

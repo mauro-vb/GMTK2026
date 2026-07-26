@@ -38,6 +38,9 @@ func _ready() -> void:
 # Private
 func _dynamic_sizing() -> void:
 	super._dynamic_sizing()
+	if detection_collision_shape == null:
+		return
+
 	detection_collision_shape.shape.size = Vector2(8 * size, 1)
 	
 func _disable() -> void:
