@@ -6,6 +6,10 @@ func get_state_id() -> PlayerState.STATE_ID:
 
 func enter() -> void:
 	player.play_animation("run")
+	player.play_run_sound()
+
+func exit() -> void:
+	player.stop_run_sound()
 
 func physics_update(delta: float) -> void:
 	player.apply_horizontal_movement(delta)

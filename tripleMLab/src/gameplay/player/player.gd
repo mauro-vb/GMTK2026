@@ -22,6 +22,26 @@ const TINT_FADE: float = 0.3
 const BLINK_INTERVAL: float = 0.075
 const BLINK_ALPHA: float = 0.25
 
+# --- Sound effects -------------------------------------------------------------
+# Only three non-clock clips exist, so each is reused across a couple of
+# actions at different pitches rather than one dedicated recording per move.
+const STEP_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/step.wav")
+const LANDING_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/landing.wav")
+const HOVER_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/hover.wav")
+const SFX_VOLUME_DB: float = -10.0
+
+## Retrigger interval for the running footstep sound. A native AudioStreamWAV
+## loop repeats a clip back-to-back with zero gap at whatever length the
+## recording happens to be — for a short step clip that's much faster than any
+## real footstep cadence, and it reads as a buzz instead of footsteps. Retriggering
+## on our own timer decouples "how often it plays" from "how long the file is".
+## Not ear-tuned against the actual clip — nudge this if the cadence feels off.
+const STEP_INTERVAL: float = 0.28
+
+const JUMP_PITCH: float = 1.25
+const DOUBLE_JUMP_PITCH: float = 1.6
+const DASH_PITCH: float = 1.5
+
 # Movement abilities a modifier can grant or take away (see GrantAbilityModifier)
 enum Ability { DASH, DOUBLE_JUMP, POGO }
 
@@ -86,6 +106,16 @@ var _tint_time: float = 0.0
 var _blink_time: float = 0.0
 var _blink_elapsed: float = 0.0
 
+# Built in _ready() rather than placed in Player.tscn, so the raw sfx can drop
+# straight in without an editor pass over the scene.
+var _step_audio: AudioStreamPlayer
+var _step_timer: Timer
+var _landing_audio: AudioStreamPlayer
+var _jump_audio: AudioStreamPlayer
+var _double_jump_audio: AudioStreamPlayer
+var _dash_audio: AudioStreamPlayer
+var _pogo_audio: AudioStreamPlayer
+
 @onready var state_machine: PlayerStateMachine = %StateMachine
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 
@@ -96,6 +126,30 @@ var _blink_elapsed: float = 0.0
 func _ready() -> void:
 	_floor_check_reach = floor_check.target_position.y
 	state_machine.setup(self, stats)
+	_build_sfx_players()
+
+
+func _build_sfx_players() -> void:
+	_step_audio = _new_sfx_player(STEP_SFX)
+	_landing_audio = _new_sfx_player(LANDING_SFX)
+	_jump_audio = _new_sfx_player(STEP_SFX, JUMP_PITCH)
+	_double_jump_audio = _new_sfx_player(STEP_SFX, DOUBLE_JUMP_PITCH)
+	_dash_audio = _new_sfx_player(HOVER_SFX, DASH_PITCH)
+	_pogo_audio = _new_sfx_player(HOVER_SFX)
+
+	_step_timer = Timer.new()
+	_step_timer.wait_time = STEP_INTERVAL
+	_step_timer.timeout.connect(_step_audio.play)
+	add_child(_step_timer)
+
+
+func _new_sfx_player(stream: AudioStreamWAV, pitch: float = 1.0) -> AudioStreamPlayer:
+	var player: AudioStreamPlayer = AudioStreamPlayer.new()
+	player.stream = stream
+	player.volume_db = SFX_VOLUME_DB
+	player.pitch_scale = pitch
+	add_child(player)
+	return player
 
 # Clears carried-over motion, ability state and held input, so a room never
 # starts mid-dash, mid-fall or still drifting. The player node is reused across
@@ -229,6 +283,31 @@ func consume_jump() -> void:
 	jump_buffer_timer = 0.0
 	is_jump_cut = false
 
+## The run loop — started on entering StateRun, stopped on leaving it (see
+## StateRun.enter/exit). Restarting an already-running timer would reset the
+## cadence, so this only ever (re)starts a stopped one.
+func play_run_sound() -> void:
+	if _step_timer.is_stopped():
+		_step_audio.play()
+		_step_timer.start()
+
+func stop_run_sound() -> void:
+	_step_timer.stop()
+
+## Fired once per landing — see StateFall.physics_update(), the one place that
+## actually detects the floor being hit rather than just resting on it.
+func play_landing_sound() -> void:
+	_landing_audio.play()
+
+func play_jump_sound() -> void:
+	_jump_audio.play()
+
+func play_double_jump_sound() -> void:
+	_double_jump_audio.play()
+
+func play_dash_sound() -> void:
+	_dash_audio.play()
+
 func can_pogo() -> bool:
 	return has_pogo_ability and pogo_grace_timer > 0.0 and pogo_buffer_timer > 0.0
 
@@ -238,6 +317,7 @@ func consume_pogo() -> void:
 	is_jump_cut = false
 	dash_used = false
 	pay_ability_cost(Ability.POGO)
+	_pogo_audio.play()
 	if _last_pogo_area != null:
 		_last_pogo_area.bounced.emit()
 		_last_pogo_area = null

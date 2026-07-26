@@ -8,6 +8,7 @@ func enter() -> void:
 	player.velocity.y = stats.double_jump_velocity
 	player.consume_double_jump()
 	player.play_animation("double_jump")
+	player.play_double_jump_sound()
 
 func physics_update(delta: float) -> void:
 	player.apply_horizontal_movement(delta)

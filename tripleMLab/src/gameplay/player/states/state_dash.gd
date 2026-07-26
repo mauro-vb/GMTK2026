@@ -15,6 +15,7 @@ func enter() -> void:
 	player.velocity.x = stats.dash_speed * _dash_direction
 	player.consume_dash()
 	player.play_dash_animation()
+	player.play_dash_sound()
 	
 func exit() -> void:
 	player.is_dashing = false
