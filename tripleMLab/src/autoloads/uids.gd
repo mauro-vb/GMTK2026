@@ -18,11 +18,10 @@ const WORKSHOP_DEFAULT_POOL_UID: String = "uid://cm2vj7xkq9nsw"
 const WORKSHOP_CARD_SCENE_UID: String = "uid://dp5nt8crj4wxb"
 
 # TREASURE
-## Every kind of chest the map may place, dealt across a treasure row.
+## The good and corrupted chest, dealt across a treasure row.
 const TREASURE_SET_UID: String = "uid://cn6wb3vkm9xqt"
-const TREASURE_EVEN_SPLIT_UID: String = "uid://cm5nw9vkx3qbt"
-const TREASURE_RICH_SEAM_UID: String = "uid://bv8kq4nwm6xtr"
-const TREASURE_DEAD_DROP_UID: String = "uid://dk2mx7wnq5vbc"
+const TREASURE_GOOD_UID: String = "uid://bv8kq4nwm6xtr"
+const TREASURE_CORRUPTED_UID: String = "uid://dk2mx7wnq5vbc"
 
 ## The three ways a chest can be opened. Which one a chest allows is a flag on
 ## its table, so adding a fourth game is a scene, a uid and one enum value.

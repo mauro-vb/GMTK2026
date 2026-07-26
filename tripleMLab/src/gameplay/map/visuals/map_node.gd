@@ -79,6 +79,12 @@ const AVAILABLE_MODULATE: Color = Color.WHITE
 const UNAVAILABLE_MODULATE: Color = Color(0.66, 0.63, 0.68, 1.0)
 const SPENT_MODULATE: Color = Color(0.5, 0.48, 0.5, 1.0)
 
+## A corrupted chest wears a red tint until its own art exists — see
+## [method _refresh_art]. Multiplied on top of the usual modulate rather than
+## replacing it, so it still dims/greys out the same way as it goes unavailable
+## or spent.
+const CORRUPTED_TINT: Color = Color(1.6, 0.55, 0.55, 1.0)
+
 ## The charge going off. The player is looking straight at the map when this
 ## fires — it runs the moment they get back from the room — so the swap punches
 ## out, changes tint at the peak while it is blown white, and settles.
@@ -203,6 +209,11 @@ func _refresh_art() -> void:
 	else:
 		modulate = UNAVAILABLE_MODULATE
 
+	# A corrupted chest is told apart before it's opened — until its own art
+	# exists, that's a tint rather than a different sprite (see is_corrupted).
+	if room.type == Room.Type.TREASURE and room.is_corrupted:
+		modulate *= CORRUPTED_TINT
+
 func _texture_for_room() -> Texture2D:
 	var pair: Array = _art_pair_for_room()
 	return pair[FACE_ACTIVATED] if _spent else pair[FACE_DEFAULT]
@@ -213,11 +224,11 @@ func _art_pair_for_room() -> Array:
 		# to mark an event as good vs bad.
 		return EVENT_ART_POSITIVE if room.event_positive else EVENT_ART_NEGATIVE
 
-	# ART: a chest wears its own face when its [TreasureTable] has one, so the
-	# three chests on a treasure row are told apart before they're opened —
-	# which is the only way the choice between them is a choice. Drop the
-	# sprites into the tables' `map_icon` / `spent_icon` and nothing here
-	# changes; until then all three share the fallback chest below.
+	# ART: a chest wears its own face when its [TreasureTable] has one, so a
+	# good and a corrupted chest can be told apart by their sprite rather than
+	# just a tint (see CORRUPTED_TINT). Drop the sprites into the tables'
+	# `map_icon` / `spent_icon` and nothing here changes; until then both share
+	# the fallback chest below, tinted.
 	var chest: Texture2D = _chest_texture()
 	if chest != null:
 		return chest

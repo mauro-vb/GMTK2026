@@ -158,16 +158,16 @@ func _setup_node_types() -> void:
 				if next_node.type == Room.Type.NOT_ASSIGNED:
 					_set_node_randomly(next_node)
 	
-## Hands every chest on the map the kind of chest it is.
+## Hands every chest on the map its fate.
 ##
-## Dealt per row rather than rolled per room: the row is a choice between chests,
-## and three independent rolls would routinely put the same bet on two paths and
-## quietly reduce the choice to a coin toss about geometry. Rooms with no
-## outgoing cords are the ones no path reaches and [method Map.create_map] never
-## draws them, so they are left out of the deal rather than eating a kind.
+## Dealt per row rather than rolled per room, weighted 2:1 good, so a row of
+## three trends toward two good and one corrupted instead of each chest
+## independently coming up however it likes. Rooms with no outgoing cords are
+## the ones no path reaches and [method Map.create_map] never draws them, so
+## they are left out of the deal rather than eating a slot in it.
 func _assign_treasure_tables() -> void:
 	var treasure_set: TreasureSet = ResourceLoader.load(UIDs.TREASURE_SET_UID) as TreasureSet
-	if treasure_set == null or treasure_set.tables.is_empty():
+	if treasure_set == null or treasure_set.good_table == null or treasure_set.corrupted_table == null:
 		push_error("MapGenerator: no TreasureSet to deal chests from.")
 		return
 
@@ -177,9 +177,10 @@ func _assign_treasure_tables() -> void:
 			if node.type == Room.Type.TREASURE and node.next_nodes.size() > 0:
 				chests.append(node)
 
-		var dealt: Array[TreasureTable] = treasure_set.deal(chests.size())
+		var dealt: Array[bool] = treasure_set.deal(chests.size())
 		for index: int in chests.size():
-			chests[index].treasure = dealt[index]
+			chests[index].is_corrupted = dealt[index]
+			chests[index].treasure = treasure_set.table_for(dealt[index])
 
 ## Types are picked first and the scene each one loads is resolved after, so a
 ## room only has to be told what it is, never what file that means.

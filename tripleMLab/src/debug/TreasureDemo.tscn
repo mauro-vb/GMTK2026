@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://cq2wv8nkm4xbt"]
-
-[ext_resource type="Script" uid="uid://bm4xq7wnv2kdt" path="res://src/debug/treasure_demo.gd" id="1_demo"]
-
-[node name="TreasureDemo" type="Node"]
-script = ExtResource("1_demo")

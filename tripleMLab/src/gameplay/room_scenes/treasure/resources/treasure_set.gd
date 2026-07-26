@@ -1,30 +1,30 @@
 class_name TreasureSet
 extends Resource
-## Every kind of chest the map is allowed to place, and the deal that spreads
-## them across a row.
+## The two chests the map is allowed to place, and the deal that spreads them
+## across a row.
 ##
-## The point of a treasure row is the choice: three chests side by side, one on
-## each path, each a different bet. So the row is *dealt* from a shuffled set
-## rather than each chest rolling independently — three independent rolls would
-## routinely hand out the same chest twice and quietly turn the choice into a
-## formality.
+## Every TREASURE room always pays or always bites — decided here, at map-gen
+## time, not by a roll inside the room. A row is dealt from a shuffled bag
+## weighted 2:1 good, so three chests side by side trend toward two good and
+## one corrupted without ever being locked to exactly that split.
 
 # Exports
-@export var tables: Array[TreasureTable] = []
+@export var good_table: TreasureTable
+@export var corrupted_table: TreasureTable
 
 # Public
-## Deals `count` chests, all different while the set has different ones left. A
-## row wider than the set reshuffles and carries on, so a five-chest row is two
-## repeats rather than five of the same.
-func deal(count: int) -> Array[TreasureTable]:
-	var dealt: Array[TreasureTable] = []
-	if count <= 0 or tables.is_empty():
+## Deals `count` corruption flags for one row, from a bag weighted 2 good : 1
+## corrupted. A row wider than the bag reshuffles and carries on, the same way
+## chest dealing always has.
+func deal(count: int) -> Array[bool]:
+	var dealt: Array[bool] = []
+	if count <= 0:
 		return dealt
 
-	var remaining: Array[TreasureTable] = []
+	var remaining: Array[bool] = []
 	while dealt.size() < count:
 		if remaining.is_empty():
-			remaining = tables.duplicate()
+			remaining = [false, false, true]
 			remaining.shuffle()
 
 		dealt.append(remaining.pop_back())
@@ -32,8 +32,5 @@ func deal(count: int) -> Array[TreasureTable]:
 	return dealt
 
 
-func pick() -> TreasureTable:
-	if tables.is_empty():
-		return null
-
-	return tables[randi() % tables.size()]
+func table_for(corrupted: bool) -> TreasureTable:
+	return corrupted_table if corrupted else good_table
