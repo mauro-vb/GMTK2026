@@ -12,8 +12,12 @@ func _init() -> void:
 
 func _ready() -> void:
 	bounced.connect(animate)
+	animated_sprite_2d.animation_finished.connect(_on_animation_finished)
 
 func animate() -> void:
 	if animated_sprite_2d == null:
 		return
 	animated_sprite_2d.play("triggered")
+	
+func _on_animation_finished() -> void:
+	animated_sprite_2d.play("default")
