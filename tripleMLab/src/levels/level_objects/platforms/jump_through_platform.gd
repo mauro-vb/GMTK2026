@@ -4,7 +4,11 @@ extends AnimatableBody2D
 # Signals
 # Constants
 const COLLISION_LAYER: int = 9
-const ONE_WAY_COLLISION_MARGIN: float = 7.0
+# Keep this well under platform_height. The margin is how deep the player may
+# sink into the shape and still get pushed back out the top, so a margin taller
+# than the platform itself grabs a player who has already cleared it from below
+# and snaps them up onto it. 2px is enough to catch a fast landing.
+const ONE_WAY_COLLISION_MARGIN: float = 2.0
 # Exports
 ## Setter fires as soon as this changes in the Inspector, so the platform
 ## resizes live in the editor instead of only after a reload.
