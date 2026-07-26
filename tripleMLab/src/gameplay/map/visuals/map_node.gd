@@ -32,10 +32,9 @@ const ROOM_ART: Dictionary[Room.Type, Array] = {
 		preload("res://assets/art/map/icons/WorkBenchDefault.png"),
 		preload("res://assets/art/map/icons/WorkBenchActivated.png"),
 	],
-	Room.Type.TREASURE: [
-		preload("res://assets/art/map/icons/ChestDefault.png"),
-		preload("res://assets/art/map/icons/ChestActivated.png"),
-	],
+	# TREASURE has no entry: a chest's face comes from its own table (see
+	# _art_for), so it varies with what the chest is.
+	#
 	# The final room is a level like any other — the last one — so it wears the
 	# level's own face rather than a chest's. FINAL_SCALE is what marks it out.
 	Room.Type.FINAL: [
@@ -63,12 +62,6 @@ const FINAL_SCALE: float = 1.35
 const AVAILABLE_MODULATE: Color = Color.WHITE
 const UNAVAILABLE_MODULATE: Color = Color(0.66, 0.63, 0.68, 1.0)
 const SPENT_MODULATE: Color = Color(0.5, 0.48, 0.5, 1.0)
-
-## A corrupted chest wears a red tint until its own art exists — see
-## [method _refresh_art]. Multiplied on top of the usual modulate rather than
-## replacing it, so it still dims/greys out the same way as it goes unavailable
-## or spent.
-const CORRUPTED_TINT: Color = Color(1.6, 0.55, 0.55, 1.0)
 
 ## The charge going off. The player is looking straight at the map when this
 ## fires — it runs the moment they get back from the room — so the swap punches
@@ -194,11 +187,6 @@ func _refresh_art() -> void:
 	else:
 		modulate = UNAVAILABLE_MODULATE
 
-	# A corrupted chest is told apart before it's opened — until its own art
-	# exists, that's a tint rather than a different sprite (see is_corrupted).
-	if room.type == Room.Type.TREASURE and room.is_corrupted:
-		modulate *= CORRUPTED_TINT
-
 func _texture_for_room() -> Texture2D:
 	var pair: Array = _art_pair_for_room()
 	return pair[FACE_ACTIVATED] if _spent else pair[FACE_DEFAULT]
@@ -209,14 +197,13 @@ func _art_pair_for_room() -> Array:
 		# to mark an event as good vs bad.
 		return EVENT_ART_POSITIVE if room.event_positive else EVENT_ART_NEGATIVE
 
-	# ART: a chest wears its own faces when its [TreasureTable] has them, so a
-	# good and a corrupted chest can be told apart by their sprite rather than
-	# just a tint (see CORRUPTED_TINT). Drop the sprites into the tables'
-	# `map_icon` / `spent_icon` and nothing here changes; until then both share
-	# the fallback chest pair below, tinted.
-	var chest: Array = _chest_art_pair()
-	if not chest.is_empty():
-		return chest
+	if room.type == Room.Type.TREASURE:
+		# A per-table custom icon (map_icon/spent_icon) still wins if one's
+		# ever set — this is just the shared fallback until then.
+		var chest: Array = _chest_art_pair()
+		if not chest.is_empty():
+			return chest
+		return EVENT_ART_NEGATIVE if room.is_corrupted else EVENT_ART_POSITIVE
 
 	return ROOM_ART.get(room.type, ROOM_ART[Room.Type.NOT_ASSIGNED])
 

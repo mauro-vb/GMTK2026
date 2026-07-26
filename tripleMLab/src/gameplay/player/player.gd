@@ -173,7 +173,12 @@ func _apply_gravity(delta: float) -> void:
 		return
 	var gravity_multiplier := 1.0
 
-	if is_jump_cut and velocity.y < 0:
+	# Releasing jump can still flip is_jump_cut true while pogoing — the player
+	# is often still holding jump from the jump that led into the pogo — but a
+	# pogo's arc isn't a jump and must never be cut short by it. Scoped to state
+	# rather than cleared harder on entry, since the release can happen at any
+	# point during the bounce, not just at the start of it.
+	if is_jump_cut and velocity.y < 0 and state_machine.current_state.get_state_id() != PlayerState.STATE_ID.POGO:
 		gravity_multiplier = stats.jump_cut_gravity_mult
 	elif abs(velocity.y) < stats.jump_hang_threshold:
 		gravity_multiplier = stats.jump_hang_gravity_mult
