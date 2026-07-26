@@ -218,7 +218,9 @@ failing, and pushes a warning. Asking for zero returns empty rather than errorin
 
 ### 2.5 `default_pool.tres`
 
-38 entries, 13 of which are combined cards.
+45 entries, 13 of which are combined cards. The seven treasure charms are in here too:
+a chest is another moment in the same run, so a card that changes one is drawn from the same
+bench (see `docs/treasure.md` §5.2).
 
 Only upgrades and two-edged trades are in the pool. **Pure downgrades are never
 offered**; they reach the player only as the second half of a combined card, which
@@ -550,7 +552,7 @@ visits.
 
 | group | covers |
 |---|---|
-| pool | all 38 entries resolve a named, uniquely-ided modifier; both scenes load |
+| pool | all 45 entries resolve a named, uniquely-ided modifier; both scenes load |
 | combined | the pool offers combined cards but not only combined cards; **no drawback is offered on its own**; every drawback has a name and a description to print |
 | draw | 3 offers at depths 0/4/8, no duplicates, nothing gated deeper leaks through, zero-draw is empty not an error, oversized draw caps at pool size |
 | hooks | each perk's arithmetic; one-shot spends on a pick but keeps on an empty exit; a plain modifier changes nothing |
@@ -559,6 +561,14 @@ visits.
 | live visit 1 | Open Bench + Second Set of Hands → 5 cards, 2 picks; take one (bench stays open) then the second (bench closes); modifiers granted; one-shot spent; permanent kept |
 | live visit 2 | Scrap Heap's sweep lays a genuinely different bench and is spent; leaving empty-handed pays Union Break's 8s (30.0 → 38.0) |
 | live visit 3 | Danger Money puts a combined card on the bench; its seam names the drawback; taking it grants **both** halves |
+
+Live visit 3 used to be flaky, and the cause was worth writing down: it opened its bench at
+the run's **depth 0**, where the only two-edged cards in the pool are the two ability
+upgrades that drag a cost along — and an earlier group in the same file could already have
+taken both, at which point no bench could ever satisfy it. It now sets `map.progress` to 4
+first, which is where the combined cards actually live, and opens up to
+`COMBINED_ATTEMPTS` benches before giving up. Danger Money makes a two-edged bench very
+likely; it was never asked to make one certain.
 
 The layout was also rendered at a true 320×180 and inspected at three, five and taken-card
 states, including the worst-case description (a body plus a `Comes with:` line).

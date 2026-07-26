@@ -208,6 +208,63 @@ func get_treasure_loss(base: float) -> float:
 	return maxf(seconds, 0.0)
 
 
+## One outcome's share of a chest, folded the same way — but asked *before* the
+## chest is laid out rather than after it has settled. Whatever comes back here
+## is what the wheel cuts its wedges from and what the board deals its row from,
+## so a tilt is always something the player can see before committing.
+##
+## Clamped at zero: a stacked tilt can shrink an outcome away to nothing, but it
+## can never turn one into a negative share of the odds.
+func get_treasure_weight(base: float, is_gain: bool) -> float:
+	var weight: float = base
+	for modifier: Modifier in modifiers:
+		weight = modifier.modify_treasure_weight(weight, is_gain)
+
+	return maxf(weight, 0.0)
+
+
+## Spends the first modifier willing to pay for a chest that has just bitten to
+## be opened again, and says whether one did.
+##
+## Dropping it here rather than leaving it to the caller is what stops a second
+## chance from looping: a modifier can only ever buy the one reopening it is
+## spent on, so a run holding three of them gets three retries and no more.
+func claim_treasure_retry(seconds: float) -> bool:
+	for modifier: Modifier in modifiers.duplicate():
+		if not modifiers.has(modifier):
+			continue
+		if modifier.wants_treasure_retry(seconds):
+			remove_modifier(modifier)
+			return true
+
+	return false
+
+
+## The odds this chest also hands over a modifier, starting from "it doesn't".
+##
+## Each modifier folds its own chance in as an independent one rather than adding
+## it on, so two charms that each pay half the time come out at three quarters
+## instead of at certainty — stacking them is worth something, and never worth
+## everything.
+func get_treasure_card_chance(was_gain: bool) -> float:
+	var chance: float = 0.0
+	for modifier: Modifier in modifiers:
+		chance = modifier.modify_treasure_card_chance(chance, was_gain)
+
+	return clampf(chance, 0.0, 1.0)
+
+
+## Whether anything the player is carrying keeps the fuse burning while a chest
+## is open. Any one of them is enough — this is a cost, and a second copy of a
+## cost that is already being paid is not twice the cost.
+func is_treasure_clock_running() -> bool:
+	for modifier: Modifier in modifiers:
+		if modifier.runs_clock_in_treasure():
+			return true
+
+	return false
+
+
 ## Closes out a chest, mirroring notify_workshop_visited(): one-shot charms spend
 ## themselves here. `seconds` is the signed change that was applied.
 func notify_treasure_opened(seconds: float) -> void:

@@ -270,15 +270,20 @@ that way.
 ```
 _ready()
  ├── _resolve_table()      ← the chest the player clicked, off map.last_room
+ ├── _tilt()               ← every held modifier's say over its odds, before anything draws
  ├── _build_strip()        ← clock + carried-modifier row
- ├── _refresh_header()     ← the chest's name, and its odds, before anything is played
+ ├── _refresh_header()     ← the chest's name, before anything is played
  └── _open()
       ├── fade backdrop + UI in
       └── _lay_out_game()
            ├── shuffle the games this chest allows
            ├── first one whose can_present() agrees, wins
            └── begin()  → the player is now in control
-                          resolved(slice) → _settle()
+                          resolved(slice)
+                           ├── bit, and something pays for it? → _retry() ─┐
+                           └── otherwise → _settle() → _offer_card()       │
+                                                                 ↑────────┘
+                                                          (laid out again)
 ```
 
 There is no way to walk away from a chest. The choice was made on the map; the Leave button
@@ -323,48 +328,176 @@ hooks, in exactly the same shape:
 
 ```gdscript
 ## Seconds a chest is about to pay out. `seconds` is positive.
-func modify_treasure_gain(seconds: float) -> float:     return seconds
+func modify_treasure_gain(seconds: float) -> float:                    return seconds
 ## Seconds a chest is about to take. `seconds` is positive — an amount, not a signed change.
-func modify_treasure_loss(seconds: float) -> float:     return seconds
+func modify_treasure_loss(seconds: float) -> float:                    return seconds
+## One outcome's share of the odds, asked before the chest is laid out.
+func modify_treasure_weight(weight: float, _is_gain: bool) -> float:   return weight
+## Return true to buy one more opening of a chest that just bit.
+func wants_treasure_retry(_seconds: float) -> bool:                    return false
+## Odds this chest hands over a modifier as well as seconds.
+func modify_treasure_card_chance(chance: float, _was_gain: bool) -> float: return chance
+## Return true to keep the fuse burning while the chest is open.
+func runs_clock_in_treasure() -> bool:                                 return false
 ## Return true to be dropped — how a one-shot charm spends itself.
-func on_treasure_opened(_seconds: float) -> bool:       return false
+func on_treasure_opened(_seconds: float) -> bool:                      return false
 ```
 
 Pass-through by default, so **every pre-existing modifier inherits "changes nothing about a
 chest" for free** and no existing `.tres` was touched. `ModifiersSystem` folds each across
-everything held (`get_treasure_gain`, `get_treasure_loss`, `notify_treasure_opened`), and
-both getters clamp at zero, so stacked modifiers can never flip a payout into a bite.
+everything held (`get_treasure_gain`, `get_treasure_loss`, `get_treasure_weight`,
+`claim_treasure_retry`, `get_treasure_card_chance`, `is_treasure_clock_running`,
+`notify_treasure_opened`), and the seconds getters clamp at zero, so stacked modifiers can
+never flip a payout into a bite.
 
-Both hooks take a **positive amount**, which is why a modifier that halves losses can't
-accidentally halve a win.
+The two seconds hooks take a **positive amount**, which is why a modifier that halves losses
+can't accidentally halve a win.
 
-### 5.1 What is deliberately *not* on offer
+### 5.1 The odds, and the condition they come with
 
-**There is no hook for a chest's odds.** A chest states its percentages on the map icon's
-tooltip-free promise and again in the room before the player commits; a modifier that
-quietly bent those numbers would make that statement a lie. Modifiers change what the
-outcomes are worth, never how likely they are.
+The first pass at this file said there would be no hook for a chest's odds, because a chest
+states its terms before the player commits and a modifier that quietly bent them would make
+that statement a lie. **The objection was right; the conclusion was too strong.** What makes
+a bent number a lie is bending it *after* the chest has drawn itself.
+
+So `modify_treasure_weight` is asked **once per outcome, on arrival, before any minigame
+exists** — `TreasureRoom._tilt()`, called on the way out of `_resolve_table()`. Everything
+downstream reads its odds off that one tilted table: the wheel cuts its wedges from it, the
+board deals its row from it, `roll()` draws from it. A player carrying two Thumbs On The
+Scale walks into a 70% chest and sees a wheel that is **82% green**, because the wheel was
+cut after the tilt. The drawing is still the truth; it is the truth about the chest they are
+actually holding.
+
+Three properties fall out of doing it there and only there:
+
+- **The `.tres` on disk is never touched.** The tilt is a copy, slices and all, made per
+  visit — so the next chest of that kind is the authored one again, and two runs never
+  disagree about what Rich Seam is.
+- **It can't invert an outcome.** `get_treasure_weight()` clamps at zero: a stacked tilt can
+  shrink a side away to nothing, but a negative share of the odds is not a thing.
+- **A tilt that empties a chest is refused.** If nothing has weight left, the room opens the
+  chest as authored and warns, rather than laying out a chest that cannot resolve.
+
+The exception worth knowing: **the coin can't show a tilt.** A wheel has wedge sizes and a
+board has a row shape, but a coin has two sides and says nothing about odds by design
+(§3.4), so a tilted Even Split is a 50/50-looking coin that isn't one. It is the one place
+in the room where a charm's effect is only legible from the charm.
 
 ### 5.2 `TreasureModifier`
 
-One class answers all three hooks, the way `WorkshopModifier` answers the workshop's.
+One class answers all seven hooks, the way `WorkshopModifier` answers the workshop's.
 
 | export | default | effect |
 |---|---|---|
 | `gain_scale` | 1.0 | multiplier on seconds won |
 | `loss_scale` | 1.0 | multiplier on seconds lost |
+| `gain_weight_scale` | 1.0 | multiplier on how likely the paying outcomes are |
+| `loss_weight_scale` | 1.0 | multiplier on how likely the biting ones are |
 | `gain_bonus_seconds` | 0.0 | flat seconds on top of a win, after the scale |
+| `retry_on_loss` | false | pays for a chest that bit to be opened again |
+| `gain_card_chance` | 0.0 | odds a chest that paid also hands over a modifier |
+| `loss_card_chance` | 0.0 | odds a chest that bit does |
+| `runs_clock` | false | the fuse keeps burning while the chest is open |
 | `consume_on_use` | false | spend itself on the first chest it actually changed |
 
 `consume_on_use` asks "did this do anything?" — a charm that only sweetens wins is not spent
-by a loss, and one that only softens losses is not spent by a win.
+by a loss, and one that only softens losses is not spent by a win. `retry_on_loss` doesn't
+need it: the retry is spent inside `claim_treasure_retry()` at the moment it is used, which
+is also what stops a second chance from looping (§5.4).
 
-Two cards ship, both added to the workshop pool (`weight 0.8`, `min_depth 1`):
+Card chances fold as **independent** chances rather than adding up, so two charms that each
+search half the chests come out at three quarters. Stacking them is worth something and
+never worth everything.
 
-| name | id | effect |
-|---|---|---|
-| **Lucky Charm** | `lucky_charm` | chests that pay, pay **half again** |
-| **Padded Crate** | `padded_crate` | chests that bite, take **half as much** |
+**Seven cards ship**, all in the workshop pool:
+
+| name | id | terms | effect |
+|---|---|---|---|
+| **Lucky Charm** | `lucky_charm` | 0.8 / row 1 | chests that pay, pay **half again** |
+| **Padded Crate** | `padded_crate` | 0.8 / row 1 | chests that bite, take **half as much** |
+| **Thumb On The Scale** | `thumb_on_the_scale` | 0.7 / row 2 | **combined** — every chest ×1.6 likelier to pay, and shows it; comes with **On The Clock** |
+| **Second Chance** | `second_chance` | 0.8 / row 1 | the first chest that bites is **opened again**; spent |
+| **Magpie's Eye** | `magpies_eye` | 0.6 / row 2 | **half** the chests that pay also hand over a card |
+| **Salvage Rights** | `salvage_rights` | 0.6 / row 2 | **60%** of the chests that bite hand over a card instead |
+| **Shallow Seam** | `shallow_seam` | 0.7 / row 2 | pays **twice as often** and **40% less** |
+
+Shallow Seam is a trade-off inside a single card rather than a `linked_modifier` pair: both
+halves are about what one chest pays, so splitting them across two icons would say less than
+one line does.
+
+### 5.2a Thumb On The Scale, and what better odds cost
+
+Thumb On The Scale is the **combined card** (`docs/workshop.md` §1.4): the bonus carries
+`linked_modifier` → **On The Clock**, so taking it grants both halves and the bench prints
+the cost on the card's seam before the player commits.
+
+The price is the interesting part. Everything else a treasure room could charge is *seconds
+off a payout* — and paying for better odds with a smaller win is a wash, not a trade. So the
+cost is the room's own rule instead:
+
+> `should_tick_time = false` — a gamble is not a time trial.
+
+**On The Clock takes that away.** The fuse keeps burning while the lid is up, so a chest
+costs whatever the player spends deciding — which lands hardest exactly where the room is
+most interesting, on the plinko board with nine slots to weigh up. Better odds, worse
+composure.
+
+```gdscript
+func _read_clock_terms() -> void:      # TreasureRoom, in _ready
+    if _modifiers_system == null or not _modifiers_system.is_treasure_clock_running():
+        return
+    should_tick_time = true
+```
+
+Flipping the room's **own flag** rather than writing to `time_system.ticking` is the whole
+trick: `MainGame.enter_room()` does `time_system.ticking = _current_room.should_tick_time`
+immediately after loading the room, so a direct write would be overwritten one line later.
+Changing what the room says about itself is read by the thing that asks. ("Live Wire" solves
+the same problem on the map screen a different way — it is typed `EXIT_LEVEL` so it fires in
+the one gap where nothing else owns `ticking`.)
+
+`is_treasure_clock_running()` is an **any**, not a fold: a second copy of a cost that is
+already being paid is not twice the cost.
+
+The room says it twice, because a clock that has quietly started running is the one thing
+here a player must not be left to notice for themselves: the chest's name line reads
+`RICH SEAM · ON THE CLOCK`, and the clock in the corner is drawn in the run's warning colour
+instead of as quiet furniture.
+
+**Worth knowing:** nothing in the game listens to `TimeSystem.time_expired` yet, so running
+out mid-chest currently costs the run nothing but the seconds. When death lands, this card
+becomes the first thing that can kill in a treasure room — `SURVIVAL_FLOOR` protects the
+player from the *chest*, not from the fuse.
+
+### 5.3 A card in the lining
+
+`_offer_card()` runs last in `_settle()`, after the one-shot charms have spent themselves —
+so a card found in a chest can't be burned by the chest that handed it over.
+
+It draws from **the workshop's own pool at the run's current depth**, which is the whole of
+what keeps it honest: a chest can only hand out what a bench that deep could have laid out,
+`min_depth` holds, and modifiers the player already has (and can't stack) are filtered out
+by `WorkshopEntry.is_available()` exactly as they are on a bench. `TreasureRoom.card_pool`
+is exported for a chest-specific pool and falls back to the workshop's when left null, which
+is what ships.
+
+The card announces itself twice: its icon lands in the carry strip on the spot (the strip
+listens to `modifier_added`, the way the workshop does), and the header names it —
+`PAID OUT · BARELY MADE IT`. Without the name, the only sign of it is one more icon in a row
+of icons.
+
+### 5.4 A second chance
+
+Asked in `_on_game_resolved()`, **before a single second moves**, and only about a bite: a
+second chance is insurance, not a reroll of a payout the player was happy with.
+
+When one is claimed, the chest is **laid out again from scratch** rather than replayed —
+which usually means a different one of the chest's minigames, and is the honest reading of
+"open it again". The second outcome stands.
+
+It cannot loop, and not by a counter: `ModifiersSystem.claim_treasure_retry()` removes the
+modifier that agreed *before* returning true, so a run gets exactly as many reopenings as it
+brought charms to buy them with.
 
 ---
 
@@ -373,6 +506,7 @@ Two cards ship, both added to the workshop pool (`weight 0.8`, `min_depth 1`):
 | where | const | default |
 |---|---|---|
 | `TreasureRoom` | `SURVIVAL_FLOOR` | 2.0s |
+| `TreasureRoom` | `RETRY_PAUSE` | 0.9s |
 | `PlinkoGame` | `BINS` / `PEG_ROWS` | 9 / 10 |
 | `PlinkoGame` | `BOARD_WIDTH` | 160px, centred |
 | `PlinkoGame` | `WILD_SCALE` / `MILD_SCALE` | 1.5 / 0.5 |
@@ -390,7 +524,7 @@ restating them — the treasure room is another moment in the same run, not anot
 
 ## 7. Verified behaviour
 
-`src/debug/TreasureCheck.tscn` — 121 checks, all passing:
+`src/debug/TreasureCheck.tscn` — 192 checks, all passing:
 
 ```
 godot --headless res://src/debug/TreasureCheck.tscn
@@ -410,10 +544,13 @@ leaving rolls on to the next.
 | the coin | all four combinations of call × outcome, **forced rather than sampled**: calling right pays the better outcome, calling wrong pays the worse one, and the face it comes down on always agrees with what it paid |
 | the board | on a real board at the size the room gives it: bin counts match the odds, never more than two alike in a row, the rare outcome leads from the edge, every bin pays its own outcome scaled by its position and never flips sign, and the edges beat the middle |
 | the fall | **4,000 free drops from each of the nine slots, per chest**: the ball never leaves the board, always comes to rest over a whole bin, **no slot is a guarantee** (nothing above 98% or below 2%), and the rare outcome lands within ten points of the chest's own odds both overall and from the middle |
-| hooks | each charm's arithmetic, in isolation and folded through the system; a plain modifier changes nothing and is never spent; a negative amount can't become a payout |
+| hooks | each charm's arithmetic, in isolation and folded through the system; a plain modifier changes nothing, is never spent, bends no odds and buys no reopening; a negative amount can't become a payout; a negative tilt clamps at zero; two card charms fold to 75% rather than to 100%; **all seven cards are reachable from a bench** |
 | chest row | 20 generated maps: every chest knows which chest it is, points at the right scene, and **no row ever offers the same chest twice** |
 | live rooms | all three games played end to end through the real `MainGame`: the clock moves by exactly what the room reports, in the direction the outcome said, and the way out only appears once it has paid |
 | charms | Lucky Charm and Padded Crate measured on a real payout; a forced payout against a 57-second clock fills the tank, reports the 3s that actually landed, and says `TANK FULL`; the survival floor holds on a 4-second clock |
+| a tilted chest | Thumb On The Scale walked into a real Rich Seam: the card brings its drawback with it, the room opens the chest at **79% rather than 70%**, the minigame was handed that same tilted table, the `.tres` on disk is still 70% afterwards — and the fuse really is burning (`MainGame` started the clock, seconds came off standing still, and the name line says `ON THE CLOCK`) |
+| a second chance | a **forced bite** through the real room: it buys the reopening, spends the charm, moves the clock by nothing yet, keeps the way out shut, lays the chest out again as a *different* game object, lets the second outcome be the one that lands, and does not reopen a third time on an empty pocket |
+| the lining | a **forced payout** with a certain searcher: the card is drawn, carried, named in the header and iconed in the strip — and a run carrying nothing gets seconds and nothing else |
 
 The layout was also rendered at the shipping resolution and inspected in all three games, at
 the waiting, mid-animation and result states.
@@ -462,6 +599,16 @@ Four more bugs came out of rendering it:
 - **A chest can't be declined.** Deliberate: the decision was which chest to walk into. If
   playtesting says players want to back out, that is a Leave button shown before
   `begin()` and a `notify_treasure_opened(0.0)`.
+- **A tilt is invisible on the coin** (§5.1). The wheel and the board draw themselves out of
+  the tilted odds; a coin has two sides whatever the odds are. Even Split is the only
+  coin-only chest, so a run holding Thumb On The Scale gets one chest in three where the
+  charm is real but unreadable. The fix, if it matters, is the coin drawing its faces at
+  different sizes — which is a design decision, not a bug fix.
+- **The retry doesn't say what it saved you from.** A second chance prints
+  `IT BIT · SECOND CHANCE` and re-lays the board, but never shows the number it tore up. It
+  is deliberate for now — the outcome was never applied, so showing it invites the player to
+  mourn seconds they never lost — and it is the first thing to revisit if playtesting says
+  the charm feels like it did nothing.
 - **`_last_resolved()` in the check harness recovers the outcome from the direction the
   clock moved**, which works because every shipped table has exactly one payout and one
   bite. A table with two payouts would need the room to record the slice it settled on.
@@ -484,21 +631,23 @@ Four more bugs came out of rendering it:
 | `room_scenes/treasure/resources/treasure_table.gd` | **new** — a chest: odds, payouts, allowed games, map art |
 | `room_scenes/treasure/resources/treasure_set.gd` | **new** — every chest kind, and the deal across a row |
 | `room_scenes/treasure/tables/*.tres` | **new** — Even Split, Rich Seam, Dead Drop, and the set |
-| `room_scenes/treasure/treasure_room.gd` + `.tscn` | **new** — the room and its flow |
+| `room_scenes/treasure/treasure_room.gd` + `.tscn` | **new** — the room and its flow; `_tilt()`, `_retry()`, `_offer_card()`, `_read_clock_terms()` |
 | `room_scenes/treasure/games/treasure_game.gd` | **new** — base: a presentation of a table |
 | `room_scenes/treasure/games/coin_flip_game.gd` + `.tscn` | **new** — call it in the air |
 | `room_scenes/treasure/games/wheel_game.gd` + `.tscn` | **new** — wedges cut by weight |
 | `room_scenes/treasure/games/plinko_game.gd` + `.tscn` | **new** — the board with a decision in it |
 | `ui/treasure/treasure_style.gd` | **new** — gain/loss colours, board furniture, timings |
-| `systems/modifiers_system/treasure_modifier.gd` | **new** — answers all three hooks |
-| `systems/modifiers_system/resources/modifier.gd` | **+3 treasure hooks**, all pass-through |
-| `systems/modifiers_system/modifiers_system.gd` | **+3 aggregators**, incl. `notify_treasure_opened()` |
+| `systems/modifiers_system/treasure_modifier.gd` | **new** — answers all seven hooks |
+| `systems/modifiers_system/resources/modifier.gd` | **+7 treasure hooks**, all pass-through |
+| `systems/modifiers_system/modifiers_system.gd` | **+7 aggregators**, incl. `claim_treasure_retry()` and `is_treasure_clock_running()` |
 | `gameplay/modifiers/lucky_charm.tres`, `padded_crate.tres` | **new** — 2 charms |
-| `room_scenes/workshop/default_pool.tres` | +2 entries, so the charms are reachable |
+| `gameplay/modifiers/thumb_on_the_scale.tres`, `second_chance.tres`, `magpies_eye.tres`, `salvage_rights.tres`, `shallow_seam.tres` | **new** — 5 charms: odds, a retry, and two ways a chest hands over a card |
+| `gameplay/modifiers/on_the_clock.tres` | **new** — the drawback half of Thumb On The Scale; never in the pool |
+| `room_scenes/workshop/default_pool.tres` | +7 entries, so the charms are reachable |
 | `core/main_game/main_game.gd` | `enter_rest` → `enter_treasure`, implemented |
 | `map/generation/room.gd` | `HEAL` → `TREASURE`; `treasure` field; scene uid |
 | `map/generation/map_generator.gd` | rename; `_assign_treasure_tables()` |
 | `map/visuals/map_node.gd` | rename in `ROOM_ART`; per-chest icon with fallback |
-| `autoloads/uids.gd` | room, set, 3 tables, 3 games, 2 modifiers |
-| `debug/treasure_check.gd` + `TreasureCheck.tscn` | **new** — 121-check headless harness |
+| `autoloads/uids.gd` | room, set, 3 tables, 3 games, 8 modifiers |
+| `debug/treasure_check.gd` + `TreasureCheck.tscn` | **new** — 192-check headless harness |
 | `debug/treasure_demo.gd` + `TreasureDemo.tscn` | **new** — play the chests without walking a run to one |

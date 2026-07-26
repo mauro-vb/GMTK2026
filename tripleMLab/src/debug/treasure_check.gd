@@ -359,7 +359,142 @@ func _check_hooks() -> void:
 	_check(is_equal_approx(system.get_treasure_gain(10.0), 15.0), "the system folds the charm into a payout")
 	_check(is_equal_approx(system.get_treasure_loss(18.0), 9.0), "and the crate into a bite")
 	_check(is_equal_approx(system.get_treasure_loss(-5.0), 0.0), "a negative amount can never become a payout")
+	_check(is_equal_approx(system.get_treasure_weight(70.0, true), 70.0)
+		and is_equal_approx(system.get_treasure_weight(30.0, false), 30.0),
+		"neither of them touches a chest's odds")
+	_check(not system.claim_treasure_retry(-18.0), "and neither buys a second opening")
+	_check(is_zero_approx(system.get_treasure_card_chance(true))
+		and is_zero_approx(system.get_treasure_card_chance(false)),
+		"a chest hands out no cards until something says otherwise")
 	system.free()
+
+	_check_odds_hooks()
+	_check_retry_hook()
+	_check_card_hooks()
+
+
+## The odds hook, which is the one with a rule attached: it is asked *before* the
+## chest is laid out, so whatever it returns is what the wheel and the board are
+## built out of. Checked here as arithmetic; §"a tilted chest" plays one.
+func _check_odds_hooks() -> void:
+	var thumb: Modifier = load(UIDs.THUMB_ON_THE_SCALE_UID) as Modifier
+	_check(thumb != null and not thumb.stackable, "Thumb On The Scale is one card, not a stack")
+	_check(is_equal_approx(thumb.modify_treasure_weight(70.0, true), 112.0),
+		"...and leans a paying outcome from 70 to 112")
+	_check(is_equal_approx(thumb.modify_treasure_weight(30.0, false), 30.0),
+		"...leaving the biting one where it was")
+	_check(is_equal_approx(thumb.modify_treasure_gain(10.0), 10.0)
+		and is_equal_approx(thumb.modify_treasure_loss(10.0), 10.0),
+		"...and changing nothing about what either is worth")
+
+	var seam: Modifier = load(UIDs.SHALLOW_SEAM_UID) as Modifier
+	_check(is_equal_approx(seam.modify_treasure_weight(70.0, true), 140.0)
+		and is_equal_approx(seam.modify_treasure_gain(10.0), 6.0),
+		"Shallow Seam pays twice as often and 40% less")
+
+	# The cost half. Better odds are bought with a burning fuse, which is the one
+	# price a treasure room can charge that isn't just a smaller payout.
+	var clock: Modifier = thumb.linked_modifier
+	if not _check(clock != null, "Thumb On The Scale drags a drawback along with it"):
+		return
+
+	_check(clock.modifier_name == "On The Clock", "...and it is '%s'" % clock.modifier_name)
+	_check(clock.runs_clock_in_treasure(), "...which runs the fuse while a chest is open")
+	_check(is_equal_approx(clock.modify_treasure_weight(70.0, true), 70.0)
+		and is_equal_approx(clock.modify_treasure_gain(10.0), 10.0),
+		"...and bends nothing else — the cost is the clock, and only the clock")
+	_check(not thumb.runs_clock_in_treasure(), "the bonus half doesn't charge for itself twice")
+
+	# One thumb turns a 70/30 chest into a 79/21 one — and grants both halves,
+	# because a linked modifier comes with the card that carries it.
+	var system: ModifiersSystem = ModifiersSystem.new()
+	system.add_modifier(thumb)
+	_check(system.has_modifier("thumb_on_the_scale") and system.has_modifier("on_the_clock"),
+		"taking the card grants both halves")
+	_check(system.is_treasure_clock_running(), "...so the next chest is on a running clock")
+
+	var gain: float = system.get_treasure_weight(70.0, true)
+	var loss: float = system.get_treasure_weight(30.0, false)
+	var share: float = gain / (gain + loss)
+	_check(is_equal_approx(gain, 112.0), "the tilt reaches the fold intact (%.1f)" % gain)
+	_check(absf(share - 0.79) < 0.01, "a 70%% chest opens as a %.0f%% one" % [share * 100.0])
+
+	# Everything else leaves the room's usual "a gamble is not a time trial" alone.
+	var plain_system: ModifiersSystem = ModifiersSystem.new()
+	plain_system.add_modifier(load(UIDs.LUCKY_CHARM_UID))
+	_check(not plain_system.is_treasure_clock_running(),
+		"a run carrying anything else opens chests on a stopped clock")
+	plain_system.free()
+
+	# A tilt can shrink a side away to nothing; it can never invert one.
+	var flattened: TreasureModifier = TreasureModifier.new()
+	flattened.gain_weight_scale = -5.0
+	system.add_modifier(flattened)
+	_check(system.get_treasure_weight(70.0, true) >= 0.0, "a negative tilt clamps at zero, not below")
+	system.free()
+
+
+func _check_retry_hook() -> void:
+	var second: Modifier = load(UIDs.SECOND_CHANCE_UID) as Modifier
+	_check(second != null and second.wants_treasure_retry(-18.0), "Second Chance buys a reopening")
+	_check(second.get_description().contains("Spent once used"), "...and says on the card that it is spent")
+
+	var system: ModifiersSystem = ModifiersSystem.new()
+	system.add_modifier(second)
+	system.add_modifier(load(UIDs.LUCKY_CHARM_UID))
+	_check(system.claim_treasure_retry(-18.0), "the system finds it")
+	_check(not system.has_modifier("second_chance"), "...spends it on the spot")
+	_check(system.has_modifier("lucky_charm"), "...and leaves everything else alone")
+	_check(not system.claim_treasure_retry(-18.0), "so a chest can't be reopened forever")
+	system.free()
+
+
+func _check_card_hooks() -> void:
+	var magpie: Modifier = load(UIDs.MAGPIES_EYE_UID) as Modifier
+	_check(is_equal_approx(magpie.modify_treasure_card_chance(0.0, true), 0.5),
+		"Magpie's Eye searches half the chests that pay")
+	_check(is_zero_approx(magpie.modify_treasure_card_chance(0.0, false)),
+		"...and none of the ones that bite")
+
+	var salvage: Modifier = load(UIDs.SALVAGE_RIGHTS_UID) as Modifier
+	_check(is_equal_approx(salvage.modify_treasure_card_chance(0.0, false), 0.6),
+		"Salvage Rights takes 60% of what bites you")
+	_check(is_zero_approx(salvage.modify_treasure_card_chance(0.0, true)),
+		"...and leaves the payouts alone")
+
+	# Independent rather than additive: two half-chances are three quarters, and
+	# no stack of them reaches certainty by arithmetic.
+	_check(is_equal_approx(magpie.modify_treasure_card_chance(0.5, true), 0.75),
+		"a second searcher folds in as an independent chance, not as an addition")
+
+	var second_eye: TreasureModifier = TreasureModifier.new()
+	second_eye.id = "test_second_eye"
+	second_eye.gain_card_chance = 0.5
+
+	var system: ModifiersSystem = ModifiersSystem.new()
+	system.add_modifier(magpie)
+	system.add_modifier(second_eye)
+	_check(is_equal_approx(system.get_treasure_card_chance(true), 0.75),
+		"the system folds two of them to 75%, not to 100%")
+	_check(system.get_treasure_card_chance(true) <= 1.0, "and the chance can never pass certainty")
+	_check(is_zero_approx(system.get_treasure_card_chance(false)),
+		"neither of them searches a chest that bit")
+	system.free()
+
+	# The pool a chest draws from is the workshop's own, so anything it hands out
+	# is something a bench that deep could have laid out.
+	var pool: WorkshopPool = load(UIDs.WORKSHOP_DEFAULT_POOL_UID) as WorkshopPool
+	if not _check(pool != null, "the workshop pool loads for a chest to draw from"):
+		return
+
+	var ids: Dictionary[String, bool] = {}
+	for entry: WorkshopEntry in pool.entries:
+		if entry != null and entry.modifier != null:
+			ids[entry.modifier.id] = true
+
+	for id: String in ["lucky_charm", "padded_crate", "thumb_on_the_scale", "second_chance",
+			"magpies_eye", "salvage_rights", "shallow_seam"]:
+		_check(ids.has(id), "'%s' is reachable from a bench" % id)
 
 
 # --- The map -----------------------------------------------------------------
@@ -439,6 +574,9 @@ func _check_live_rooms() -> void:
 	await _play(game, UIDs.TREASURE_RICH_SEAM_UID, TreasureTable.Game.WHEEL, "the wheel")
 	await _play(game, UIDs.TREASURE_DEAD_DROP_UID, TreasureTable.Game.PLINKO, "the board")
 	await _check_charms(game)
+	await _check_tilt(game)
+	await _check_second_chance(game)
+	await _check_lining(game)
 
 
 ## One full visit: enter the room, play whatever it laid out, and check the clock
@@ -509,7 +647,7 @@ func _play_minigame(minigame: TreasureGame) -> void:
 ## Enters a treasure room carrying a specific chest. A real visit gets the chest
 ## off the map node the player clicked; forcing it here is what lets all three be
 ## walked in one run.
-func _enter(game: MainGame, table: TreasureTable) -> TreasureRoom:
+func _enter(game: MainGame, table: TreasureTable, on_the_clock: bool = false) -> TreasureRoom:
 	var room_data: Room = Room.new()
 	room_data.type = Room.Type.TREASURE
 	room_data.treasure = table
@@ -521,7 +659,10 @@ func _enter(game: MainGame, table: TreasureTable) -> TreasureRoom:
 	if not _check(room != null, "entering a TREASURE room loads a TreasureRoom"):
 		return null
 
-	_check(not room.should_tick_time, "the clock is off while a chest is open")
+	if on_the_clock:
+		_check(room.should_tick_time, "the fuse is burning while this chest is open")
+	else:
+		_check(not room.should_tick_time, "the clock is off while a chest is open")
 
 	# The opening fade, then the game is live.
 	await get_tree().create_timer(0.6).timeout
@@ -605,6 +746,177 @@ func _check_charms(game: MainGame) -> void:
 
 	floored._on_leave_pressed()
 	await get_tree().create_timer(0.5).timeout
+
+
+## A tilted chest, played. The rule the odds hook exists under is that the game
+## in front of the player is built out of the tilt — so this checks the room's
+## table really is the leaned-on one, that the minigame was handed that same
+## table, and that the authored .tres on disk came through untouched.
+##
+## And the other half of the same card: the fuse burning while the lid is up.
+func _check_tilt(game: MainGame) -> void:
+	print("\n[ a tilted chest ]")
+
+	var modifiers: ModifiersSystem = game.modifiers_system
+	_clear_carried(modifiers)
+	modifiers.add_modifier(load(UIDs.THUMB_ON_THE_SCALE_UID))
+	_check(modifiers.has_modifier("on_the_clock"), "the card brought its drawback into the run")
+
+	var authored: TreasureTable = load(UIDs.TREASURE_RICH_SEAM_UID) as TreasureTable
+	var before: float = authored.chance_of(authored.best_slice())
+
+	game.time_system.current_time = 30.0
+	var room: TreasureRoom = await _enter(game, authored, true)
+	if room == null:
+		return
+
+	# The cost, measured on the real clock: this room is the one place in the
+	# game where a chest is a time trial, and it has to say so.
+	_check(game.time_system.ticking, "...and MainGame started the clock on the room's say-so")
+	_check(game.time_system.current_time < 30.0,
+		"...so the chest has already cost %.1fs just standing here" % [30.0 - game.time_system.current_time])
+	_check(room.location_label.text.contains("ON THE CLOCK"),
+		"...and the room says so: '%s'" % room.location_label.text)
+
+	var played: TreasureTable = room.get("_table") as TreasureTable
+	var after: float = played.chance_of(played.best_slice())
+	_check(played != authored, "a chest leaned on by a charm is a copy, not the .tres")
+	_check(absf(authored.chance_of(authored.best_slice()) - before) < 0.0001,
+		"...so the authored chest is still %.0f%% on disk" % [before * 100.0])
+	# 70% × 1.6 against an untouched 30% is 78.9%, so this is the tilt landing in
+	# full rather than merely landing.
+	_check(absf(after - 0.789) < 0.01, "the chest is opened at %.0f%% rather than %.0f%%" % [
+		after * 100.0, before * 100.0])
+
+	var minigame: TreasureGame = room.get("_game") as TreasureGame
+	_check(minigame != null and minigame.table == played,
+		"the game the player is looking at was cut from the tilted odds")
+
+	_play_minigame(minigame)
+	await get_tree().create_timer(4.0).timeout
+	_check(not room.leave_button.disabled, "a tilted chest still pays out and lets go")
+
+	room._on_leave_pressed()
+	await get_tree().create_timer(0.5).timeout
+
+
+## A chest that bites with a Second Chance in the player's pocket: the outcome is
+## torn up, the same chest is opened again, and the charm is gone.
+func _check_second_chance(game: MainGame) -> void:
+	print("\n[ a second chance ]")
+
+	var modifiers: ModifiersSystem = game.modifiers_system
+	_clear_carried(modifiers)
+	modifiers.add_modifier(load(UIDs.SECOND_CHANCE_UID))
+
+	# Forced to bite, both times. A chest that happened to pay would walk this
+	# check straight past the thing it is here to prove.
+	var biting: TreasureTable = _forced(load(UIDs.TREASURE_EVEN_SPLIT_UID), false)
+	game.time_system.current_time = 40.0
+
+	var room: TreasureRoom = await _enter(game, biting)
+	if room == null:
+		return
+
+	var before: float = game.time_system.current_time
+	var first: TreasureGame = room.get("_game") as TreasureGame
+	_play_minigame(first)
+	# The toss, the payout beat, and the pause the room holds before it opens the
+	# same chest again.
+	await get_tree().create_timer(4.0).timeout
+
+	_check(int(room.get("_retries")) == 1, "the bite bought a reopening")
+	_check(not modifiers.has_modifier("second_chance"), "...and spent the charm doing it")
+	_check(is_equal_approx(game.time_system.current_time, before),
+		"the clock has not moved yet (%.1fs)" % game.time_system.current_time)
+	_check(room.leave_button.disabled, "and there is still no way out")
+
+	var second: TreasureGame = room.get("_game") as TreasureGame
+	if not _check(second != null and second != first, "the chest was laid out again from scratch"):
+		return
+
+	_play_minigame(second)
+	await get_tree().create_timer(4.0).timeout
+
+	_check(game.time_system.current_time < before, "the second outcome is the one that counts (%.1fs)"
+		% game.time_system.current_time)
+	_check(int(room.get("_retries")) == 1, "and it is not reopened a third time on an empty pocket")
+	_check(not room.leave_button.disabled, "the way out opens once the second one has paid")
+
+	room._on_leave_pressed()
+	await get_tree().create_timer(0.5).timeout
+
+
+## A chest that hands over a card as well as seconds. Forced to certainty rather
+## than sampled: at 50% this would pass half the time whatever the code did.
+func _check_lining(game: MainGame) -> void:
+	print("\n[ something in the lining ]")
+
+	var modifiers: ModifiersSystem = game.modifiers_system
+	_clear_carried(modifiers)
+
+	var certain: TreasureModifier = TreasureModifier.new()
+	certain.modifier_name = "Test Lining"
+	certain.id = "test_lining"
+	certain.gain_card_chance = 1.0
+	modifiers.add_modifier(certain)
+
+	var paying: TreasureTable = _forced(load(UIDs.TREASURE_EVEN_SPLIT_UID), true)
+	game.time_system.current_time = 30.0
+
+	var room: TreasureRoom = await _enter(game, paying)
+	if room == null:
+		return
+
+	var carried: int = modifiers.modifiers.size()
+	var icons: int = room.carry_row.get_child_count()
+	_play_minigame(room.get("_game") as TreasureGame)
+	await get_tree().create_timer(3.0).timeout
+
+	var card: Modifier = room.get("_card") as Modifier
+	if not _check(card != null, "a chest that pays out coughed up a card as well"):
+		return
+
+	_check(modifiers.modifiers.size() > carried, "...the run is carrying it (%d -> %d)" % [
+		carried, modifiers.modifiers.size()])
+	_check(modifiers.has_modifier(card.id), "...and it is the card the room named ('%s')" % card.modifier_name)
+	_check(room.carry_row.get_child_count() > icons, "...its icon landed in the strip on the spot")
+	_check(room.instruction_label.text.contains(card.modifier_name.to_upper()),
+		"...and the header says which it was: '%s'" % room.instruction_label.text)
+
+	room._on_leave_pressed()
+	await get_tree().create_timer(0.5).timeout
+
+	# A chest with nothing carried is still a chest that only pays in seconds.
+	_clear_carried(modifiers)
+	var plain: TreasureRoom = await _enter(game, paying)
+	if plain == null:
+		return
+
+	_play_minigame(plain.get("_game") as TreasureGame)
+	await get_tree().create_timer(3.0).timeout
+	_check(plain.get("_card") == null, "a run carrying nothing gets seconds and nothing else")
+
+	plain._on_leave_pressed()
+	await get_tree().create_timer(0.5).timeout
+
+
+## A copy of a table that can only do one thing, so a check about what happens
+## *after* an outcome never has to gamble on getting that outcome.
+func _forced(source: TreasureTable, pays: bool) -> TreasureTable:
+	var table: TreasureTable = source.duplicate(true) as TreasureTable
+	var wanted: TreasureSlice = table.best_slice() if pays else table.worst_slice()
+	for slice: TreasureSlice in table.slices:
+		slice.weight = 1.0 if slice == wanted else 0.0
+
+	return table
+
+
+## Empties the run's pockets between groups, so a charm from one check can't
+## quietly change the arithmetic of the next.
+func _clear_carried(modifiers: ModifiersSystem) -> void:
+	for modifier: Modifier in modifiers.modifiers.duplicate():
+		modifiers.remove_modifier(modifier)
 
 
 ## The outcome a room settled on, read back off the room rather than off a signal
