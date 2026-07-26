@@ -165,6 +165,10 @@ func _setup_node_types() -> void:
 ## independently coming up however it likes. Rooms with no outgoing cords are
 ## the ones no path reaches and [method Map.create_map] never draws them, so
 ## they are left out of the deal rather than eating a slot in it.
+##
+## The deal is then corrected so that every set of chests the player is asked to
+## pick between holds one of each — see [method _mixed_deal]. The weighting
+## survives it: the correction moves as few chests as it can.
 func _assign_treasure_tables() -> void:
 	var treasure_set: TreasureSet = ResourceLoader.load(UIDs.TREASURE_SET_UID) as TreasureSet
 	if treasure_set == null or treasure_set.good_table == null or treasure_set.corrupted_table == null \
@@ -172,17 +176,156 @@ func _assign_treasure_tables() -> void:
 		push_error("MapGenerator: no TreasureSet to deal chests from.")
 		return
 
+	var all_chests: Array[Room] = []
+
 	for current_row: Array[Room] in map_data:
 		var chests: Array[Room] = []
 		for node: Room in current_row:
 			if node.type == Room.Type.TREASURE and node.next_nodes.size() > 0:
 				chests.append(node)
 
-		var dealt: Array[bool] = treasure_set.deal(chests.size())
+		var dealt: Array[bool] = _mixed_deal(treasure_set.deal(chests.size()), chests)
 		for index: int in chests.size():
-			chests[index].is_corrupted = dealt[index]
-			chests[index].treasure = treasure_set.table_for(dealt[index])
-			chests[index].treasure_coin = treasure_set.coin_table_for(dealt[index])
+			_stock_chest(chests[index], dealt[index], treasure_set)
+
+		all_chests.append_array(chests)
+
+	_guarantee_both_chests(all_chests, treasure_set)
+
+func _stock_chest(chest: Room, corrupted: bool, treasure_set: TreasureSet) -> void:
+	chest.is_corrupted = corrupted
+	chest.treasure = treasure_set.table_for(corrupted)
+	chest.treasure_coin = treasure_set.coin_table_for(corrupted)
+
+## Corrects a row's deal so that no set of chests the player picks between comes
+## up all good or all corrupted, because a row of chests that all pay — or all
+## bite — is not a decision, it is a formality with extra steps.
+##
+## A chest wears its fate on its face (see [method MapNode._art_pair_for_room]),
+## so this is the whole of what the chest row asks: look at what is on offer and
+## take the one you want. That only exists if there is something to weigh.
+##
+## Two things count as a set: the row as a whole, and the chests any one room
+## leads into — the row can hold both kinds and still deal a given player two
+## good ones, if those happen to be the only two cords out of where they stand.
+##
+## Rather than reroll until the deal happens to come out mixed, every pattern of
+## fates the row could wear is scored — there are at most 2^[constant WIDTH] of
+## them — and the winner is the one satisfying the most sets, breaking ties
+## toward whatever is closest to the weighted deal it was handed. So the 2:1
+## lean is kept wherever it does not cost the player a choice, and the smallest
+## possible number of chests are turned over where it does.
+##
+## Scored rather than solved because the sets can genuinely conflict: three rooms
+## offering the pairs (a,b), (b,c) and (a,c) cannot all be mixed with two kinds
+## of chest. Rare, but the generator is free to build it, so this settles for the
+## best available instead of hunting for a perfection that may not exist.
+func _mixed_deal(dealt: Array[bool], chests: Array[Room]) -> Array[bool]:
+	var count: int = chests.size()
+	if count < 2:
+		return dealt
+
+	var sets: Array[Array] = _chest_choice_sets(chests)
+
+	var best: Array[bool] = dealt
+	var best_satisfied: int = -1
+	var best_distance: int = 0
+
+	for pattern: int in 1 << count:
+		var candidate: Array[bool] = []
+		for index: int in count:
+			candidate.append(pattern & (1 << index) != 0)
+
+		var satisfied: int = _sets_satisfied(candidate, sets)
+		var distance: int = _deal_distance(candidate, dealt)
+
+		if satisfied > best_satisfied or (satisfied == best_satisfied and distance < best_distance):
+			best = candidate
+			best_satisfied = satisfied
+			best_distance = distance
+
+	return best
+
+## Every group of chests in a row that has to hold one of each, as indices into
+## [param chests]: the row itself, plus one group per room feeding into it.
+##
+## A room offering only one chest is left out — there is nothing to pick between
+## — and so is any chest with no cords out of it, since those are never drawn and
+## the player can never stand in front of them.
+func _chest_choice_sets(chests: Array[Room]) -> Array[Array]:
+	var sets: Array[Array] = []
+
+	var whole_row: Array[int] = []
+	for index: int in chests.size():
+		whole_row.append(index)
+	sets.append(whole_row)
+
+	var parents: Array[Room] = []
+	for chest: Room in chests:
+		for parent: Room in chest.parents:
+			if not parents.has(parent):
+				parents.append(parent)
+
+	for parent: Room in parents:
+		var offered: Array[int] = []
+		for next: Room in parent.next_nodes:
+			var index: int = chests.find(next)
+			if index >= 0 and not offered.has(index):
+				offered.append(index)
+
+		if offered.size() > 1:
+			sets.append(offered)
+
+	return sets
+
+func _sets_satisfied(candidate: Array[bool], sets: Array[Array]) -> int:
+	var satisfied: int = 0
+
+	for choice: Array in sets:
+		var has_good: bool = false
+		var has_corrupted: bool = false
+		for index: int in choice:
+			if candidate[index]:
+				has_corrupted = true
+			else:
+				has_good = true
+
+		if has_good and has_corrupted:
+			satisfied += 1
+
+	return satisfied
+
+## How many chests [param candidate] turns over relative to the weighted deal.
+func _deal_distance(candidate: Array[bool], dealt: Array[bool]) -> int:
+	var distance: int = 0
+	for index: int in candidate.size():
+		if candidate[index] != dealt[index]:
+			distance += 1
+
+	return distance
+
+## The backstop for a map whose chests never share a row: [method _mixed_deal]
+## can only mix a row it is given two chests of, so a run that scatters its
+## chests one to a row could still come up all good or all corrupted. One chest
+## is turned over so the run has seen both kinds by the end of it.
+func _guarantee_both_chests(chests: Array[Room], treasure_set: TreasureSet) -> void:
+	if chests.size() < 2:
+		return
+
+	var good: Array[Room] = []
+	var corrupted: Array[Room] = []
+	for chest: Room in chests:
+		if chest.is_corrupted:
+			corrupted.append(chest)
+		else:
+			good.append(chest)
+
+	if not good.is_empty() and not corrupted.is_empty():
+		return
+
+	var all_alike: Array[Room] = corrupted if good.is_empty() else good
+	var odd_one_out: Room = all_alike[randi_range(0, all_alike.size() - 1)]
+	_stock_chest(odd_one_out, not odd_one_out.is_corrupted, treasure_set)
 
 ## Types are picked first and the scene each one loads is resolved after, so a
 ## room only has to be told what it is, never what file that means.

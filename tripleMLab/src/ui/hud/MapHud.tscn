@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://c8vqmn3wxk5tb" path="res://src/ui/hud/FuseBar.tscn" id="1_fuse"]
 [ext_resource type="PackedScene" uid="uid://dv6ct8mkr3jqw" path="res://src/ui/modifier_display/ModifierDisplay.tscn" id="2_mdmap"]
+[ext_resource type="PackedScene" uid="uid://cq8vrn2mwk4tf" path="res://src/ui/hud/MapKey.tscn" id="3_mapkey"]
 
 [node name="MapHud" type="Control" unique_id=1061453240]
 layout_mode = 3
@@ -35,4 +36,7 @@ theme_override_constants/separation = 2
 layout_mode = 2
 
 [node name="ModifierDisplay" parent="." unique_id=612613159 instance=ExtResource("2_mdmap")]
+layout_mode = 1
+
+[node name="MapKey" parent="." instance=ExtResource("3_mapkey")]
 layout_mode = 1

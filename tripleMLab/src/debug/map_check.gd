@@ -29,7 +29,76 @@ var _tightest: float = INF
 
 func _ready() -> void:
 	await _check_fit()
+	await _check_chest_choices()
 	_finish()
+
+
+## Every set of chests a player can be asked to pick between has to hold one
+## good and one corrupted, or the pick is not a pick. Same reason as the fit
+## check above deals hundreds of maps: the one in front of you proves nothing
+## about the one the generator deals next.
+func _check_chest_choices() -> void:
+	print("\n[ chest choices ]  %d maps" % MAPS)
+
+	var generator: MapGenerator = MapGenerator.new()
+	add_child(generator)
+
+	var one_sided_rows: int = 0
+	var one_sided_picks: int = 0
+	var one_sided_maps: int = 0
+	var chestless_maps: int = 0
+
+	for index: int in MAPS:
+		var map_data: Array[Array] = generator.generate_map()
+		var all_chests: Array[Room] = []
+
+		for current_row: Array in map_data:
+			var chests: Array[Room] = []
+			for room: Room in current_row:
+				if room.type == Room.Type.TREASURE and room.next_nodes.size() > 0:
+					chests.append(room)
+
+			all_chests.append_array(chests)
+
+			if chests.size() > 1 and not _is_mixed(chests):
+				one_sided_rows += 1
+
+			# Every room feeding the row, and what it actually offers.
+			for room: Room in current_row:
+				for parent: Room in room.parents:
+					var offered: Array[Room] = []
+					for next: Room in parent.next_nodes:
+						if chests.has(next) and not offered.has(next):
+							offered.append(next)
+
+					if offered.size() > 1 and not _is_mixed(offered):
+						one_sided_picks += 1
+
+		if all_chests.size() < 2:
+			chestless_maps += 1
+		elif not _is_mixed(all_chests):
+			one_sided_maps += 1
+
+	generator.queue_free()
+	await generator.tree_exited
+
+	_check(one_sided_picks == 0, "no room ever offers a one-sided pair of chests (%d found)" % one_sided_picks)
+	_check(one_sided_rows == 0, "no row of chests is all one kind (%d found)" % one_sided_rows)
+	_check(one_sided_maps == 0, "no map runs entirely on one kind of chest (%d found)" % one_sided_maps)
+	print("  maps with fewer than two chests: %d" % chestless_maps)
+
+
+func _is_mixed(chests: Array[Room]) -> bool:
+	var has_good: bool = false
+	var has_corrupted: bool = false
+
+	for chest: Room in chests:
+		if chest.is_corrupted:
+			has_corrupted = true
+		else:
+			has_good = true
+
+	return has_good and has_corrupted
 
 
 func _check_fit() -> void:
