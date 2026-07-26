@@ -32,7 +32,7 @@ const ROOM_ART: Dictionary[Room.Type, Array] = {
 		preload("res://assets/art/map/icons/WorkBenchDefault.png"),
 		preload("res://assets/art/map/icons/WorkBenchActivated.png"),
 	],
-	Room.Type.HEAL: [
+	Room.Type.TREASURE: [
 		preload("res://assets/art/map/icons/ChestDefault.png"),
 		preload("res://assets/art/map/icons/ChestActivated.png"),
 	],
@@ -61,6 +61,12 @@ const FINAL_SCALE: float = 1.35
 const AVAILABLE_MODULATE: Color = Color.WHITE
 const UNAVAILABLE_MODULATE: Color = Color(0.66, 0.63, 0.68, 1.0)
 const SPENT_MODULATE: Color = Color(0.5, 0.48, 0.5, 1.0)
+
+## A corrupted chest wears a red tint until its own art exists — see
+## [method _refresh_art]. Multiplied on top of the usual modulate rather than
+## replacing it, so it still dims/greys out the same way as it goes unavailable
+## or spent.
+const CORRUPTED_TINT: Color = Color(1.6, 0.55, 0.55, 1.0)
 
 ## The charge going off. The player is looking straight at the map when this
 ## fires — it runs the moment they get back from the room — so the swap punches
@@ -186,6 +192,11 @@ func _refresh_art() -> void:
 	else:
 		modulate = UNAVAILABLE_MODULATE
 
+	# A corrupted chest is told apart before it's opened — until its own art
+	# exists, that's a tint rather than a different sprite (see is_corrupted).
+	if room.type == Room.Type.TREASURE and room.is_corrupted:
+		modulate *= CORRUPTED_TINT
+
 func _texture_for_room() -> Texture2D:
 	var pair: Array = _art_pair_for_room()
 	return pair[FACE_ACTIVATED] if _spent else pair[FACE_DEFAULT]
@@ -196,7 +207,32 @@ func _art_pair_for_room() -> Array:
 		# to mark an event as good vs bad.
 		return EVENT_ART_POSITIVE if room.event_positive else EVENT_ART_NEGATIVE
 
+	# ART: a chest wears its own faces when its [TreasureTable] has them, so a
+	# good and a corrupted chest can be told apart by their sprite rather than
+	# just a tint (see CORRUPTED_TINT). Drop the sprites into the tables'
+	# `map_icon` / `spent_icon` and nothing here changes; until then both share
+	# the fallback chest pair below, tinted.
+	var chest: Array = _chest_art_pair()
+	if not chest.is_empty():
+		return chest
+
 	return ROOM_ART.get(room.type, ROOM_ART[Room.Type.NOT_ASSIGNED])
+
+## The chest's own [Default, Activated] pair, or an empty array to fall back to
+## the shared chest art. Spent art is optional on its own: a table with an
+## open-chest sprite and no closed one just repeats it for [FACE_ACTIVATED]
+## rather than being odd or broken.
+func _chest_art_pair() -> Array:
+	if room.type != Room.Type.TREASURE or room.treasure == null or room.treasure.map_icon == null:
+		return []
+
+	var activated: Texture2D = room.treasure.spent_icon if room.treasure.spent_icon != null else room.treasure.map_icon
+	return [room.treasure.map_icon, activated]
+
+## A stable per-room number. Two odd primes so neighbouring rooms, which differ
+## by one lane and one step, never land on the same face.
+func _variant() -> int:
+	return absi(room.coordinates.x * 7 + room.coordinates.y * 3)
 
 func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if not available or not event.is_action_pressed("left_mouse"):

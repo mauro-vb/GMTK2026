@@ -20,12 +20,12 @@ const PATHS: int = 3
 # Room type distribution
 const LEVEL_ROOM_WEIGHT: float = 10.0
 const WORKSHOP_ROOM_WEIGHT: float = 2.5
-const HEAL_ROOM_WEIGHT: float = 4.0
+const TREASURE_ROOM_WEIGHT: float = 4.0
 
 var random_node_type_total_weights: Dictionary[Room.Type, float] = {
 	Room.Type.LEVEL: 0.0,
 	Room.Type.WORKSHOP: 0.0,
-	Room.Type.HEAL: 0.0,
+	Room.Type.TREASURE: 0.0,
 }
 
 var random_node_type_total_weight: float = 0.0
@@ -44,6 +44,7 @@ func generate_map() -> Array[Array]:
 	_setup_final_node()
 	_setup_random_node_weights()
 	_setup_node_types()
+	_assign_treasure_tables()
 	_apply_scene_uids()
 
 	return map_data
@@ -133,8 +134,8 @@ func _setup_final_node() -> void:
 
 func _setup_random_node_weights() -> void:
 	random_node_type_total_weights[Room.Type.LEVEL] = LEVEL_ROOM_WEIGHT
-	random_node_type_total_weights[Room.Type.HEAL] = LEVEL_ROOM_WEIGHT + HEAL_ROOM_WEIGHT
-	random_node_type_total_weights[Room.Type.WORKSHOP] = LEVEL_ROOM_WEIGHT + HEAL_ROOM_WEIGHT + WORKSHOP_ROOM_WEIGHT
+	random_node_type_total_weights[Room.Type.TREASURE] = LEVEL_ROOM_WEIGHT + TREASURE_ROOM_WEIGHT
+	random_node_type_total_weights[Room.Type.WORKSHOP] = LEVEL_ROOM_WEIGHT + TREASURE_ROOM_WEIGHT + WORKSHOP_ROOM_WEIGHT
 	
 	random_node_type_total_weight = random_node_type_total_weights[Room.Type.WORKSHOP]
 	
@@ -146,8 +147,10 @@ func _setup_node_types() -> void:
 	# TODO: Come up with custom rules
 	# Example set first floor always to LEVEL
 	set_full_row.call(0, Room.Type.LEVEL)
-	# Example set last floor always to HEAL
-	set_full_row.call(floori(LENGTH * .5), Room.Type.HEAL)
+	# The chest row. Every path crosses it, so halfway through a run every player
+	# stands in front of a row of chests and has to pick one — which is the whole
+	# point of dealing that row three different chests (see _assign_treasure_tables).
+	set_full_row.call(floori(LENGTH * .5), Room.Type.TREASURE)
 	
 	for current_row: Array[Room] in map_data:
 		for node: Room in current_row:
@@ -155,6 +158,32 @@ func _setup_node_types() -> void:
 				if next_node.type == Room.Type.NOT_ASSIGNED:
 					_set_node_randomly(next_node)
 	
+## Hands every chest on the map its fate.
+##
+## Dealt per row rather than rolled per room, weighted 2:1 good, so a row of
+## three trends toward two good and one corrupted instead of each chest
+## independently coming up however it likes. Rooms with no outgoing cords are
+## the ones no path reaches and [method Map.create_map] never draws them, so
+## they are left out of the deal rather than eating a slot in it.
+func _assign_treasure_tables() -> void:
+	var treasure_set: TreasureSet = ResourceLoader.load(UIDs.TREASURE_SET_UID) as TreasureSet
+	if treasure_set == null or treasure_set.good_table == null or treasure_set.corrupted_table == null \
+			or treasure_set.good_coin_table == null or treasure_set.corrupted_coin_table == null:
+		push_error("MapGenerator: no TreasureSet to deal chests from.")
+		return
+
+	for current_row: Array[Room] in map_data:
+		var chests: Array[Room] = []
+		for node: Room in current_row:
+			if node.type == Room.Type.TREASURE and node.next_nodes.size() > 0:
+				chests.append(node)
+
+		var dealt: Array[bool] = treasure_set.deal(chests.size())
+		for index: int in chests.size():
+			chests[index].is_corrupted = dealt[index]
+			chests[index].treasure = treasure_set.table_for(dealt[index])
+			chests[index].treasure_coin = treasure_set.coin_table_for(dealt[index])
+
 ## Types are picked first and the scene each one loads is resolved after, so a
 ## room only has to be told what it is, never what file that means.
 func _apply_scene_uids() -> void:
@@ -166,25 +195,25 @@ func _set_node_randomly(node: Room) -> void:
 	var is_consecutive_type: Callable = func(candidate: Room.Type, type: Room.Type) -> bool:
 		return candidate == type and _node_has_parent_of_type(node, type)
 	# TODO: Setup Custom Rules
-	# Examples: 
-	# No heal below 4
-	var heal_before_4: bool = true
-	# No consecutive heals
-	var consecutive_heal: bool = true
+	# Examples:
+	# No chests in the first three rows
+	var treasure_before_3: bool = true
+	# No consecutive chests
+	var consecutive_treasure: bool = true
 	# No consecutive workshops
 	var consecutive_workshop: bool = true
-	# No heals after specified row (that is forced to be heal)
-	var heal_on_specific_row: bool = true
+	# No chest immediately after the row that is forced to be chests
+	var treasure_on_forced_row: bool = true
 
 	var type_candidate: Room.Type = Room.Type.NOT_ASSIGNED
 	
-	while heal_before_4 or consecutive_heal or consecutive_workshop or heal_on_specific_row:
+	while treasure_before_3 or consecutive_treasure or consecutive_workshop or treasure_on_forced_row:
 		type_candidate = _get_random_node_type_by_weight()
 		
-		heal_before_4 = type_candidate == Room.Type.HEAL and node.coordinates.y < 3
-		consecutive_heal = is_consecutive_type.call(type_candidate, Room.Type.HEAL)
+		treasure_before_3 = type_candidate == Room.Type.TREASURE and node.coordinates.y < 3
+		consecutive_treasure = is_consecutive_type.call(type_candidate, Room.Type.TREASURE)
 		consecutive_workshop = is_consecutive_type.call(type_candidate, Room.Type.WORKSHOP)
-		heal_on_specific_row = type_candidate == Room.Type.HEAL and node.coordinates.y == floori(LENGTH * .5) + 1
+		treasure_on_forced_row = type_candidate == Room.Type.TREASURE and node.coordinates.y == floori(LENGTH * .5) + 1
 		
 	node.type = type_candidate
 	

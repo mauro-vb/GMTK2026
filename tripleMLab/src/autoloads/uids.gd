@@ -11,10 +11,23 @@ const MAP_SCENE_UID: String = "uid://ipmc68r6n333"
 const PLAYER_SCENE_UID: String = "uid://kwjq37d8yab5"
 const TEST_LEVEL_UID: String = "res://src/levels/initial_levels/Level1.tscn"
 const WORKSHOP_SCENE_UID: String = "uid://bkq7wn3vxm2td"
+const TREASURE_ROOM_SCENE_UID: String = "uid://dn8kw3vqm7xbt"
 
 # WORKSHOP
 const WORKSHOP_DEFAULT_POOL_UID: String = "uid://cm2vj7xkq9nsw"
 const WORKSHOP_CARD_SCENE_UID: String = "uid://dp5nt8crj4wxb"
+
+# TREASURE
+## The good and corrupted chest, dealt across a treasure row.
+const TREASURE_SET_UID: String = "uid://cn6wb3vkm9xqt"
+const TREASURE_GOOD_UID: String = "uid://bv8kq4nwm6xtr"
+const TREASURE_CORRUPTED_UID: String = "uid://dk2mx7wnq5vbc"
+
+## The three ways a chest can be opened. Which one a chest allows is a flag on
+## its table, so adding a fourth game is a scene, a uid and one enum value.
+const TREASURE_COIN_GAME_UID: String = "uid://bw6mq2nvk9xtr"
+const TREASURE_WHEEL_GAME_UID: String = "uid://ck4nx8wbm3qvt"
+const TREASURE_PLINKO_GAME_UID: String = "uid://dt9vm5nkq2wxb"
 
 # SYSTEMS
 const TIME_SYSTEM_UID: String = "uid://bjktioxpxjuo"
@@ -77,6 +90,17 @@ const OPEN_CIRCUIT_UID: String = "uid://dk5nw9xbm3qvr"
 const SPARKING_CONTACT_UID: String = "uid://bw6qt3nkc8mxv"
 const THIN_SKIN_UID: String = "uid://ch4mb8wvn5rkt"
 const DOCKED_PAY_UID: String = "uid://dv9nk2xqm7bwt"
+
+# MODIFIERS - treasure terms
+const LUCKY_CHARM_UID: String = "uid://bx4nq9wmk7vtd"
+const PADDED_CRATE_UID: String = "uid://dw7kv2nxb5mqr"
+const THUMB_ON_THE_SCALE_UID: String = "uid://cj4nv7wxk2mtb"
+## The drawback half of Thumb On The Scale — never offered on its own.
+const ON_THE_CLOCK_UID: String = "uid://bn7mk4wxq2vtc"
+const SECOND_CHANCE_UID: String = "uid://dp8mk3nwq6vxr"
+const MAGPIES_EYE_UID: String = "uid://bt5wn9kvx3qmc"
+const SALVAGE_RIGHTS_UID: String = "uid://ck7bm2vnq8wxt"
+const SHALLOW_SEAM_UID: String = "uid://dv4kn6wxm9btq"
 
 # MODIFIERS - workshop terms
 const SECOND_SET_OF_HANDS_UID: String = "uid://bs4mv9xkq7ntd"

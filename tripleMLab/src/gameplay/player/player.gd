@@ -35,6 +35,7 @@ var is_jump_cut: bool = false
 # pogo behavior
 var pogo_buffer_timer: float = 0.0
 var pogo_grace_timer: float = 0.0
+var _last_pogo_area: PogoArea = null
 var _is_whiffing: bool = false # pogoing outside of pogo area
 
 # double jump behavior
@@ -55,8 +56,6 @@ var _direction_stack: Array[String] = []
 
 # FloorCheck's authored cast length, used whenever the look-ahead doesn't need more
 var _floor_check_reach: float = 0.0
-
-var _last_pogo_area: PogoArea = null
 
 @onready var state_machine: PlayerStateMachine = %StateMachine
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -81,6 +80,7 @@ func reset_for_new_room() -> void:
 	pogo_buffer_timer = 0.0
 	pogo_grace_timer = 0.0
 	_is_whiffing = false
+	_last_pogo_area = null
 	air_jumps_used = 0
 	is_dashing = false
 	dash_used = false
@@ -142,7 +142,11 @@ func _update_timers(delta: float) -> void:
 	else:
 		jump_buffer_timer = max(jump_buffer_timer - delta, 0.0)
 	
-	var touching_pogoable: = pogo_detector.has_overlapping_bodies() or pogo_detector.has_overlapping_areas()
+	var touching_pogo_area := _find_pogo_area()
+	if touching_pogo_area != null:
+		_last_pogo_area = touching_pogo_area
+
+	var touching_pogoable := touching_pogo_area != null or pogo_detector.has_overlapping_bodies()
 	pogo_grace_timer = stats.pogo_grace_time if touching_pogoable else max(pogo_grace_timer - delta, 0.0)
 
 	if Input.is_action_just_pressed("attack"):
@@ -193,7 +197,16 @@ func consume_pogo() -> void:
 	pogo_buffer_timer = 0.0
 	is_jump_cut = false
 	pay_ability_cost(Ability.POGO)
+	if _last_pogo_area != null:
+		_last_pogo_area.bounced.emit()
+		_last_pogo_area = null
 
+func _find_pogo_area() -> PogoArea:
+	for area: Area2D in pogo_detector.get_overlapping_areas():
+		if area is PogoArea:
+			return area
+	return null
+	
 func can_double_jump() -> bool:
 	log(has_double_jump_ability)
 	return has_double_jump_ability and not is_on_floor() and air_jumps_used < stats.max_air_jumps and jump_buffer_timer > 0.0

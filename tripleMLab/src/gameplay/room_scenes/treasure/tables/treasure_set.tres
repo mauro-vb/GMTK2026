@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TreasureSet" load_steps=6 format=3 uid="uid://cn6wb3vkm9xqt"]
+
+[ext_resource type="Script" uid="uid://dm2wq8nkv5xbr" path="res://src/gameplay/room_scenes/treasure/resources/treasure_set.gd" id="1_set"]
+[ext_resource type="Resource" uid="uid://bv8kq4nwm6xtr" path="res://src/gameplay/room_scenes/treasure/tables/good.tres" id="2_good"]
+[ext_resource type="Resource" uid="uid://dk2mx7wnq5vbc" path="res://src/gameplay/room_scenes/treasure/tables/corrupted.tres" id="3_corrupted"]
+[ext_resource type="Resource" path="res://src/gameplay/room_scenes/treasure/tables/good_coin.tres" id="4_good_coin"]
+[ext_resource type="Resource" path="res://src/gameplay/room_scenes/treasure/tables/corrupted_coin.tres" id="5_corrupted_coin"]
+
+[resource]
+script = ExtResource("1_set")
+good_table = ExtResource("2_good")
+corrupted_table = ExtResource("3_corrupted")
+good_coin_table = ExtResource("4_good_coin")
+corrupted_coin_table = ExtResource("5_corrupted_coin")
+metadata/_custom_type_script = "uid://dm2wq8nkv5xbr"

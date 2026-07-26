@@ -100,6 +100,71 @@ func modify_workshop_skip_bonus(seconds: float) -> float:
 func on_workshop_visited(_picks_taken: int) -> bool:
 	return false
 
+# Treasure hooks. Same shape again: a chest pays out through these rather than
+# straight into the clock, so a modifier can sweeten a win, soften a loss, lean
+# on the odds or buy a second go without the treasure room knowing it exists.
+# See [TreasureModifier].
+#
+# The one rule they all obey: **a chest never says one thing and does another.**
+# The payout hooks are asked after the outcome is known, so they can't; the odds
+# hook is asked *before the chest is laid out*, so the wheel's wedges and the
+# board's row are cut from whatever it returns and the tilt is on screen before
+# the player commits to it.
+
+## Seconds a chest is about to pay out. `seconds` is positive.
+func modify_treasure_gain(seconds: float) -> float:
+	return seconds
+
+## Seconds a chest is about to take. `seconds` is positive — it's an amount, not
+## a signed change, so scaling it down is always the kind thing to do.
+func modify_treasure_loss(seconds: float) -> float:
+	return seconds
+
+## One outcome's share of a chest's odds, asked once per outcome before the room
+## lays the chest out. `is_gain` says which side of the table the weight belongs
+## to, so a charm can lean a chest toward paying without knowing what any
+## particular chest pays.
+##
+## This is the only hook that has to be answered early, and the reason is the
+## rule above: a wheel cuts its wedges and a board deals its row from these
+## numbers, so a tilt applied here is a tilt the player can read off the game in
+## front of them. Bending the odds *after* a chest had drawn itself would make
+## the drawing a lie, which is why there is no such hook.
+func modify_treasure_weight(weight: float, _is_gain: bool) -> float:
+	return weight
+
+## Asked when a chest has bitten, before a single second is taken: return true to
+## buy the player one more opening of the same chest, and the second outcome
+## stands. Whoever says yes is spent on the spot (see
+## [method ModifiersSystem.claim_treasure_retry]), which is what stops a retry
+## from looping.
+func wants_treasure_retry(_seconds: float) -> bool:
+	return false
+
+## Odds that a chest hands over a modifier as well as seconds, asked once the
+## chest has settled. Zero on every chest until something the player is carrying
+## says otherwise: a chest pays in time, and anything in the lining is something
+## the player brought with them.
+func modify_treasure_card_chance(chance: float, _was_gain: bool) -> float:
+	return chance
+
+## Whether the fuse keeps burning while a chest is open. False for everyone by
+## default — a gamble is not a time trial — and the drawback half of a combined
+## card is the only thing that says otherwise.
+##
+## The counterpart to "Live Wire" running the clock on the map screen, and the
+## only kind of cost a treasure room has to offer: everything else it could take
+## is seconds off a payout, and a card that pays for better odds with a worse
+## payout is not a trade so much as a wash.
+func runs_clock_in_treasure() -> bool:
+	return false
+
+## Called on every held modifier once a chest has paid out. Return true to be
+## dropped. `seconds` is the signed change that was actually applied, so a
+## one-shot charm can decline to spend itself on a chest it didn't help with.
+func on_treasure_opened(_seconds: float) -> bool:
+	return false
+
 ## Whether this modifier would do anything at all for the run as it stands.
 ##
 ## Almost everything is unconditionally useful and inherits `true`. The exception

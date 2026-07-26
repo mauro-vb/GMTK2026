@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TreasureModifier" load_steps=2 format=3 uid="uid://ck7bm2vnq8wxt"]
+
+[ext_resource type="Script" uid="uid://bq3wn8vkx5mtr" path="res://src/gameplay/systems/modifiers_system/treasure_modifier.gd" id="1_sr001"]
+
+[resource]
+script = ExtResource("1_sr001")
+loss_card_chance = 0.6
+type = 2
+modifier_name = "Salvage Rights"
+id = "salvage_rights"
+description = "A chest that took your time still owes you. More often than not it hands over something to carry instead."
+metadata/_custom_type_script = "uid://bq3wn8vkx5mtr"

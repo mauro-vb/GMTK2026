@@ -16,6 +16,11 @@ extends Node
 
 const MAIN_SCENE_UID: String = "uid://ccxuyq6o8k8ca"
 
+## Benches opened while looking for a combined card to take. Danger Money makes
+## one very likely per bench and never certain, so this is what turns "very
+## likely" into "certain enough to assert on" without rigging the draw.
+const COMBINED_ATTEMPTS: int = 6
+
 var _failures: int = 0
 ## A member, not a local: GDScript lambdas capture locals by value, so a flag
 ## set inside a signal handler would never be seen out here.
@@ -309,23 +314,49 @@ func _check_live_workshop() -> void:
 func _check_combined_pick(game: MainGame, modifiers: ModifiersSystem) -> void:
 	print("\n[ taking a combined card ]")
 
-	# Danger Money makes the bench overwhelmingly two-edged, so a combined card
-	# is almost certainly on it; the loop below still copes if one isn't.
+	# Danger Money makes the bench overwhelmingly two-edged — but "overwhelmingly"
+	# is not "always". The draw is weighted, not rigged, so three clean cards in a
+	# row is a bench this perk will hand out every so often, and how often depends
+	# on how many clean cards the pool happens to hold on any given day. Benches
+	# are opened until one carries a combined card, so what is being checked here
+	# is what the card *does*, not whether the pool got lucky.
 	modifiers.add_modifier(load(UIDs.DANGER_MONEY_UID))
-	game.enter_room(UIDs.WORKSHOP_SCENE_UID, Room.Type.WORKSHOP)
-	var workshop: Workshop = game.get("_current_room") as Workshop
-	if not _check(workshop != null, "a third workshop opens"):
-		return
 
-	await get_tree().create_timer(1.5).timeout
+	# Four rows in, because that is where the combined cards live. Every bench in
+	# this harness is a bench at the run's current depth, and the run's depth here
+	# is zero — at which the only two-edged cards in the pool are the two ability
+	# upgrades that drag a cost along, and an earlier group in this file may have
+	# already taken both. That is what made this check flaky: not the perk, and
+	# not the card, but a bench that was being asked for cards it wasn't deep
+	# enough to lay out.
+	if game.map != null:
+		game.map.progress = 4
 
+	var workshop: Workshop = null
 	var target: WorkshopCard = null
-	for card: WorkshopCard in workshop.get("_cards"):
-		if card.entry.is_combined():
-			target = card
+	for attempt: int in COMBINED_ATTEMPTS:
+		game.enter_room(UIDs.WORKSHOP_SCENE_UID, Room.Type.WORKSHOP)
+		workshop = game.get("_current_room") as Workshop
+		if attempt == 0 and not _check(workshop != null, "a third workshop opens"):
+			return
+		if workshop == null:
 			break
 
-	if not _check(target != null, "Danger Money put a combined card on the bench"):
+		await get_tree().create_timer(1.5).timeout
+
+		for card: WorkshopCard in workshop.get("_cards"):
+			if card.entry.is_combined():
+				target = card
+				break
+
+		if target != null:
+			break
+
+		# Nothing two-edged on this one; close it and lay out another.
+		workshop._on_leave_pressed()
+		await get_tree().create_timer(1.5).timeout
+
+	if not _check(target != null, "Danger Money put a combined card on a bench"):
 		return
 
 	var bonus: Modifier = target.entry.modifier

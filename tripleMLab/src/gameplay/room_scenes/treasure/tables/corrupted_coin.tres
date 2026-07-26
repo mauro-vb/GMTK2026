@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="TreasureTable" load_steps=3 format=3]
+
+[ext_resource type="Script" uid="uid://cr9nk3vbx6mwt" path="res://src/gameplay/room_scenes/treasure/resources/treasure_table.gd" id="1_table"]
+[ext_resource type="Script" uid="uid://bt4mq7wxn2kvd" path="res://src/gameplay/room_scenes/treasure/resources/treasure_slice.gd" id="2_slice"]
+
+[sub_resource type="Resource" id="Resource_s00"]
+script = ExtResource("2_slice")
+label = ""
+weight = 55.0
+seconds = -13.0
+metadata/_custom_type_script = "uid://bt4mq7wxn2kvd"
+
+[sub_resource type="Resource" id="Resource_s01"]
+script = ExtResource("2_slice")
+label = ""
+weight = 45.0
+seconds = 0.0
+metadata/_custom_type_script = "uid://bt4mq7wxn2kvd"
+
+[resource]
+script = ExtResource("1_table")
+table_name = "Corrupted Chest"
+description = "Call it right and you dodge it clean. Call it wrong and it bites."
+entry_line = "A FUSE THAT BITES BACK"
+games = 1
+slices = Array[TreasureSlice]([SubResource("Resource_s00"), SubResource("Resource_s01")])
+metadata/_custom_type_script = "uid://cr9nk3vbx6mwt"

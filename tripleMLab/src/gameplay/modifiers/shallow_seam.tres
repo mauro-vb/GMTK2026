@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TreasureModifier" load_steps=2 format=3 uid="uid://dv4kn6wxm9btq"]
+
+[ext_resource type="Script" uid="uid://bq3wn8vkx5mtr" path="res://src/gameplay/systems/modifiers_system/treasure_modifier.gd" id="1_ss001"]
+
+[resource]
+script = ExtResource("1_ss001")
+gain_scale = 0.6
+gain_weight_scale = 2.0
+type = 2
+modifier_name = "Shallow Seam"
+id = "shallow_seam"
+description = "Easier ground, thinner pickings. Chests pay out twice as often and hand over well under what they used to."
+metadata/_custom_type_script = "uid://bq3wn8vkx5mtr"
