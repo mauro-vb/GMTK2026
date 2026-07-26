@@ -108,10 +108,9 @@ const SWEEP_MARKER_X: float = 306.0
 
 # --- Getting hit -------------------------------------------------------------
 const HIT_COST: float = 3.0
+## How long after a hit the player cannot be hit again. The blink that draws it
+## is the Player's (see [method Player.play_hurt]); this is only the rule.
 const INVULNERABLE_TIME: float = 0.6
-## Half-period of the invulnerability flash.
-const FLASH_INTERVAL: float = 0.075
-const FLASH_ALPHA: float = 0.25
 const HIT_FLASH_ALPHA: float = 0.45
 const HIT_FLASH_TIME: float = 0.18
 const SHAKE_STRENGTH: float = 3.0
@@ -155,7 +154,6 @@ var _sweep_timer: float = 0.0
 var _next_gap_index: int = 0
 
 var _invulnerable_time: float = 0.0
-var _flash_time: float = 0.0
 var _shake_time: float = 0.0
 
 var _telegraphs: Array[Telegraph] = []
@@ -228,7 +226,6 @@ func _exit_tree() -> void:
 	# re-parented out of it.
 	_set_canvas_offset(Vector2.ZERO)
 	if _player != null:
-		_player.modulate.a = 1.0
 		_player.can_move = true
 
 
@@ -244,9 +241,10 @@ func report_hit() -> bool:
 		return false
 
 	_invulnerable_time = INVULNERABLE_TIME
-	_flash_time = 0.0
 	_shake_time = SHAKE_TIME
 	_flash_screen()
+	if _player != null:
+		_player.play_hurt(INVULNERABLE_TIME)
 
 	# Straight at the clock. See BossProjectile's class doc for why this doesn't
 	# go anywhere near ModifiersSystem.
@@ -275,7 +273,6 @@ func _start_fight() -> void:
 	_sweep_timer = 0.0
 	_next_gap_index = 0
 	_invulnerable_time = 0.0
-	_flash_time = 0.0
 	_position_history.clear()
 
 	_hide_platforms()
@@ -537,25 +534,10 @@ func _build_phase_ticks() -> void:
 		survival_bar.add_child(tick)
 
 
+## Counts the window down. Only the rule lives here — the player draws it, and
+## stops on its own when the same duration is up.
 func _update_invulnerability(delta: float) -> void:
-	if _invulnerable_time <= 0.0:
-		return
-
-	_invulnerable_time -= delta
-	if _invulnerable_time <= 0.0:
-		_invulnerable_time = 0.0
-		_set_player_alpha(1.0)
-		return
-
-	_flash_time += delta
-	var lit: bool = fmod(_flash_time, FLASH_INTERVAL * 2.0) < FLASH_INTERVAL
-	_set_player_alpha(1.0 if lit else FLASH_ALPHA)
-
-
-func _set_player_alpha(alpha: float) -> void:
-	if _player == null:
-		return
-	_player.modulate.a = alpha
+	_invulnerable_time = maxf(_invulnerable_time - delta, 0.0)
 
 
 func _flash_screen() -> void:

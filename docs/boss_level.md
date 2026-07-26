@@ -191,7 +191,12 @@ have to be lined up with, but something that exists.
 |---|---|
 | Cost | 3.0 seconds, straight to `TimeSystem` |
 | Invulnerability | 0.6s |
-| Feedback | player sprite flashes on a 0.075s beat, red screen flash, 0.25s shake |
+| Feedback | `Player.play_hurt()`, red screen flash, 0.25s shake |
+
+The flash and the blink are `Player`'s, not the boss's — `play_hurt(INVULNERABLE_TIME)` asks
+for them, and a hot orb in an ordinary level asks for the same thing without the blink. The
+boss keeps only the *rule*: how long the window lasts and what it refuses. The screen flash and
+the shake stay here, because they are the boss's emphasis rather than what damage looks like.
 
 `BossProjectile` carries no damage rule of its own. It reports to `BossLevel.report_hit()`,
 which returns whether the hit landed — the invulnerability window belongs to the fight, not to

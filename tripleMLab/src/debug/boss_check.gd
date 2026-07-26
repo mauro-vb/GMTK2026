@@ -85,7 +85,7 @@ func _check_fight() -> void:
 	await _check_ground_rush(level)
 	await _check_rain(level)
 	await _check_crossfire(level)
-	_check_hits(game, level)
+	await _check_hits(game, level)
 	# Survival last of the three, because winning ends the run — the defeat check
 	# below deals itself a fresh one rather than carrying on in a finished room.
 	await _check_survival(game, level)
@@ -185,6 +185,13 @@ func _check_hits(game: MainGame, level: BossLevel) -> void:
 	_check(not level.report_hit(), "the next orb is refused while invulnerable")
 	_check(is_equal_approx(game.time_system.current_time, before - BossLevel.HIT_COST),
 		"...and takes nothing")
+
+	# The flash itself is the Player's, and it lands a frame later — the boss
+	# only asks for it. Red channel up, green down: a tint, not a dimming.
+	await get_tree().create_timer(0.05).timeout
+	var tint: Color = game.player.modulate
+	_check(tint.r > tint.g and tint.r > tint.b,
+		"the player flashes red (%.2f, %.2f, %.2f)" % [tint.r, tint.g, tint.b])
 
 
 ## Running the clock out in the boss room has to end the run exactly the way it
