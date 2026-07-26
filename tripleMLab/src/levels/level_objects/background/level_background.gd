@@ -50,11 +50,26 @@ const BRICK_RECTS: Array[Rect2] = [
 
 # Exports
 
-## Not pure white. The terrain's top edge is `#e1eed8`, which is within a
-## whisker of white — on `#ffffff` every platform loses its cap and the level
-## flattens into navy blocks. This leans warm and pink, away from the terrain's
-## green, so the bone edge still reads.
-@export var field_color: Color = Color("f5ece6")
+## Light grey, and a good way down from white. The terrain's top edge is
+## `#e1eed8`, within a whisker of white: against a near-white field every
+## platform loses its cap and the level flattens into navy blocks. Tinting the
+## field warm didn't buy enough — the two were still the same brightness, and
+## two near-whites side by side clash rather than separate. Dropping the field
+## to a grey separates them by value instead of by hue, which is the difference
+## the eye actually reads, and puts the brightest pixel in the room back on the
+## thing the player has to stand on.
+##
+## Mixed out of the palette's own navy rather than picked as a neutral grey, so
+## it carries the same faint violet cast as everything else on screen.
+@export var field_color: Color = Color("c9c9d2")
+
+## The masonry is drawn in the same four colours as the terrain, which means the
+## pillars carry the same bone highlight as a platform cap. On the old parchment
+## field that highlight was invisible; on grey it came forward as a white stripe
+## and competed with the terrain for the eye. Multiplying the sheets down into
+## the field's own grey settles them back into the wall — and takes the red
+## flecks with it, from fresh brick to something older.
+@export var masonry_tint: Color = Color("b4b4c0")
 
 ## Pillars land on a multiple of `TILE`, so a column never sits half a pixel off
 ## the grid the rest of the art is drawn on.
@@ -72,8 +87,12 @@ const BRICK_RECTS: Array[Rect2] = [
 ## The background's whole job is to be behind something. Both of these are held
 ## well back on purpose: at full strength the colonnade competes with the orbs,
 ## and the orbs are what the player is reading.
-@export_range(0.0, 1.0) var pillar_alpha: float = 0.5
-@export_range(0.0, 1.0) var brick_alpha: float = 0.38
+##
+## Nudged up from 0.5 / 0.38 to pay for the grey field. Navy over grey is a
+## shorter fall than navy over parchment, so the same alpha bought less shape
+## than it used to; the masonry now sits at roughly the weight it always did.
+@export_range(0.0, 1.0) var pillar_alpha: float = 0.62
+@export_range(0.0, 1.0) var brick_alpha: float = 0.46
 
 ## Chance that any given 32x24 patch of open wall gets a brick.
 @export_range(0.0, 1.0) var brick_density: float = 0.45
@@ -108,7 +127,7 @@ func _draw() -> void:
 
 # Drawing
 func _draw_colonnade(rng: RandomNumberGenerator) -> void:
-	var tint := Color(1.0, 1.0, 1.0, pillar_alpha)
+	var tint := Color(masonry_tint, pillar_alpha)
 	var x: int = _bounds.position.x + rng.randi_range(TILE, pillar_spacing_max)
 
 	while x < _bounds.end.x:
@@ -143,7 +162,7 @@ func _draw_pillar(x: float, top: float, bottom: float, tint: Color) -> void:
 
 
 func _draw_bricks(rng: RandomNumberGenerator) -> void:
-	var tint := Color(1.0, 1.0, 1.0, brick_alpha)
+	var tint := Color(masonry_tint, brick_alpha)
 	const CELL_W: int = 32
 	const CELL_H: int = 24
 
