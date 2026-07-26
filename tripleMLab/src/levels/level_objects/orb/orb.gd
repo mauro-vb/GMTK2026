@@ -6,7 +6,8 @@ signal collected(orb_type)
 
 enum Type { COLD, HOT }
 
-const TIME_ADDED: int = 2
+const TIME_ADDED: float = 2.5
+const TIME_REMOVED: float = -5
 
 const TEXTURES: Dictionary[Type, Texture2D] = {
 	Type.COLD: preload("uid://bcvwcjovn3urq"),
@@ -58,7 +59,7 @@ func _on_body_entered(body: Node2D) -> void:
 		queue_free()
 		return
 
-	var value: float = TIME_ADDED if type == Type.COLD else -TIME_ADDED
+	var value: float = TIME_ADDED if type == Type.COLD else TIME_REMOVED
 	value = modifiers_system.modify_orb_value(modifier_type, value)
 
 	# add_time()/remove_time() aren't interchangeable with a signed amount: each

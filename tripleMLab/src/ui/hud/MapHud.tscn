@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://ogipvp6hivr7"]
+[gd_scene format=3 uid="uid://ogipvp6hivr7"]
 
 [ext_resource type="PackedScene" uid="uid://c8vqmn3wxk5tb" path="res://src/ui/hud/FuseBar.tscn" id="1_fuse"]
 [ext_resource type="PackedScene" uid="uid://dv6ct8mkr3jqw" path="res://src/ui/modifier_display/ModifierDisplay.tscn" id="2_mdmap"]
 
-[node name="MapHud" type="Control"]
+[node name="MapHud" type="Control" unique_id=1061453240]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,7 +12,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=809771739]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,14 +25,14 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 4
 
-[node name="Column" type="VBoxContainer" parent="MarginContainer"]
+[node name="Column" type="VBoxContainer" parent="MarginContainer" unique_id=763157841]
 layout_mode = 2
-size_flags_vertical = 0
+size_flags_vertical = 8
 mouse_filter = 2
 theme_override_constants/separation = 2
 
-[node name="FuseBar" parent="MarginContainer/Column" instance=ExtResource("1_fuse")]
+[node name="FuseBar" parent="MarginContainer/Column" unique_id=1307672598 instance=ExtResource("1_fuse")]
 layout_mode = 2
 
-[node name="ModifierDisplay" parent="." instance=ExtResource("2_mdmap")]
+[node name="ModifierDisplay" parent="." unique_id=612613159 instance=ExtResource("2_mdmap")]
 layout_mode = 1
