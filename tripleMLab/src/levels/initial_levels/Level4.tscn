@@ -1,0 +1,100 @@
+[gd_scene format=4 uid="uid://ds50cp2jsqn4w"]
+
+[ext_resource type="Script" uid="uid://vl5l3vkfttjf" path="res://src/gameplay/room_scenes/base_level.gd" id="1_dlmwi"]
+[ext_resource type="PackedScene" uid="uid://vfgbeafbho51" path="res://src/levels/level_objects/orb/Orb.tscn" id="2_jdom8"]
+[ext_resource type="PackedScene" uid="uid://d1nnx3b3ntv5n" path="res://src/levels/level_objects/platforms/dropthrough_platforms/DropThroughPlatform.tscn" id="3_r3deh"]
+[ext_resource type="PackedScene" uid="uid://c2g85bh61el1e" path="res://src/levels/level_objects/platforms/breaking/BreakingPlatform.tscn" id="4_poqba"]
+[ext_resource type="TileSet" uid="uid://buff046vfej1g" path="res://src/levels/tilesets/level_tileset.tres" id="5_4j6hw"]
+[ext_resource type="PackedScene" uid="uid://gkjr0jw35tlv" path="res://src/levels/level_objects/player_spawn/PlayerSpawn.tscn" id="6_if3sd"]
+[ext_resource type="PackedScene" uid="uid://mhk2a54mwtho" path="res://src/levels/level_objects/level_exit/LevelExit.tscn" id="7_wfl6x"]
+
+[node name="Level1" type="Node2D" unique_id=880942447]
+script = ExtResource("1_dlmwi")
+metadata/_custom_type_script = "uid://vl5l3vkfttjf"
+
+[node name="Orbs" type="Node2D" parent="." unique_id=908609498]
+
+[node name="Cold" type="Node2D" parent="Orbs" unique_id=1983215820]
+
+[node name="Orb" parent="Orbs/Cold" unique_id=1840351593 instance=ExtResource("2_jdom8")]
+position = Vector2(111.719185, 160.01392)
+
+[node name="Orb2" parent="Orbs/Cold" unique_id=589698411 instance=ExtResource("2_jdom8")]
+position = Vector2(168, 160)
+
+[node name="Orb3" parent="Orbs/Cold" unique_id=1178233546 instance=ExtResource("2_jdom8")]
+position = Vector2(280, 160)
+
+[node name="Orb4" parent="Orbs/Cold" unique_id=776588250 instance=ExtResource("2_jdom8")]
+position = Vector2(304, 160)
+
+[node name="Orb5" parent="Orbs/Cold" unique_id=284716227 instance=ExtResource("2_jdom8")]
+position = Vector2(292, 160)
+
+[node name="Orb7" parent="Orbs/Cold" unique_id=410649087 instance=ExtResource("2_jdom8")]
+position = Vector2(160, 16)
+
+[node name="Orb9" parent="Orbs/Cold" unique_id=1911578955 instance=ExtResource("2_jdom8")]
+position = Vector2(148, 16)
+
+[node name="Hot" type="Node2D" parent="Orbs" unique_id=599733078]
+
+[node name="Orb" parent="Orbs/Hot" unique_id=461625609 instance=ExtResource("2_jdom8")]
+position = Vector2(136, 136)
+type = 1
+
+[node name="Orb2" parent="Orbs/Hot" unique_id=1186871749 instance=ExtResource("2_jdom8")]
+position = Vector2(200, 152)
+type = 1
+
+[node name="Platforms" type="Node2D" parent="." unique_id=1355039280]
+
+[node name="DropThrough" type="Node2D" parent="Platforms" unique_id=1200962243]
+
+[node name="DropThroughPlatform" parent="Platforms/DropThrough" unique_id=874837879 instance=ExtResource("3_r3deh")]
+position = Vector2(172, 144)
+
+[node name="DropThroughPlatform2" parent="Platforms/DropThrough" unique_id=644157416 instance=ExtResource("3_r3deh")]
+position = Vector2(292, 144)
+size = 5
+
+[node name="DropThroughPlatform3" parent="Platforms/DropThrough" unique_id=1731189360 instance=ExtResource("3_r3deh")]
+position = Vector2(24, 48)
+size = 7
+
+[node name="Breaking" type="Node2D" parent="Platforms" unique_id=1368586099]
+
+[node name="BreakOnJump" type="Node2D" parent="Platforms/Breaking" unique_id=150326491]
+
+[node name="BreakingPlatform" parent="Platforms/Breaking/BreakOnJump" unique_id=242398333 instance=ExtResource("4_poqba")]
+position = Vector2(144, 48)
+break_on_jump = true
+size = 22
+
+[node name="Normal" type="Node2D" parent="Platforms/Breaking" unique_id=517218632]
+
+[node name="BreakingPlatform" parent="Platforms/Breaking/Normal" unique_id=1067826459 instance=ExtResource("4_poqba")]
+position = Vector2(304, 116)
+size = 4
+
+[node name="BreakingPlatform2" parent="Platforms/Breaking/Normal" unique_id=1005844820 instance=ExtResource("4_poqba")]
+position = Vector2(124, 116)
+size = 6
+
+[node name="BreakingPlatform3" parent="Platforms/Breaking/Normal" unique_id=1184058070 instance=ExtResource("4_poqba")]
+position = Vector2(288, 68)
+size = 8
+
+[node name="Normal" type="Node2D" parent="Platforms" unique_id=1375409850]
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1797342369]
+tile_map_data = PackedByteArray("AAAAABYAAAABAAIAAAAAABUAAAABAAEAAAAAABQAAAACAAEAAAAAABMAAAACAAEAAAAAABIAAAACAAEAAAAAABEAAAACAAEAAAAAABAAAAACAAEAAAAAAA8AAAACAAEAAAAAAA4AAAABAAEAAAAAAA0AAAACAAEAAAAAAAwAAAABAAEAAAAAAAsAAAACAAEAAAAAAAoAAAACAAEAAAAAAAkAAAACAAEAAAAAAAgAAAACAAEAAAAAAAcAAAACAAEAAAAAAAYAAAACAAEAAAAAAAUAAAACAAEAAAAAAAQAAAACAAEAAAAAAAMAAAACAAEAAAAAAAIAAAACAAEAAAAAAAEAAAACAAAAAAD//xYAAAAAAAIAAAD//xUAAAAAAAEAAAD//xQAAAAAAAEAAAD//xMAAAAAAAEAAAD//xIAAAAAAAEAAAD//xEAAAAAAAEAAAD//xAAAAAAAAEAAAD//w8AAAAAAAEAAAD//w4AAAAAAAEAAAD//w0AAAAAAAEAAAD//wwAAAAAAAEAAAD//wsAAAAAAAEAAAD//woAAAAAAAEAAAD//wkAAAAAAAEAAAD//wgAAAAAAAEAAAD//wcAAAAAAAEAAAD//wYAAAAAAAEAAAD//wUAAAAAAAEAAAD//wQAAAAAAAEAAAD//wMAAAAAAAEAAAD//wIAAAAAAAEAAAD//wEAAAAAAAAAAAAdABYAAAABAAIAAAAcABYAAAABAAIAAAAbABYAAAABAAIAAAAaABYAAAABAAIAAAAZABYAAAABAAIAAAAYABYAAAABAAIAAAAXABYAAAABAAIAAAAWABYAAAABAAIAAAAVABYAAAABAAIAAAAUABYAAAABAAIAAAATABYAAAABAAIAAAASABYAAAABAAIAAAARABYAAAABAAIAAAAQABYAAAABAAIAAAAPABYAAAABAAIAAAAOABYAAAABAAIAAAANABYAAAABAAIAAAAMABYAAAABAAIAAAALABYAAAABAAEAAAAKABYAAAABAAEAAAAJABYAAAABAAEAAAAIABYAAAABAAEAAAAHABYAAAABAAEAAAAGABYAAAABAAEAAAAFABYAAAABAAEAAAAEABYAAAABAAEAAAADABYAAAABAAEAAAACABYAAAABAAEAAAABABYAAAABAAEAAAAoABYAAAACAAIAAAAoABUAAAACAAEAAAAnABYAAAABAAIAAAAnABUAAAABAAEAAAAmABYAAAABAAIAAAAmABUAAAAEAAAAAQAlABYAAAABAAIAAAAlABUAAAADAAAAAQAkABYAAAABAAIAAAAkABUAAAABAAAAAQAjABYAAAABAAIAAAAjABUAAAABAAAAAAAiABYAAAABAAIAAAAiABUAAAAEAAAAAQAhABYAAAABAAIAAAAhABUAAAABAAEAAAAgABYAAAABAAIAAAAgABUAAAABAAEAAAAfABYAAAABAAIAAAAfABUAAAABAAEAAAAeABYAAAABAAIAAAAeABUAAAABAAEAAAAdABUAAAABAAEAAAAcABUAAAABAAEAAAAbABUAAAABAAEAAAAaABUAAAABAAEAAAAZABUAAAABAAEAAAAYABUAAAABAAEAAAAXABUAAAAEAAAAAAAWABUAAAABAAAAAQAVABUAAAADAAAAAQAUABUAAAABAAAAAQATABUAAAABAAEAAAASABUAAAABAAEAAAARABUAAAABAAEAAAAQABUAAAABAAEAAAAPABUAAAADAAAAAAAOABUAAAAEAAAAAQANABUAAAABAAAAAQAMABUAAAADAAAAAAALABUAAAABAAEAAAAKABUAAAABAAEAAAAJABUAAAABAAEAAAAIABUAAAAEAAAAAQAHABUAAAABAAAAAAAGABUAAAAEAAAAAAAFABUAAAABAAAAAAAEABUAAAABAAAAAAADABUAAAAEAAAAAQACABUAAAADAAAAAQABABUAAAAEAAAAAAAoABQAAAACAAEAAAAoABMAAAACAAEAAAAoABIAAAACAAEAAAAoABEAAAACAAEAAAAoABAAAAACAAEAAAAoAA8AAAACAAEAAAAoAA4AAAACAAEAAAAoAA0AAAACAAEAAAAoAAwAAAACAAEAAAAoAAsAAAACAAEAAAAoAAoAAAACAAEAAAAoAAkAAAACAAEAAAAoAAgAAAACAAEAAAAoAAcAAAACAAEAAAAoAAYAAAACAAEAAAAoAAUAAAACAAEAAAAoAAQAAAACAAEAAAAoAAMAAAACAAEAAAAoAAIAAAACAAEAAAAoAAEAAAACAAAAAAAnABQAAAAAAAEAAAAnABMAAAABAAEAAAAnABIAAAABAAEAAAAnABEAAAABAAEAAAAnABAAAAABAAEAAAAnAA8AAAABAAEAAAAnAA4AAAABAAEAAAAnAA0AAAABAAEAAAAnAAwAAAABAAEAAAAnAAsAAAABAAEAAAAnAAoAAAABAAEAAAAnAAkAAAABAAEAAAAnAAgAAAABAAEAAAAnAAcAAAABAAEAAAAnAAYAAAABAAEAAAAnAAUAAAABAAEAAAAnAAQAAAABAAEAAAAnAAMAAAABAAEAAAAnAAIAAAABAAEAAAAnAAEAAAAAAAAAAAALABQAAAACAAAAAAAKABQAAAAEAAAAAAAJABQAAAAAAAAAAAATABQAAAACAAEAAAATABMAAAACAAEAAAATABIAAAACAAAAAAASABQAAAABAAEAAAASABMAAAABAAEAAAASABIAAAADAAAAAAARABQAAAABAAEAAAARABMAAAABAAEAAAARABIAAAAEAAAAAQAQABQAAAAAAAEAAAAQABMAAAAAAAEAAAAQABIAAAAAAAAAAAAeABQAAAADAAAAAAAdABQAAAADAAAAAQAcABQAAAAEAAAAAAAbABQAAAADAAAAAQAaABQAAAABAAAAAQAZABQAAAABAAAAAAAYABQAAAAAAAAAAAAfABQAAAABAAEAAAAfABMAAAAAAAEAAAAfABIAAAAAAAAAAAAgABIAAAAEAAAAAQAgABMAAAABAAEAAAAgABQAAAABAAEAAAAhABIAAAACAAAAAAAhABMAAAACAAEAAAAhABQAAAACAAEAAAAFAAYAAAAAAAAAAAAFAAcAAAABAAEAAAAFAAgAAAABAAEAAAAFAAkAAAABAAEAAAAFAAoAAAAAAAEAAAAGAAYAAAACAAAAAAAGAAcAAAACAAEAAAAGAAgAAAACAAEAAAAGAAkAAAACAAEAAAAGAAoAAAACAAEAAAACAAsAAAADAAAAAAADAAsAAAAEAAAAAAAEAAsAAAABAAAAAAAFAAsAAAABAAEAAAAGAAsAAAACAAEAAAABAAsAAAAAAAAAAAAFAAwAAAABAAIAAAAEAAwAAAABAAIAAAADAAwAAAABAAIAAAACAAwAAAABAAIAAAABAAwAAAABAAIAAAAGAAwAAAACAAIAAAA=")
+tile_set = ExtResource("5_4j6hw")
+
+[node name="PlayerSpawn" parent="." unique_id=1373603790 instance=ExtResource("6_if3sd")]
+unique_name_in_owner = true
+position = Vector2(208, 108)
+
+[node name="LevelExit" parent="." unique_id=167028476 instance=ExtResource("7_wfl6x")]
+unique_name_in_owner = true
+position = Vector2(24, 80)
