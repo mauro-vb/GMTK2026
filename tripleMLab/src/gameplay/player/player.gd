@@ -6,6 +6,22 @@ const JUMP_THROUGH_PLATFORMS_LAYER: int = 9
 # the frame before the feet reach it rather than exactly on contact
 const FLOOR_CHECK_LOOKAHEAD_MARGIN: float = 2.0
 
+# --- Damage and heal feedback -------------------------------------------------
+# The player is the only node that survives every room, so the flash for the
+# clock being hurt or healed lives here rather than in whatever did it. A hot
+# orb, a boss projectile and anything added later all get the same reading for
+# free, and nothing else has to know how it is drawn.
+## Red for seconds lost, green for seconds gained. Both are tints on the
+## existing sprites — no new art, and the face goes with the body because
+## modulate propagates to children.
+const HURT_TINT: Color = Color(1.0, 0.32, 0.3)
+const HEAL_TINT: Color = Color(0.38, 1.0, 0.48)
+## How long the tint takes to fade back to normal.
+const TINT_FADE: float = 0.3
+## Half-period of the invulnerability blink, and how far the dip goes.
+const BLINK_INTERVAL: float = 0.075
+const BLINK_ALPHA: float = 0.25
+
 # Movement abilities a modifier can grant or take away (see GrantAbilityModifier)
 enum Ability { DASH, DOUBLE_JUMP, POGO }
 
@@ -57,6 +73,12 @@ var _direction_stack: Array[String] = []
 # FloorCheck's authored cast length, used whenever the look-ahead doesn't need more
 var _floor_check_reach: float = 0.0
 
+# Damage/heal flash state — see play_hurt() and play_heal()
+var _tint: Color = Color.WHITE
+var _tint_time: float = 0.0
+var _blink_time: float = 0.0
+var _blink_elapsed: float = 0.0
+
 @onready var state_machine: PlayerStateMachine = %StateMachine
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 
@@ -73,6 +95,7 @@ func _ready() -> void:
 # rooms (only re-parented, so _ready() doesn't run again) — every bit of state
 # that isn't reset here survives the swap. Called by MainGame.enter_level()
 func reset_for_new_room() -> void:
+	_clear_flash()
 	can_move = true
 	sprite.visible = true
 	velocity = Vector2.ZERO
@@ -320,7 +343,64 @@ func play_animation(anim_name: String) -> void:
 ## the one animation nothing gets to talk over. The whiff and dash guards are
 ## cleared for the same reason — either could still be mid-await and would put
 ## its own animation back on top a frame later.
+## Flashes the player red for losing seconds.
+##
+## `invulnerable_time` blinks them on top of the tint for that long. The caller
+## owns the actual invulnerability rule — this only draws it, so a room with
+## i-frames and a room without both ask for the same flash and differ in one
+## argument (see [method BossLevel.report_hit]).
+func play_hurt(invulnerable_time: float = 0.0) -> void:
+	_start_flash(HURT_TINT, invulnerable_time)
+
+
+## Flashes the player green for gaining seconds.
+func play_heal() -> void:
+	_start_flash(HEAL_TINT, 0.0)
+
+
+func _start_flash(tint: Color, blink_time: float) -> void:
+	_tint = tint
+	_tint_time = TINT_FADE
+	_blink_time = blink_time
+	_blink_elapsed = 0.0
+
+
+## Runs in _process, not _physics_process: that one returns early while
+## `can_move` is false, and a player frozen mid-flash would keep the tint for
+## as long as they stayed frozen.
+func _process(delta: float) -> void:
+	if _tint_time <= 0.0 and _blink_time <= 0.0:
+		return
+
+	_tint_time = maxf(_tint_time - delta, 0.0)
+	_blink_time = maxf(_blink_time - delta, 0.0)
+	_blink_elapsed += delta
+
+	# Settled: put the colour back exactly, rather than leaving it wherever the
+	# last frame's blink happened to land.
+	if _tint_time <= 0.0 and _blink_time <= 0.0:
+		modulate = Color.WHITE
+		return
+
+	var colour: Color = Color.WHITE
+	if _tint_time > 0.0:
+		colour = _tint.lerp(Color.WHITE, 1.0 - _tint_time / TINT_FADE)
+	if _blink_time > 0.0 and fmod(_blink_elapsed, BLINK_INTERVAL * 2.0) >= BLINK_INTERVAL:
+		colour.a = BLINK_ALPHA
+
+	modulate = colour
+
+
+func _clear_flash() -> void:
+	_tint_time = 0.0
+	_blink_time = 0.0
+	modulate = Color.WHITE
+
+
 func explode() -> void:
+	# A death outranks whatever flash was mid-fade — the detonation is not
+	# played through a red tint left over from the hit that caused it.
+	_clear_flash()
 	can_move = false
 	velocity = Vector2.ZERO
 	_is_whiffing = false

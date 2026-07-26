@@ -1,0 +1,110 @@
+[gd_scene format=3 uid="uid://bqn4mx8wkv3td"]
+
+[ext_resource type="Script" path="res://src/levels/final_level/boss_level.gd" id="1_boss_level"]
+[ext_resource type="TileSet" uid="uid://buff046vfej1g" path="res://src/levels/tilesets/level_tileset.tres" id="2_tileset"]
+[ext_resource type="PackedScene" uid="uid://gc2ml1e5xwrm" path="res://src/levels/level_objects/platforms/normal/NormalPlatform.tscn" id="3_platform"]
+[ext_resource type="PackedScene" uid="uid://gkjr0jw35tlv" path="res://src/levels/level_objects/player_spawn/PlayerSpawn.tscn" id="4_spawn"]
+[ext_resource type="PackedScene" uid="uid://mhk2a54mwtho" path="res://src/levels/level_objects/level_exit/LevelExit.tscn" id="5_exit"]
+[ext_resource type="Theme" uid="uid://djryy3nm637jt" path="res://src/ui/themes/main_theme.tres" id="6_theme"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+content_margin_left = 1.0
+content_margin_top = 1.0
+content_margin_right = 1.0
+content_margin_bottom = 1.0
+bg_color = Color(0.16862746, 0.16078432, 0.28235295, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.05490196, 0.047058824, 0.101960786, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_fill"]
+bg_color = Color(0.827451, 0.16078432, 0.16078432, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+anti_aliasing = false
+
+[node name="BossLevel" type="Node2D"]
+script = ExtResource("1_boss_level")
+should_tick_time = false
+
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
+tile_map_data = PackedByteArray("AAD//wAAAAAAAAAAAAD//wEAAAAAAAEAAAD//wIAAAAAAAEAAAD//wMAAAAAAAEAAAD//wQAAAAAAAEAAAD//wUAAAAAAAEAAAD//wYAAAAAAAEAAAD//wcAAAAAAAEAAAD//wgAAAAAAAEAAAD//wkAAAAAAAEAAAD//woAAAAAAAEAAAD//wsAAAAAAAEAAAD//wwAAAAAAAEAAAD//w0AAAAAAAEAAAD//w4AAAAAAAEAAAD//w8AAAAAAAEAAAD//xAAAAAAAAEAAAD//xEAAAAAAAEAAAD//xIAAAAAAAEAAAD//xMAAAAAAAEAAAD//xQAAAAAAAEAAAD//xUAAAAAAAEAAAD//xYAAAAAAAIAAAAAAAAAAAACAAAAAAAAAAEAAAACAAEAAAAAAAIAAAACAAEAAAAAAAMAAAACAAEAAAAAAAQAAAACAAEAAAAAAAUAAAACAAEAAAAAAAYAAAACAAEAAAAAAAcAAAACAAEAAAAAAAgAAAACAAEAAAAAAAkAAAACAAEAAAAAAAoAAAACAAEAAAAAAAsAAAACAAEAAAAAAAwAAAACAAEAAAAAAA0AAAACAAEAAAAAAA4AAAACAAEAAAAAAA8AAAACAAEAAAAAABAAAAACAAEAAAAAABEAAAACAAEAAAAAABIAAAACAAEAAAAAABMAAAACAAEAAAAAABQAAAACAAEAAAAAABUAAAABAAEAAAAAABYAAAABAAIAAAABABUAAAABAAAAAAABABYAAAABAAIAAAACABUAAAABAAAAAAACABYAAAABAAIAAAADABUAAAABAAAAAAADABYAAAABAAIAAAAEABUAAAABAAAAAAAEABYAAAABAAIAAAAFABUAAAABAAAAAAAFABYAAAABAAIAAAAGABUAAAABAAAAAAAGABYAAAABAAIAAAAHABUAAAABAAAAAAAHABYAAAABAAIAAAAIABUAAAABAAAAAAAIABYAAAABAAIAAAAJABUAAAABAAAAAAAJABYAAAABAAIAAAAKABUAAAABAAAAAAAKABYAAAABAAIAAAALABUAAAABAAAAAAALABYAAAABAAIAAAAMABUAAAABAAAAAAAMABYAAAABAAIAAAANABUAAAABAAAAAAANABYAAAABAAIAAAAOABUAAAABAAAAAAAOABYAAAABAAIAAAAPABUAAAABAAAAAAAPABYAAAABAAIAAAAQABUAAAABAAAAAAAQABYAAAABAAIAAAARABUAAAABAAAAAAARABYAAAABAAIAAAASABUAAAABAAAAAAASABYAAAABAAIAAAATABUAAAABAAAAAAATABYAAAABAAIAAAAUABUAAAABAAAAAAAUABYAAAABAAIAAAAVABUAAAABAAAAAAAVABYAAAABAAIAAAAWABUAAAABAAAAAAAWABYAAAABAAIAAAAXABUAAAABAAAAAAAXABYAAAABAAIAAAAYABUAAAABAAAAAAAYABYAAAABAAIAAAAZABUAAAABAAAAAAAZABYAAAABAAIAAAAaABUAAAABAAAAAAAaABYAAAABAAIAAAAbABUAAAABAAAAAAAbABYAAAABAAIAAAAcABUAAAABAAAAAAAcABYAAAABAAIAAAAdABUAAAABAAAAAAAdABYAAAABAAIAAAAeABUAAAABAAAAAAAeABYAAAABAAIAAAAfABUAAAABAAAAAAAfABYAAAABAAIAAAAgABUAAAABAAAAAAAgABYAAAABAAIAAAAhABUAAAABAAAAAAAhABYAAAABAAIAAAAiABUAAAABAAAAAAAiABYAAAABAAIAAAAjABUAAAABAAAAAAAjABYAAAABAAIAAAAkABUAAAABAAAAAAAkABYAAAABAAIAAAAlABUAAAABAAAAAAAlABYAAAABAAIAAAAmABUAAAABAAAAAAAmABYAAAABAAIAAAAnAAAAAAAAAAAAAAAnAAEAAAAAAAEAAAAnAAIAAAAAAAEAAAAnAAMAAAAAAAEAAAAnAAQAAAAAAAEAAAAnAAUAAAAAAAEAAAAnAAYAAAAAAAEAAAAnAAcAAAAAAAEAAAAnAAgAAAAAAAEAAAAnAAkAAAAAAAEAAAAnAAoAAAAAAAEAAAAnAAsAAAAAAAEAAAAnAAwAAAAAAAEAAAAnAA0AAAAAAAEAAAAnAA4AAAAAAAEAAAAnAA8AAAAAAAEAAAAnABAAAAAAAAEAAAAnABEAAAAAAAEAAAAnABIAAAAAAAEAAAAnABMAAAAAAAEAAAAnABQAAAAAAAEAAAAnABUAAAABAAEAAAAnABYAAAABAAIAAAAoAAAAAAACAAAAAAAoAAEAAAACAAEAAAAoAAIAAAACAAEAAAAoAAMAAAACAAEAAAAoAAQAAAACAAEAAAAoAAUAAAACAAEAAAAoAAYAAAACAAEAAAAoAAcAAAACAAEAAAAoAAgAAAACAAEAAAAoAAkAAAACAAEAAAAoAAoAAAACAAEAAAAoAAsAAAACAAEAAAAoAAwAAAACAAEAAAAoAA0AAAACAAEAAAAoAA4AAAACAAEAAAAoAA8AAAACAAEAAAAoABAAAAACAAEAAAAoABEAAAACAAEAAAAoABIAAAACAAEAAAAoABMAAAACAAEAAAAoABQAAAACAAEAAAAoABUAAAACAAEAAAAoABYAAAACAAIAAAA=")
+tile_set = ExtResource("2_tileset")
+
+[node name="Phase2Platforms" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="Left" parent="Phase2Platforms" instance=ExtResource("3_platform")]
+position = Vector2(64, 128)
+size = 4
+
+[node name="Middle" parent="Phase2Platforms" instance=ExtResource("3_platform")]
+position = Vector2(160, 96)
+size = 4
+
+[node name="Right" parent="Phase2Platforms" instance=ExtResource("3_platform")]
+position = Vector2(256, 128)
+size = 4
+
+[node name="PlayerSpawn" parent="." instance=ExtResource("4_spawn")]
+unique_name_in_owner = true
+position = Vector2(80, 160)
+
+[node name="LevelExit" parent="." instance=ExtResource("5_exit")]
+unique_name_in_owner = true
+position = Vector2(160, 90)
+
+[node name="Projectiles" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="Markers" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="BossHud" type="CanvasLayer" parent="."]
+
+[node name="Hud" type="Control" parent="BossHud"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("6_theme")
+
+[node name="SurvivalBar" type="ProgressBar" parent="BossHud/Hud"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -56.0
+offset_top = 22.0
+offset_right = 56.0
+offset_bottom = 29.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
+value = 100.0
+show_percentage = false
+
+[node name="HitFlash" type="ColorRect" parent="BossHud/Hud"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.85882354, 0.16078432, 0.16078432, 0)

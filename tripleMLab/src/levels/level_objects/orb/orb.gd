@@ -61,6 +61,16 @@ func _on_body_entered(body: Node2D) -> void:
 	var value: float = TIME_ADDED if type == Type.COLD else -TIME_ADDED
 	value = modifiers_system.modify_orb_value(modifier_type, value)
 	Global.main_game.time_system.add_time(value)
+
+	# Off the value, not off the orb's type: a modifier is allowed to turn the
+	# sign around, and the flash has to report what actually happened to the
+	# clock rather than what the sprite was going to do. A value modified to
+	# nothing gets no flash, because nothing is what it did.
+	if value < 0.0:
+		(body as Player).play_hurt()
+	elif value > 0.0:
+		(body as Player).play_heal()
+
 	modifiers_system.activate_modifiers(modifier_type)
 	collected.emit(type)
 	queue_free()
