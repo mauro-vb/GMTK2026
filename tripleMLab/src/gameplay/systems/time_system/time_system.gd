@@ -3,8 +3,10 @@ extends Node
 
 # Signals
 signal time_changed(current_time: float)
+signal tick_rate_changed(current_tick_rate: float)
 signal max_time_changed
 signal time_expired
+signal ticking_changed(ticking: bool)
 
 # Constants
 const STARTING_TIME: float = 60.0
@@ -108,6 +110,7 @@ func _refresh_tick_rate() -> void:
 
 func _set_ticking(value: bool) -> void:
 	ticking = value and not _expired_emitted
+	ticking_changed.emit(ticking)
 	
 func _set_current_time(value: float) -> void:
 	value = clampf(value, 0.0, max_time)
@@ -121,5 +124,8 @@ func _set_max_time(value: float) -> void:
 	max_time_changed.emit()
 	current_time = min(current_time, max_time)
 	
+func _set_tick_rate(value: float) -> void:
+	tick_rate = max(0.0, value)
+	tick_rate_changed.emit(tick_rate)
 
 # Callbacks

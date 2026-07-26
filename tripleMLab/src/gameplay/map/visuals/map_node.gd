@@ -2,59 +2,47 @@ class_name MapNode
 extends Area2D
 ## One room on the map, drawn as the thing you are about to blow up.
 ##
-## Icons are baked at [constant ICON_SIZE] and centred on the room's position,
-## so the cords running into a node disappear under it: a fuse plugs into the
-## crate rather than stopping short of it. Nothing here sets a z_index — the
-## ordering that keeps fuses behind icons lives on the containers in Map.tscn.
+## Each room type has exactly two faces: Default (not yet detonated) and
+## Activated (chosen and blown up). Availability itself has no dedicated
+## art — it's just a tint on Default plus the "highlight" pulse animation.
 
 signal selected(node: Room)
 
+## Fired only while [member available] is true — hover has nothing to say
+## about a room the player cannot pick.
+signal hover_entered(room: Room)
+signal hover_exited(room: Room)
+
 const SCENE: PackedScene = preload("res://src/gameplay/map/visuals/MapNode.tscn")
 
-## Longest side of every icon, in map pixels. Mirrors ICON_BOX in
-## tools/slice_room_art.py, which is what actually bakes them.
-const ICON_SIZE: int = 26
+## Index into a [Default, Activated] pair.
+const FACE_DEFAULT: int = 0
+const FACE_ACTIVATED: int = 1
 
-## Indices into a face pair: what a room looks like before and after its charge
-## goes off.
-const FACE_OPEN: int = 0
-const FACE_SPENT: int = 1
-
-## Every face a LEVEL room can wear, each paired with its own blown-up twin.
-##
-## Pairing the two ends rather than picking each at random is what sells the
-## swap: the crate you were looking at is the crate now in pieces, the timbered
-## mouth is the one that came down. Several faces so a screen holding twenty
-## levels does not read as one stamp repeated; the pick comes from the room's
-## coordinates, so rebuilding the map keeps every face where it was.
-##
-## Note every open face carries a light frame or a lit side. The background's
-## rock band is nearly black in places, and an unframed icon on it disappears —
-## which is why the black cave mouth is only ever a spent face.
-const LEVEL_FACES: Array[Array] = [
-	[
-		preload("res://assets/art/map/rooms/crate.png"),
-		preload("res://assets/art/map/rooms/crate_burnt.png"),
+## One [Default, Activated] pair per room type. LEVEL doubles as the
+## fallback for NOT_ASSIGNED. FINAL has no dedicated art yet — reusing
+## Chest as a placeholder until that exists.
+## TODO: swap in real FINAL art when it lands.
+const ROOM_ART: Dictionary[Room.Type, Array] = {
+	Room.Type.NOT_ASSIGNED: [
+		preload("res://assets/art/map/icons/LevelDefault.png"),
+		preload("res://assets/art/map/icons/LevelActivated.png"),
 	],
-	[
-		preload("res://assets/art/map/rooms/crate_tarp.png"),
-		preload("res://assets/art/map/rooms/crate_burnt.png"),
+	Room.Type.LEVEL: [
+		preload("res://assets/art/map/icons/LevelDefault.png"),
+		preload("res://assets/art/map/icons/LevelActivated.png"),
 	],
-	[
-		preload("res://assets/art/map/rooms/entrance_timber.png"),
-		preload("res://assets/art/map/rooms/entrance_collapsed.png"),
+	Room.Type.SHOP: [
+		preload("res://assets/art/map/icons/WorkBenchDefault.png"),
+		preload("res://assets/art/map/icons/WorkBenchActivated.png"),
 	],
-	[
-		preload("res://assets/art/map/rooms/entrance_door.png"),
-		preload("res://assets/art/map/rooms/entrance_boarded.png"),
+	Room.Type.HEAL: [
+		preload("res://assets/art/map/icons/ChestDefault.png"),
+		preload("res://assets/art/map/icons/ChestActivated.png"),
 	],
-	[
-		preload("res://assets/art/map/rooms/entrance_tunnel.png"),
-		preload("res://assets/art/map/rooms/entrance_rails_boarded.png"),
-	],
-	[
-		preload("res://assets/art/map/rooms/entrance_tunnel_lit.png"),
-		preload("res://assets/art/map/rooms/entrance_cave.png"),
+	Room.Type.FINAL: [
+		preload("res://assets/art/map/icons/ChestDefault.png"),
+		preload("res://assets/art/map/icons/ChestActivated.png"),
 	],
 ]
 
@@ -71,6 +59,17 @@ const ROOM_ART: Dictionary[Room.Type, Texture2D] = {
 	Room.Type.FINAL: preload("res://assets/art/map/rooms/barrel.png"),
 }
 
+## EVENT rooms pick between two art sets depending on whether the event is
+## a good or bad one, rather than looking up ROOM_ART.
+const EVENT_ART_POSITIVE: Array = [
+	preload("res://assets/art/map/icons/AddedTimeDefault.png"),
+	preload("res://assets/art/map/icons/AddedTimeActivated.png"),
+]
+const EVENT_ART_NEGATIVE: Array = [
+	preload("res://assets/art/map/icons/LostTimeDefault.png"),
+	preload("res://assets/art/map/icons/LostTimeActivated.png"),
+]
+
 ## The barrel every path converges on is the payoff, so it outsizes the rooms
 ## feeding it. Applied to Visuals, not the root, because the root's scale is
 ## the highlight animation's to drive.
@@ -84,16 +83,28 @@ const SPENT_MODULATE: Color = Color(0.5, 0.48, 0.5, 1.0)
 
 ## The charge going off. The player is looking straight at the map when this
 ## fires — it runs the moment they get back from the room — so the swap punches
-## out, changes face at the peak while it is blown white, and settles.
+## out, changes tint at the peak while it is blown white, and settles.
 const DETONATE_SCALE: float = 1.3
 const DETONATE_OUT: float = 0.09
 const DETONATE_SETTLE: float = 0.24
 const DETONATE_FLASH: Color = Color(2.4, 2.0, 1.5, 1.0)
 
+## The hovered room steps forward; every other room still in play steps back
+## a little to sell that one choice, without fighting the highlight pulse or
+## the detonate punch, both of which animate [member scale] instead of
+## [member Node2D.scale] on [member visuals].
+const HOVER_SCALE: float = 1.15
+const HOVER_NEIGHBOR_SCALE: float = 0.9
+const HOVER_TWEEN_TIME: float = 0.12
+
 var available: bool = false: set = _set_available
 var room: Room: set = _set_room
 
 var _spent: bool = false
+## visuals.scale at rest — Vector2.ONE for most rooms, FINAL_SCALE for the
+## final room. Hover multiplies against this rather than against whatever
+## visuals.scale happens to be mid-tween.
+var _visuals_base_scale: Vector2 = Vector2.ONE
 
 @onready var visuals: Node2D = $Visuals
 @onready var shadow: Sprite2D = $Visuals/Shadow
@@ -109,18 +120,21 @@ static func new_map_node(node_data: Room) -> MapNode:
 
 func _ready() -> void:
 	input_event.connect(_on_input_event)
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
 
 	if room.type == Room.Type.FINAL:
-		visuals.scale = Vector2.ONE * FINAL_SCALE
+		_visuals_base_scale = Vector2.ONE * FINAL_SCALE
+	visuals.scale = _visuals_base_scale
 
 	_refresh_art()
 
-## Restores a room the run has already burnt past: sealed art, no animation.
+## Restores a room the run has already burnt past: dim art, no animation.
 func show_spent() -> void:
 	_spent = true
 	_refresh_art()
 
-## Blows the room open and swaps it to its spent face, animated.
+## Blows the room open, animated. Settles into the spent (dimmed) look.
 func detonate() -> void:
 	if _spent:
 		return
@@ -144,12 +158,29 @@ func _flash_to_spent() -> void:
 func _set_available(value: bool) -> void:
 	available = value
 	_refresh_art()
+	set_hover_scale(1.0)
 
 	if available:
 		await get_tree().create_timer(randf_range(.0, .25)).timeout
 		animation_player.play("highlight")
 	elif not room.selected:
 		animation_player.play("RESET")
+
+## Tweens visuals to [param factor] times its resting scale. Map calls this
+## on every available node when any one of them is hovered: 1.15 for the
+## room under the cursor, 0.9 for its still-available siblings, 1.0 to reset.
+func set_hover_scale(factor: float) -> void:
+	var tween: Tween = create_tween()
+	tween.tween_property(visuals, ^"scale", _visuals_base_scale * factor, HOVER_TWEEN_TIME) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _on_mouse_entered() -> void:
+	if available:
+		hover_entered.emit(room)
+
+func _on_mouse_exited() -> void:
+	if available:
+		hover_exited.emit(room)
 
 func _set_room(value: Room) -> void:
 	# Runs from new_map_node() before the node is in the tree, so it may only
@@ -175,16 +206,16 @@ func _refresh_art() -> void:
 		modulate = UNAVAILABLE_MODULATE
 
 func _texture_for_room() -> Texture2D:
-	if room.type == Room.Type.LEVEL:
-		var pair: Array = LEVEL_FACES[_variant() % LEVEL_FACES.size()]
-		return pair[FACE_SPENT] if _spent else pair[FACE_OPEN]
+	var pair: Array = _art_pair_for_room()
+	return pair[FACE_ACTIVATED] if _spent else pair[FACE_DEFAULT]
+
+func _art_pair_for_room() -> Array:
+	if room.type == Room.Type.EVENT:
+		# TODO: point this at whatever field your Room class actually uses
+		# to mark an event as good vs bad.
+		return EVENT_ART_POSITIVE if room.event_positive else EVENT_ART_NEGATIVE
 
 	return ROOM_ART.get(room.type, ROOM_ART[Room.Type.NOT_ASSIGNED])
-
-## A stable per-room number. Two odd primes so neighbouring rooms, which differ
-## by one lane and one step, never land on the same face.
-func _variant() -> int:
-	return absi(room.coordinates.x * 7 + room.coordinates.y * 3)
 
 func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if not available or not event.is_action_pressed("left_mouse"):

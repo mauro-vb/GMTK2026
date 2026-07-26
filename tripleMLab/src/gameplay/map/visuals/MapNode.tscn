@@ -115,7 +115,7 @@ closed = true
 width = 2.0
 default_color = Color(1, 0.827451, 0.49803922, 0.7529412)
 
-[node name="Shadow" type="Sprite2D" parent="Visuals"]
+[node name="Shadow" type="Sprite2D" parent="Visuals" unique_id=1464428713]
 modulate = Color(0, 0, 0, 0.3019608)
 position = Vector2(2, 3)
 
