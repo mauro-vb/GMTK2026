@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AddMaxTimeModifier" format=3 uid="uid://bq7xm3nvk9wtd"]
+
+[ext_resource type="Script" uid="uid://bk4nd9wtp2xhz" path="res://src/gameplay/systems/modifiers_system/add_max_time_modifier.gd" id="1_overpres"]
+[ext_resource type="Resource" uid="uid://bn3kw7vqx2mtd" path="res://src/gameplay/modifiers/pressure_loss.tres" id="2_overpres"]
+
+[resource]
+script = ExtResource("1_overpres")
+amount = 30.0
+type = 2
+modifier_name = "Overpressure"
+id = "overpressure"
+description = "Pack the tank past its rating. Raise your maximum time by 30 seconds."
+linked_modifier = ExtResource("2_overpres")
+metadata/_custom_type_script = "uid://bk4nd9wtp2xhz"

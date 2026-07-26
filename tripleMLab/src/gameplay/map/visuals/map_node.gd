@@ -44,6 +44,19 @@ const ROOM_ART: Dictionary[Room.Type, Array] = {
 		preload("res://assets/art/map/icons/ChestDefault.png"),
 		preload("res://assets/art/map/icons/ChestActivated.png"),
 	],
+]
+
+## Everything that is not a LEVEL is a one-off prop, which is most of what makes
+## those rooms readable at a glance. They have no blown-up twin on the sheets,
+## so they only take [constant SPENT_MODULATE] once they are behind the run.
+##
+## EVENT is here for completeness; the generator does not produce them yet.
+const ROOM_ART: Dictionary[Room.Type, Texture2D] = {
+	Room.Type.NOT_ASSIGNED: preload("res://assets/art/map/rooms/crate.png"),
+	Room.Type.WORKSHOP: preload("res://assets/art/map/rooms/shop_cart.png"),
+	Room.Type.HEAL: preload("res://assets/art/map/rooms/chest.png"),
+	Room.Type.EVENT: preload("res://assets/art/map/rooms/crate.png"),
+	Room.Type.FINAL: preload("res://assets/art/map/rooms/barrel.png"),
 }
 
 ## EVENT rooms pick between two art sets depending on whether the event is

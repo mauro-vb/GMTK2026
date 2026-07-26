@@ -1,0 +1,128 @@
+[gd_scene load_steps=2 format=3 uid="uid://dp5nt8crj4wxb"]
+
+[ext_resource type="Script" uid="uid://dn6bw3xqh5mts" path="res://src/ui/workshop/workshop_card.gd" id="1_card"]
+
+[node name="WorkshopCard" type="Button"]
+focus_mode = 2
+script = ExtResource("1_card")
+
+[node name="Visual" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Glow" type="Panel" parent="Visual"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -3.0
+offset_top = -3.0
+offset_right = 3.0
+offset_bottom = 3.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Frame" type="PanelContainer" parent="Visual"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Body" type="VBoxContainer" parent="Visual/Frame"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="IconWrap" type="CenterContainer" parent="Visual/Frame/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Plinth" type="PanelContainer" parent="Visual/Frame/Body/IconWrap"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="IconCenter" type="CenterContainer" parent="Visual/Frame/Body/IconWrap/Plinth"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Icon" type="TextureRect" parent="Visual/Frame/Body/IconWrap/Plinth/IconCenter"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="Visual/Frame/Body"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 19)
+layout_mode = 2
+mouse_filter = 2
+text = "Modifier"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Seam" type="PanelContainer" parent="Visual/Frame/Body"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 2
+
+[node name="SeamLabel" type="Label" parent="Visual/Frame/Body/Seam"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+text = "DRAWBACK"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="TakenOverlay" type="Control" parent="Visual"]
+unique_name_in_owner = true
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Scrim" type="ColorRect" parent="Visual/TakenOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.043, 0.039, 0.078, 0.62)
+
+[node name="TakenLabel" type="Label" parent="Visual/TakenOverlay"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+text = "TAKEN"
+horizontal_alignment = 1
+vertical_alignment = 1

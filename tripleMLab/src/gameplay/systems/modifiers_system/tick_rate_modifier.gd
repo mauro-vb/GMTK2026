@@ -9,10 +9,9 @@ extends Modifier
 ##   multiplier 2.0 + LEVELS 3                → double speed for the next 3 levels
 ##   multiplier 0.8 + PERMANENT               → 20% slower for the rest of the run
 ##
-## Known limitation: this saves and restores tick_rate, so two overlapping tick-rate
-## modifiers only unwind cleanly if they expire in reverse order. Fine for one at a
-## time; if overlapping ones become common, TimeSystem should multiply a list of
-## contributions instead of holding a single tick_rate.
+## Registers itself as one contribution to TimeSystem's rate rather than saving
+## and restoring the whole thing, so any number of these can overlap — with each
+## other and with a freeze — and unwind in any order.
 
 # Signals
 # Enums
@@ -24,9 +23,8 @@ extends Modifier
 
 # Private
 ## ENTER_LEVEL modifiers get triggered once per level, so without this guard a
-## multi-level modifier would stack its multiplier again on every level.
+## multi-level modifier would register itself afresh on every level.
 var _applied: bool = false
-var _previous_rate: float = 1.0
 # On Ready
 
 # Static
@@ -40,8 +38,7 @@ func trigger_modifier() -> void:
 		return
 
 	_applied = true
-	_previous_rate = time_system.tick_rate
-	time_system.tick_rate = _previous_rate * multiplier
+	time_system.set_rate_contribution(_rate_key(), multiplier)
 
 
 func deactivate_modifier() -> void:
@@ -51,10 +48,13 @@ func deactivate_modifier() -> void:
 	var time_system: TimeSystem = _get_time_system()
 	if time_system == null:
 		return
-	time_system.tick_rate = _previous_rate
+	time_system.clear_rate_contribution(_rate_key())
 
 # Public
 
 # Private
+## Per instance, not per id: two stacks of the same modifier each slow the clock.
+func _rate_key() -> StringName:
+	return StringName("tick_rate:%d" % get_instance_id())
 
 # Callbacks

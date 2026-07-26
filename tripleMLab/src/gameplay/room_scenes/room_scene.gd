@@ -1,7 +1,7 @@
 class_name RoomScene
 extends Node2D
 ## Base for anything MainGame can load into SceneContainer.WORLD
-## (or a future room-specific container) — levels, shops, events, etc.
+## (or a future room-specific container) — levels, workshops, events, etc.
 ## Subclasses are responsible for emitting `exited` when the room is done
 
 signal exited

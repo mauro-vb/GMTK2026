@@ -118,8 +118,8 @@ func enter_room(room_uid: String, room_type: Room.Type) -> void:
 	match room_type:
 		Room.Type.LEVEL:#, RoomType.ELITE, RoomType.BOSS:
 			enter_level(room_uid)
-		Room.Type.SHOP:
-			enter_shop(room_uid)
+		Room.Type.WORKSHOP:
+			enter_workshop(room_uid)
 		Room.Type.EVENT:
 			enter_event(room_uid)
 		Room.Type.HEAL:
@@ -160,22 +160,26 @@ func enter_level(level_uid: String) -> void:
 	#       run progress), it happens after _current_level is confirmed non-null.
 
 
-## Shop rooms: no EntityRoot population, no combat — just a UI-driven scene
-## the player browses. Doesn't need a BaseLevel or player spawn positioning
-## the way a combat room does.
-func enter_shop(_shop_uid: String) -> void:
-	# TODO: load a lightweight shop scene/UI instead of a full BaseLevel.
-	#       Shops probably don't need EntityRoot/VisualEffectsRoot touched at
-	#       all, and the player likely doesn't need to be repositioned in
-	#       world-space, since a shop may just be a UI overlay rather than
-	#       something in SceneContainer.LEVEL. Decide whether player needs
-	#       add_child(player_root) here at all, or if shops are UI-only.
-	push_error("enter_shop not yet implemented")
+## Workshop rooms: no EntityRoot population, no combat, no player in world-space
+## — the whole room is the bench of modifiers on offer. It still loads into
+## SceneContainer.LEVEL so exit_room() tears it down like any other room; the
+## Workshop puts its own UI on a CanvasLayer, so it needs no camera of its own.
+##
+## The HUD comes down for the duration: a workshop is a full-screen takeover and
+## the map HUD anchors its clock and its modifier row into the same corners the
+## bench uses. The Workshop carries its own copy of both instead, and exit_room()
+## puts the map HUD back on the way out.
+func enter_workshop(workshop_uid: String) -> void:
+	unload_scene(SceneContainer.UI)
+
+	_current_room = load_scene(workshop_uid, SceneContainer.LEVEL) as Workshop
+	if _current_room == null:
+		push_error("'%s' did not resolve to a Workshop instance" % workshop_uid)
 
 
 ## Event rooms: narrative/choice scenes, likely UI-driven with no combat.
 func enter_event(_event_uid: String) -> void:
-	# TODO: similar to enter_shop — probably a UI/dialogue scene rather than
+	# TODO: similar to enter_workshop — probably a UI/dialogue scene rather than
 	#       a BaseLevel. Consider whether events ever need the player visible
 	#       in world-space or if they're presented purely as UI.
 	push_error("enter_event not yet implemented")
@@ -183,7 +187,7 @@ func enter_event(_event_uid: String) -> void:
 
 ## Rest rooms: heal/upgrade choice, no combat.
 func enter_rest(_rest_uid: String) -> void:
-	# TODO: likely UI-only like shop/event. May still want the player parented
+	# TODO: likely UI-only like workshop/event. May still want the player parented
 	#       and visible standing in a rest-site background scene depending on
 	#       art direction — decide once the rest room's visual design exists.
 	push_error("enter_rest not yet implemented")

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://cr8mv4nkq6wzt"]
+
+[ext_resource type="Script" uid="uid://cj9xt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_racing_w"]
+
+[resource]
+script = ExtResource("1_racing_w")
+multiplier = 2.0
+type = 0
+modifier_name = "Racing Wick"
+id = "racing_wick"
+description = "You lit it at both ends. Time burns twice as fast for the next level."
+duration = 1
+duration_levels = 1
+metadata/_custom_type_script = "uid://cj9xt4bvm7dpl"
