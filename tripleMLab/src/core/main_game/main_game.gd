@@ -5,6 +5,16 @@ extends Node
 
 enum SceneContainer { WORLD, LEVEL, UI, TRANSITION, PAUSE }
 
+## The tutorial's rooms, in the order they are walked through.
+##
+## It is two rooms because a level is one fixed screen and there is no camera in
+## the game to scroll one: the whole move set plus both orbs does not fit on
+## 320x180 with any air around it. See tools/build_tutorial_level.gd.
+const TUTORIAL_ROOM_UIDS: Array[String] = [
+	UIDs.TUTORIAL_ROOM_1_UID,
+	UIDs.TUTORIAL_ROOM_2_UID,
+]
+
 var time_system: TimeSystem = null
 var modifiers_system: ModifiersSystem = null
 var player: Player = null
@@ -25,6 +35,9 @@ var _in_final_room: bool = false
 ## reaches an exit, and either path alone is a perfectly good ending — both at
 ## once is two end screens stacked on each other.
 var _run_ended: bool = false
+## Which of [constant TUTORIAL_ROOM_UIDS] is up. Only meaningful while the
+## tutorial is running.
+var _tutorial_room: int = 0
 
 # System root node
 @onready var systems: Node = %Systems
@@ -124,16 +137,18 @@ func load_game() -> void:
 
 ## The tutorial, entered from the title screen instead of from a map.
 ##
-## It is an ordinary level and needs what a level needs — a player, and the
-## systems the player reaches into (paying an ability's time cost looks for the
-## clock) — but it is deliberately not a run: nothing is dealt, the fuse never
-## ticks, and walking out of the door goes back to the menu rather than on to a
-## map. That is the whole point of it: it is the only place in the game where
-## the movement can be tried without the clock running.
+## It is an ordinary pair of levels and needs what a level needs — a player, and
+## the systems the player reaches into (paying an ability's time cost looks for
+## the clock, and an orb looks for both) — but it is deliberately not a run:
+## nothing is dealt, the fuse never ticks, and walking out of the last door goes
+## back to the menu rather than on to a map. That is the whole point of it: it is
+## the only place in the game where the movement can be tried without the clock
+## running, which is also why the orbs in it are free to be touched.
 func load_tutorial() -> void:
 	rooms_cleared = 0
 	_in_final_room = false
 	_run_ended = false
+	_tutorial_room = 0
 
 	_load_systems()
 	_init_player()
@@ -143,15 +158,42 @@ func load_tutorial() -> void:
 	# this room doesn't run and a modifier row it never fills.
 	unload_scene(SceneContainer.UI)
 
-	_current_room = load_scene(UIDs.TUTORIAL_LEVEL_UID, SceneContainer.LEVEL) as BaseLevel
+	_enter_tutorial_room()
+
+
+## Puts up the room [member _tutorial_room] names and wires its door to the next
+## one. Deliberately not enter_level(): there is no HUD to swap, no modifiers to
+## fire, and no map waiting on the other side of the door.
+func _enter_tutorial_room() -> void:
+	var room_uid: String = TUTORIAL_ROOM_UIDS[_tutorial_room]
+
+	_current_room = load_scene(room_uid, SceneContainer.LEVEL) as BaseLevel
 	if _current_room == null:
-		push_error("TUTORIAL_LEVEL_UID did not resolve to a BaseLevel instance")
+		push_error("Tutorial room %d ('%s') did not resolve to a BaseLevel instance"
+			% [_tutorial_room, room_uid])
 		return_to_menu()
 		return
 
+	# Per room rather than once per tutorial: the player is only parented while a
+	# room is up, and _advance_tutorial() takes it back out between them.
 	player_root.add_child(player)
 	player.reset_for_new_room()
-	_current_room.exited.connect(return_to_menu, CONNECT_DEFERRED | CONNECT_ONE_SHOT)
+	_current_room.exited.connect(_advance_tutorial, CONNECT_DEFERRED | CONNECT_ONE_SHOT)
+
+
+## Walking out of a tutorial door: on to the next room, or back to the title
+## screen once there are none left.
+func _advance_tutorial() -> void:
+	player_root.remove_child(player)
+	unload_scene(SceneContainer.LEVEL)
+	_current_room = null
+
+	_tutorial_room += 1
+	if _tutorial_room >= TUTORIAL_ROOM_UIDS.size():
+		return_to_menu()
+		return
+
+	_enter_tutorial_room()
 
 
 ## Leaves the map and hands off to the correct room handler based on type.
