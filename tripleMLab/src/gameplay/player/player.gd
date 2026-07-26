@@ -29,7 +29,7 @@ enum Ability { DASH, DOUBLE_JUMP, POGO }
 
 # abilities
 var has_pogo_ability: bool = true
-var has_double_jump_ability: bool = false
+var has_double_jump_ability: bool = true
 var has_dash_ability: bool = true
 
 # Seconds charged to the TimeSystem each time an ability is used. Written by

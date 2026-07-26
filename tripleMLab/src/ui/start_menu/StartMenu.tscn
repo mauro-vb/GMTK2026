@@ -93,6 +93,14 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Play"
 
+[node name="HardModeButton" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(74, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+toggle_mode = true
+text = "Hard Mode"
+
 [node name="QuitButton" type="Button" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(74, 0)

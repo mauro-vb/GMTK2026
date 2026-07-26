@@ -122,8 +122,8 @@ and nothing else.
 | | Phase | Window | Teaches | Interval | Speed |
 |---|---|---|---|---|---|
 | 1 | Ground rush | 0–20s | the jump | 1.4s → 0.55s | 60 → 110 px/s |
-| 2 | Rain | 20–42s | keep moving | 1.2s → 0.7s | 90 → 130 px/s |
-| 3 | Crossfire | 42–70s | read and position | both streams at 70%, sweep every 5s | 95 px/s (sweep) |
+| 2 | Rain | 20–42s | keep moving | 1.25s → 0.5s | 85 → 150 px/s |
+| 3 | Crossfire | 42–70s | read and position | rush 1.1s, rain 1.15s, sweep every 5.6s | 88 px/s (sweep) |
 
 ### 3.1 Ground rush — rhythm
 
@@ -140,24 +140,35 @@ break the groove the phase exists to teach.
 
 The three platforms rise and fade in, and orbs start falling.
 
-Each drop takes the player's x from **`RAIN_LEAD` (0.8s) before it spawns**, out of a short
-ring of samples kept by `_record_position()`. Standing still means the drop is already aimed
-at you; moving means it is aimed at where you were. That is the whole phase.
+Each drop takes the player's x from **`RAIN_LEAD` before it spawns**, out of a short ring of
+samples kept by `_record_position()`. Standing still means the drop is already aimed at you;
+moving means it is aimed at where you were. That is the whole phase.
 
 Nothing falls unannounced. Every drop is a `Telegraph` — a dimmed, shrunk, pulsing copy of the
-orb's own texture parked at the top of the screen in the target lane for 0.5s first. Because
-the marker goes up half a second before the orb spawns and the sample is taken 0.8s before
-*that spawn*, the lane is read from 0.3s before the marker appears:
+orb's own texture parked at the top of the screen in the target lane before the drop arrives.
+Because the marker goes up `RAIN_TELEGRAPH` before the orb spawns and the sample is taken
+`RAIN_LEAD` before *that spawn*, the lane is read from the difference between them, ago:
 
 ```gdscript
-var lane_x: float = _position_at(_fight_time - (RAIN_LEAD - RAIN_TELEGRAPH))
+var lane_x: float = _position_at(_fight_time - maxf(lead - telegraph, 0.0))
 ```
+
+The clamp matters once both are ramps: lead is never allowed below telegraph, but if a tune
+ever pushed it there, the sample would be a *future* position — a marker promising where the
+player is going to be, which is not something they can read or the game can honestly know.
+
+**All four of this phase's numbers ramp, and all four pull the same way.** Over the 22 seconds
+the drops get more frequent (1.25s → 0.5s), faster (85 → 150 px/s), aimed closer to where the
+player actually is (lead 0.95s → 0.6s) and announced later (telegraph 0.6s → 0.4s). It opens a
+shade gentler than phase 1 closed and finishes clearly harder, so the phase is felt tightening
+rather than being one flat difficulty with a wall at the end of it. Nothing is ever removed —
+the marker shortens, it never stops appearing.
 
 ### 3.3 Crossfire — layering
 
-Both earlier streams keep running at 70% of the rate they finished on, and every five seconds
-a vertical wall of orbs enters from the right with exactly one gap in it. The gap alternates
-between three heights, in order:
+Both earlier streams keep running underneath, and every 5.6 seconds a vertical wall of orbs
+enters from the right with exactly one gap in it. The gap alternates between three heights, in
+order:
 
 | Gap centre | Where the player has to be |
 |---|---|
@@ -178,10 +189,33 @@ density. At 320x180 a real bullet-hell is unreadable, so every orb in this phase
 individually dodgeable and the sweep is slower than the ground stream so the two read as
 separate things arriving.
 
+#### The streams are stated, not derived
+
+The rush and the rain run here on their own constants — `CROSSFIRE_RUSH_INTERVAL`,
+`CROSSFIRE_RAIN_LEAD` and the rest — rather than being computed from wherever phases 1 and 2
+happened to finish. Two reasons, and the second is the one that bites:
+
+- **The layering is already the difficulty.** Three patterns at once is harder than any of them
+  alone at the same rate, so both streams are deliberately slacker here than they were on their
+  own (rush 1.1s at 100 px/s against the 0.55s at 110 they ended phase 1 on) and the rain's aim
+  and telegraph go back near their phase-2 *opening* values. With a wall to line up for, the
+  drops should be readable at a glance.
+- **A derived rate re-tunes this phase behind your back.** It used to read
+  `RAIN_INTERVAL.y / CROSSFIRE_STREAM_RATE`, so making phase 2 end harder silently made phase 3
+  harder too — which is exactly how the hardest phase in a fight ends up harder than anyone
+  decided it should be.
+
 **One deviation from the brief.** It asked for a 1.5-tile gap (12px). The player's body is
 itself 12px tall, so that is a hole they cannot fit through at any height.
 `SWEEP_GAP_HALF_HEIGHT` is 14, leaving 20px of daylight for a 12px body — still something you
 have to be lined up with, but something that exists.
+
+**It is also not a difficulty dial**, despite being the obvious-looking one. The wall's orbs
+sit on a fixed 12px lattice, so the constant only moves a gap when it crosses a lattice step.
+Raising it from 14 to 16 leaves the floor gap (20px) and the top gap (28px) at exactly the size
+they already were and blows the middle one from 28px to 40px — the wall gets uneven rather than
+easier. Ease the sweep with its period, telegraph and speed, which apply to all three gaps
+equally.
 
 ---
 
@@ -225,12 +259,59 @@ telegraph, and fades `%LevelExit` in. From there it is `BaseLevel`'s — `reache
 
 **Win.** Because `MainGame` sets `_in_final_room` on the way into a `FINAL` room, `exit_room()`
 turns walking out of it into `end_run(true)` rather than another trip to the map. The boss
-needs no part in that beyond opening its exit.
+needs no part in that beyond opening its exit. What that win *says* is §5.1.
 
 **Lose.** The clock reaching zero runs `_on_defeated()`: spawning stops, the field is cleared,
 the player detonates, and `MainGame.end_run(false)` puts up the same `RunEndScreen` every other
 death in the game puts up. There is no retry logic in this room — `RunEndScreen` owns that
 choice, and `MainGame.restart_run()` answers it.
+
+### 5.1 The ending, and hard mode
+
+A victory can only be reached one way — out the far side of this room (§5) — so `end_run(true)`
+is not "a run that went well", it is **the game being beaten**, and it is the only place in the
+codebase where that happens. Both things hang off that:
+
+- The win screen says so. `RunEndScreen` headlines `YOU BEAT IT` and reports the barrage
+  stopping with the player still standing, rather than the generic "made it out" it used when
+  there was no last room to speak of.
+- It is where **hard mode** is unlocked, announced and offered. The moment it is earned is the
+  only moment the player is definitely looking at the screen.
+
+**Hard mode is one number.** A run starts on `TimeSystem.STARTING_TIME * 0.5` — thirty seconds
+instead of sixty — and nothing else changes: same map, same rooms, same boss, same modifiers.
+`MainGame._apply_hard_mode()` sets it on the freshly built `TimeSystem` in `load_game()` rather
+than the constant being changed, so every modifier that adds, removes or scales time keeps
+working off the run's own maximum and none of them has to know which mode it is in.
+
+**Where the state lives.** `MainGame._teardown_run()` frees every system, the player and the
+map between runs, so nothing a run owns can remember anything. The two flags therefore sit on
+the `Global` autoload:
+
+| | |
+|---|---|
+| `Global.hard_mode_unlocked` | ever beaten the game. Persisted to `user://progress.cfg`, set once, never cleared |
+| `Global.hard_mode` | whether the *next* run is on the short fuse. Per session, deliberately **not** persisted |
+
+The second is not saved on purpose: it is a choice made at the menu or off the win screen, and
+a game that silently reopens in hard mode is a game that looks broken.
+
+`Global.unlock_hard_mode()` returns true only the first time, which is how the win screen tells
+*you just unlocked this* (a reward: `HARD MODE UNLOCKED / Half the fuse. Same job.`) from *this
+was already yours* (a reminder: `Hard mode is still waiting.`). Winning a hard run gets its own
+line and no offer, because there is nothing left to offer.
+
+**Two ways in.** A `Hard Mode` button on the win screen — and on the death screen too, since a
+player who has beaten this game and is now losing runs to it is exactly who the mode is for —
+which emits rather than acts, leaving `MainGame.restart_run_on_hard()` to set the flag and deal
+a fresh run. And a `Hard Mode: On/Off` toggle on the start menu, which is **absent** rather than
+greyed out until the unlock: a locked button on the title screen tells a first-time player they
+are missing something before they have played a single room. The state is spelled out in the
+label rather than left to the button's pressed styling — "is that button darker than the other
+one?" is not a readable answer at 320x180.
+
+Retry keeps the focus on both screens. Hard mode is always a thing you choose, never a thing
+you fall into by mashing the button that ended the last run.
 
 ---
 
@@ -288,6 +369,9 @@ free. Nothing in `MainGame` knows this is a boss, only that it is the last room.
 | `src/levels/final_level/` | `boss_level.gd`, `BossLevel.tscn` — the pool deals whatever is here |
 | `src/debug/BossCheck.tscn` | headless sanity check — `godot --headless res://src/debug/BossCheck.tscn` |
 | `src/debug/BossPlaytest.tscn` | drops straight into the fight, with keys to jump phases |
+| `src/autoloads/global.gd` | the unlock, and the only thing that outlives a run |
+| `src/ui/run_end/` | `run_end_screen.gd`, `RunEndScreen.tscn` — the ending and the offer |
+| `src/ui/start_menu/` | `start_menu.gd`, `StartMenu.tscn` — the hard-mode toggle |
 
 No enemy framework, no state machine, no `EntityRoot`, no new autoloads, no spawner nodes and
 no new art: projectiles and telegraphs are both `assets/art/level_elements/HotOrb.png`, the

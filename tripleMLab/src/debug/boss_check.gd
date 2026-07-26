@@ -126,7 +126,9 @@ func _check_rain(level: BossLevel) -> void:
 	_check(level.markers.get_child_count() > 0, "a drop is announced before it exists")
 	_check(_falling(level).is_empty(), "...and nothing has fallen yet")
 
-	await get_tree().create_timer(BossLevel.RAIN_TELEGRAPH).timeout
+	# The phase has only just started, so the telegraph is still at its opening
+	# length — this waits out the longest one the phase can hand out.
+	await get_tree().create_timer(BossLevel.RAIN_TELEGRAPH.x).timeout
 	_check(not _falling(level).is_empty(), "the announced drop arrives")
 
 	# The reveal tween has to finish before the platforms are stood on.
@@ -255,8 +257,12 @@ func _check_survival(game: MainGame, level: BossLevel) -> void:
 	_check(game.get("_run_ended"), "...and ends the run")
 	var screen: RunEndScreen = _run_end_screen(game)
 	if _check(screen != null, "the run-end screen is up"):
-		_check(screen.headline.text == "YOU MADE IT",
+		_check(screen.headline.text == "YOU BEAT IT",
 			"and it says the run was won ('%s')" % screen.headline.text)
+		# Surviving the barrage is the only thing in the game that unlocks hard
+		# mode, so getting here has to have done it — whether or not this run was
+		# the first one to.
+		_check(Global.hard_mode_unlocked, "...and hard mode is unlocked")
 
 
 # --- Plumbing ----------------------------------------------------------------

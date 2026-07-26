@@ -23,8 +23,9 @@ extends BaseLevel
 ## Phases, in order (see [enum Phase]):
 ## [codeblock]
 ## 0-20s  GROUND RUSH  orbs along the floor, from the right. The answer is a jump.
-## 20-42s RAIN         orbs fall on where the player was 0.8s ago. Three platforms appear.
-## 42-70s CROSSFIRE    both streams at 70% rate, plus a wall with one gap in it.
+## 20-42s RAIN         orbs fall on where the player just was. Three platforms appear.
+##                     Everything about it tightens as the phase runs.
+## 42-70s CROSSFIRE    a wall with one gap in it, over both earlier streams eased off.
 ## [/codeblock]
 
 # Signals
@@ -64,27 +65,48 @@ const RUSH_SPEED: Vector2 = Vector2(60.0, 110.0)
 const RUSH_Y: float = 160.0
 
 # --- Phase 2: rain -----------------------------------------------------------
-const RAIN_INTERVAL: Vector2 = Vector2(1.2, 0.7)
-const RAIN_SPEED: Vector2 = Vector2(90.0, 130.0)
+## Everything about this phase ramps, and all four ramps pull the same way: by
+## the end of it the drops are more frequent, faster, aimed closer to where the
+## player actually is, and announced later. It opens a shade gentler than phase
+## 1 closed and finishes clearly harder — the phase is meant to be felt
+## tightening, not to be one difficulty with a wall at the end of it.
+const RAIN_INTERVAL: Vector2 = Vector2(1.25, 0.5)
+const RAIN_SPEED: Vector2 = Vector2(85.0, 150.0)
 ## How far back a drop samples the player's x when it picks a lane. Standing
 ## still means the drop is already aimed at you; moving means it is aimed at
-## where you were.
-const RAIN_LEAD: float = 0.8
+## where you were — and the shorter this gets, the less "moving" is worth, so
+## by the end of the phase it has to be moving *now* rather than having moved.
+## Never allowed below the telegraph: a drop aimed at where the player will be
+## is not a thing they can read.
+const RAIN_LEAD: Vector2 = Vector2(0.95, 0.6)
 ## How long the marker is up before the drop it announces. No falling orb ever
-## appears without one.
-const RAIN_TELEGRAPH: float = 0.5
+## appears without one — the warning shortens, it never goes away.
+const RAIN_TELEGRAPH: Vector2 = Vector2(0.6, 0.4)
 const RAIN_MARKER_Y: float = 8.0
 
 # --- Phase 3: crossfire ------------------------------------------------------
-## Phases 1 and 2 keep running underneath the sweeps, at this fraction of the
-## spawn rate they finished on. Layering readable patterns is what makes this
-## phase hard; at 320x180 raising the density instead just makes it noise.
-const CROSSFIRE_STREAM_RATE: float = 0.7
-const SWEEP_PERIOD: float = 5.0
-const SWEEP_TELEGRAPH: float = 0.8
+## Phases 1 and 2 keep running underneath the sweeps, and this phase states
+## their settings outright rather than deriving them from where those phases
+## finished. Two reasons. The layering is already the difficulty — three
+## patterns at once is harder than any of them alone at the same rate, so both
+## streams are deliberately slacker here than they were on their own. And a
+## derived rate silently re-tunes this phase every time phase 1 or 2 is touched,
+## which is exactly how the hardest phase in the fight ends up harder than
+## anyone decided it should be.
+const CROSSFIRE_RUSH_INTERVAL: float = 1.1
+const CROSSFIRE_RUSH_SPEED: float = 100.0
+const CROSSFIRE_RAIN_INTERVAL: float = 1.15
+const CROSSFIRE_RAIN_SPEED: float = 120.0
+## Both back near their phase-2 opening values: with a wall to line up for, the
+## drops are the thing that should be readable at a glance.
+const CROSSFIRE_RAIN_LEAD: float = 0.95
+const CROSSFIRE_RAIN_TELEGRAPH: float = 0.6
+
+const SWEEP_PERIOD: float = 5.6
+const SWEEP_TELEGRAPH: float = 1.0
 ## Kept a little under the ground stream's top speed, so the wall reads as its
 ## own thing arriving rather than as the rush suddenly getting taller.
-const SWEEP_SPEED: float = 95.0
+const SWEEP_SPEED: float = 88.0
 ## Centre-to-centre spacing of the wall's orbs. At 8px across they leave 4px
 ## between them, which nothing the player is 7x12 fits through.
 const SWEEP_ORB_SPACING: float = 12.0
@@ -95,6 +117,12 @@ const SWEEP_BOTTOM_Y: float = 160.0
 ## 12px tall — that is a hole they cannot fit through at any height. 14 leaves
 ## 20px of daylight for a 12px body: still something you have to be lined up
 ## with, but something that exists.
+##
+## Not a difficulty dial, despite looking like the obvious one. The wall's orbs
+## sit on a fixed [constant SWEEP_ORB_SPACING] lattice, so this only moves a gap
+## when it crosses a lattice step — raising it to 16 leaves the floor and top
+## gaps at exactly the size they already were and doubles the middle one. Ease
+## the sweep with its period, telegraph and speed instead; they apply evenly.
 const SWEEP_GAP_HALF_HEIGHT: float = 14.0
 ## Gap centres, cycled in order. Each one is a standing player's midpoint on one
 ## of the three surfaces the arena offers — the floor at 168, the two outer
@@ -334,13 +362,25 @@ func _update_spawning(delta: float) -> void:
 		Phase.GROUND_RUSH:
 			_tick_rush(delta, _ramp(RUSH_INTERVAL, progress), _ramp(RUSH_SPEED, progress))
 		Phase.RAIN:
-			_tick_rain(delta, _ramp(RAIN_INTERVAL, progress), _ramp(RAIN_SPEED, progress))
+			_tick_rain(
+				delta,
+				_ramp(RAIN_INTERVAL, progress),
+				_ramp(RAIN_SPEED, progress),
+				_ramp(RAIN_LEAD, progress),
+				_ramp(RAIN_TELEGRAPH, progress)
+			)
 		Phase.CROSSFIRE:
-			# Both earlier streams carry on at the speed they ended on, spaced
-			# out by CROSSFIRE_STREAM_RATE. The new thing in this phase is the
+			# Both earlier streams carry on at their own settled rate, backed off
+			# from where their phases finished. The new thing in this phase is the
 			# sweep; the old things staying recognisable is the point.
-			_tick_rush(delta, RUSH_INTERVAL.y / CROSSFIRE_STREAM_RATE, RUSH_SPEED.y)
-			_tick_rain(delta, RAIN_INTERVAL.y / CROSSFIRE_STREAM_RATE, RAIN_SPEED.y)
+			_tick_rush(delta, CROSSFIRE_RUSH_INTERVAL, CROSSFIRE_RUSH_SPEED)
+			_tick_rain(
+				delta,
+				CROSSFIRE_RAIN_INTERVAL,
+				CROSSFIRE_RAIN_SPEED,
+				CROSSFIRE_RAIN_LEAD,
+				CROSSFIRE_RAIN_TELEGRAPH
+			)
 			_tick_sweep(delta)
 
 
@@ -356,13 +396,13 @@ func _tick_rush(delta: float, interval: float, speed: float) -> void:
 	_spawn_projectile(Vector2(OFFSCREEN_RIGHT_X, RUSH_Y), Vector2(-speed, 0.0))
 
 
-func _tick_rain(delta: float, interval: float, speed: float) -> void:
+func _tick_rain(delta: float, interval: float, speed: float, lead: float, telegraph: float) -> void:
 	_rain_timer -= delta
 	if _rain_timer > 0.0:
 		return
 
 	_rain_timer = interval
-	_announce_drop(speed)
+	_announce_drop(speed, lead, telegraph)
 
 
 func _tick_sweep(delta: float) -> void:
@@ -374,14 +414,16 @@ func _tick_sweep(delta: float) -> void:
 	_announce_sweep()
 
 
-func _announce_drop(speed: float) -> void:
-	# RAIN_LEAD is measured back from the moment the orb spawns, and the orb
-	# spawns RAIN_TELEGRAPH from now — so the sample is only the difference ago.
-	var lane_x: float = _position_at(_fight_time - (RAIN_LEAD - RAIN_TELEGRAPH))
+func _announce_drop(speed: float, lead: float, telegraph: float) -> void:
+	# `lead` is measured back from the moment the orb spawns, and the orb spawns
+	# `telegraph` from now — so the sample is only the difference ago. Clamped at
+	# zero because a negative difference would be asking where the player is
+	# going to be, which is not something the marker could honestly promise.
+	var lane_x: float = _position_at(_fight_time - maxf(lead - telegraph, 0.0))
 	lane_x = clampf(lane_x, SPAWN_MARGIN_X, ARENA_WIDTH - SPAWN_MARGIN_X)
 
 	_add_telegraph(
-		RAIN_TELEGRAPH,
+		telegraph,
 		[Vector2(lane_x, RAIN_MARKER_Y)],
 		func() -> void:
 			_spawn_projectile(Vector2(lane_x, OFFSCREEN_TOP_Y), Vector2(0.0, speed))
