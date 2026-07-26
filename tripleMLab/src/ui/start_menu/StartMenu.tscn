@@ -138,3 +138,23 @@ size_flags_vertical = 4
 max_value = 1.0
 step = 0.01
 value = 0.5
+
+[node name="EffectsRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="EffectsLabel" type="Label" parent="MarginContainer/VBoxContainer/EffectsRow"]
+layout_mode = 2
+theme_type_variation = &"SubtitleLabel"
+text = "Effects"
+
+[node name="SfxVolumeSlider" type="HSlider" parent="MarginContainer/VBoxContainer/EffectsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.01
+value = 0.5

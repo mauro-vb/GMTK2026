@@ -25,6 +25,7 @@ boot_splash/minimum_display_time=1000
 Global="*uid://bt12hsq3tpkhv"
 UIDs="*uid://drtyv6qm28dmv"
 MusicPlayer="*res://src/audio/music_player.gd"
+SfxBus="*res://src/audio/sfx_bus.gd"
 
 [display]
 

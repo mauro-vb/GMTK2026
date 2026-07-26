@@ -28,7 +28,7 @@ const BLINK_ALPHA: float = 0.25
 const STEP_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/step.wav")
 const LANDING_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/landing.wav")
 const HOVER_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/hover.wav")
-const SFX_VOLUME_DB: float = -10.0
+const SFX_VOLUME_DB: float = -4.0
 
 ## Retrigger interval for the running footstep sound. A native AudioStreamWAV
 ## loop repeats a clip back-to-back with zero gap at whatever length the
@@ -36,7 +36,7 @@ const SFX_VOLUME_DB: float = -10.0
 ## real footstep cadence, and it reads as a buzz instead of footsteps. Retriggering
 ## on our own timer decouples "how often it plays" from "how long the file is".
 ## Not ear-tuned against the actual clip — nudge this if the cadence feels off.
-const STEP_INTERVAL: float = 0.28
+const STEP_INTERVAL: float = 0.5
 
 const JUMP_PITCH: float = 1.25
 const DOUBLE_JUMP_PITCH: float = 1.6
@@ -148,6 +148,7 @@ func _new_sfx_player(stream: AudioStreamWAV, pitch: float = 1.0) -> AudioStreamP
 	player.stream = stream
 	player.volume_db = SFX_VOLUME_DB
 	player.pitch_scale = pitch
+	player.bus = SfxBus.BUS_NAME
 	add_child(player)
 	return player
 

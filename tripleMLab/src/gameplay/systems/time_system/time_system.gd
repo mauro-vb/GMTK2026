@@ -17,8 +17,11 @@ const STARTING_TIME: float = 60.0
 ## a gain.
 const TICK_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/clock_down.wav")
 const GAIN_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/clock_up.wav")
-const TICK_VOLUME_DB: float = -14.0
-const BURST_VOLUME_DB: float = -6.0
+## The ambient tick plays constantly through every ticking room, so it reads as
+## louder than its dB alone suggests — sits well back of the flourish, which
+## only plays for a couple of seconds at a time.
+const TICK_VOLUME_DB: float = -20.0
+const BURST_VOLUME_DB: float = -4.0
 
 ## Retrigger interval for the ambient tick, at tick_rate 1.0 — a real clock's
 ## second hand, not the length of the recording (see Player.STEP_INTERVAL for
@@ -116,6 +119,7 @@ func _build_sfx_players() -> void:
 	_tick_audio = AudioStreamPlayer.new()
 	_tick_audio.stream = TICK_SFX
 	_tick_audio.volume_db = TICK_VOLUME_DB
+	_tick_audio.bus = SfxBus.BUS_NAME
 	add_child(_tick_audio)
 
 	_tick_timer = Timer.new()
@@ -126,11 +130,13 @@ func _build_sfx_players() -> void:
 	_loss_audio = AudioStreamPlayer.new()
 	_loss_audio.stream = TICK_SFX
 	_loss_audio.volume_db = BURST_VOLUME_DB
+	_loss_audio.bus = SfxBus.BUS_NAME
 	add_child(_loss_audio)
 
 	_gain_audio = AudioStreamPlayer.new()
 	_gain_audio.stream = GAIN_SFX
 	_gain_audio.volume_db = BURST_VOLUME_DB
+	_gain_audio.bus = SfxBus.BUS_NAME
 	add_child(_gain_audio)
 
 # Public

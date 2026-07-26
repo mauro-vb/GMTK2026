@@ -20,6 +20,7 @@ const MAX_VOLUME_DB: float = 0.0
 @onready var difficulty_hint: Label = %DifficultyHint
 @onready var quit_button: Button = %QuitButton
 @onready var volume_slider: HSlider = %VolumeSlider
+@onready var sfx_volume_slider: HSlider = %SfxVolumeSlider
 
 # Lifecycle
 func _ready() -> void:
@@ -43,6 +44,9 @@ func _ready() -> void:
 	# slider always starts wherever the music actually is.
 	volume_slider.value = inverse_lerp(MIN_VOLUME_DB, MAX_VOLUME_DB, MusicPlayer.get_volume_db())
 	volume_slider.value_changed.connect(_on_volume_changed)
+
+	sfx_volume_slider.value = inverse_lerp(MIN_VOLUME_DB, MAX_VOLUME_DB, SfxBus.get_volume_db())
+	sfx_volume_slider.value_changed.connect(_on_sfx_volume_changed)
 
 	_start_bob()
 
@@ -93,3 +97,7 @@ func _on_quit_button_pressed() -> void:
 
 func _on_volume_changed(value: float) -> void:
 	MusicPlayer.set_volume_db(lerpf(MIN_VOLUME_DB, MAX_VOLUME_DB, value))
+
+
+func _on_sfx_volume_changed(value: float) -> void:
+	SfxBus.set_volume_db(lerpf(MIN_VOLUME_DB, MAX_VOLUME_DB, value))
