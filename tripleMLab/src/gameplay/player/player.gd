@@ -107,6 +107,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		is_jump_cut = true
 	elif event.is_action_pressed("attack") and pogo_grace_timer <= 0.0 and not _is_whiffing:
 		play_pogo_whiff()
+		
 
 func _physics_process(delta: float) -> void:
 	if not can_move:
