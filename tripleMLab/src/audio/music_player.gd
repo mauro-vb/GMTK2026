@@ -9,8 +9,8 @@ extends Node
 ## code that reads it. The start menu's volume slider talks to that bus
 ## directly (see StartMenu), not to this script.
 
-const LEVEL_TRACK: AudioStreamMP3 = preload("res://assets/audio/music/level_1.mp3")
-const AMBIENT_TRACK: AudioStreamMP3 = preload("res://assets/audio/music/level_2.mp3")
+var LEVEL_TRACK: AudioStreamMP3 = preload("res://assets/audio/music/level_1.mp3")
+var AMBIENT_TRACK: AudioStreamMP3 = preload("res://assets/audio/music/level_2.mp3")
 
 const BUS_NAME: StringName = &"Music"
 ## Quiet by default — these are rough placeholder tracks, not mixed, and a
