@@ -32,7 +32,7 @@ const ROOM_ART: Dictionary[Room.Type, Array] = {
 		preload("res://assets/art/map/icons/WorkBenchDefault.png"),
 		preload("res://assets/art/map/icons/WorkBenchActivated.png"),
 	],
-	Room.Type.HEAL: [
+	Room.Type.TREASURE: [
 		preload("res://assets/art/map/icons/ChestDefault.png"),
 		preload("res://assets/art/map/icons/ChestActivated.png"),
 	],
@@ -50,23 +50,6 @@ const EVENT_ART_NEGATIVE: Array = [
 	preload("res://assets/art/map/icons/LostTimeDefault.png"),
 	preload("res://assets/art/map/icons/LostTimeActivated.png"),
 ]
-
-## Everything that is not a LEVEL is a one-off prop, which is most of what makes
-## those rooms readable at a glance. They have no blown-up twin on the sheets,
-## so they only take [constant SPENT_MODULATE] once they are behind the run.
-##
-## TREASURE is the shared fallback chest: each kind of chest carries its own
-## icon and wears this one only until that art exists (see [method
-## _texture_for_room]).
-##
-## EVENT is here for completeness; the generator does not produce them yet.
-const ROOM_ART: Dictionary[Room.Type, Texture2D] = {
-	Room.Type.NOT_ASSIGNED: preload("res://assets/art/map/rooms/crate.png"),
-	Room.Type.WORKSHOP: preload("res://assets/art/map/rooms/shop_cart.png"),
-	Room.Type.TREASURE: preload("res://assets/art/map/rooms/chest.png"),
-	Room.Type.EVENT: preload("res://assets/art/map/rooms/crate.png"),
-	Room.Type.FINAL: preload("res://assets/art/map/rooms/barrel.png"),
-}
 
 ## The barrel every path converges on is the payoff, so it outsizes the rooms
 ## feeding it. Applied to Visuals, not the root, because the root's scale is
@@ -224,27 +207,27 @@ func _art_pair_for_room() -> Array:
 		# to mark an event as good vs bad.
 		return EVENT_ART_POSITIVE if room.event_positive else EVENT_ART_NEGATIVE
 
-	# ART: a chest wears its own face when its [TreasureTable] has one, so a
+	# ART: a chest wears its own faces when its [TreasureTable] has them, so a
 	# good and a corrupted chest can be told apart by their sprite rather than
 	# just a tint (see CORRUPTED_TINT). Drop the sprites into the tables'
 	# `map_icon` / `spent_icon` and nothing here changes; until then both share
-	# the fallback chest below, tinted.
-	var chest: Texture2D = _chest_texture()
-	if chest != null:
+	# the fallback chest pair below, tinted.
+	var chest: Array = _chest_art_pair()
+	if not chest.is_empty():
 		return chest
 
 	return ROOM_ART.get(room.type, ROOM_ART[Room.Type.NOT_ASSIGNED])
 
-## The chest's own art, or null to fall back. Spent art is optional on its own:
-## a table with an open-chest sprite and no closed one is odd but not broken.
-func _chest_texture() -> Texture2D:
-	if room.type != Room.Type.TREASURE or room.treasure == null:
-		return null
+## The chest's own [Default, Activated] pair, or an empty array to fall back to
+## the shared chest art. Spent art is optional on its own: a table with an
+## open-chest sprite and no closed one just repeats it for [FACE_ACTIVATED]
+## rather than being odd or broken.
+func _chest_art_pair() -> Array:
+	if room.type != Room.Type.TREASURE or room.treasure == null or room.treasure.map_icon == null:
+		return []
 
-	if _spent and room.treasure.spent_icon != null:
-		return room.treasure.spent_icon
-
-	return room.treasure.map_icon
+	var activated: Texture2D = room.treasure.spent_icon if room.treasure.spent_icon != null else room.treasure.map_icon
+	return [room.treasure.map_icon, activated]
 
 ## A stable per-room number. Two odd primes so neighbouring rooms, which differ
 ## by one lane and one step, never land on the same face.

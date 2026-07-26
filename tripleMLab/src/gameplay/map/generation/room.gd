@@ -35,6 +35,10 @@ var treasure_coin: TreasureTable = null
 ## map. Meaningless on every other room type.
 var is_corrupted: bool = false
 
+## Whether an EVENT room is the good or the bad kind, for [MapNode]'s art —
+## unset by anything yet, since [MapGenerator] doesn't produce EVENT rooms.
+var event_positive: bool = false
+
 func _to_string() -> String:
 	return "%s: (%s)" % [coordinates, get_type()[0]]
 
