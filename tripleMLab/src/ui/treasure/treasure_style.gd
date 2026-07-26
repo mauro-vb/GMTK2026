@@ -54,6 +54,11 @@ const RESULT_SCALE: float = 1.35
 ## as a consequence of the coin landing rather than as part of the same frame.
 const PAYOUT_DELAY: float = 0.35
 
+## How long the chest's entry line holds before the minigame takes the
+## instruction line over. Long enough to read a short phrase, short enough that
+## "a nice short interaction" doesn't turn into a wait.
+const ENTRY_LINE_HOLD: float = 1.4
+
 # Static
 ## Which of the two colours a number is. Zero counts as a payout: a chest that
 ## pays nothing is a let-down, not a wound.

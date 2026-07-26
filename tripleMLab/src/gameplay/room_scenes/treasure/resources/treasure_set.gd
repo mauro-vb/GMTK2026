@@ -12,6 +12,14 @@ extends Resource
 @export var good_table: TreasureTable
 @export var corrupted_table: TreasureTable
 
+## Coin flip needs exactly two outcomes to have two faces, and this branch
+## wants that call to be a clean "something or nothing" — so coin gets its own
+## two-slice table (a stake and a zero) rather than sharing [member good_table]
+## / [member corrupted_table], which now carry a third, middling outcome for
+## the wheel and the board.
+@export var good_coin_table: TreasureTable
+@export var corrupted_coin_table: TreasureTable
+
 # Public
 ## Deals `count` corruption flags for one row, from a bag weighted 2 good : 1
 ## corrupted. A row wider than the bag reshuffles and carries on, the same way
@@ -34,3 +42,7 @@ func deal(count: int) -> Array[bool]:
 
 func table_for(corrupted: bool) -> TreasureTable:
 	return corrupted_table if corrupted else good_table
+
+
+func coin_table_for(corrupted: bool) -> TreasureTable:
+	return corrupted_coin_table if corrupted else good_coin_table

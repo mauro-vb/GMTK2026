@@ -49,6 +49,10 @@ const RETRY_PAUSE: float = 0.9
 ## running the scene straight out of the editor. A real visit always takes the
 ## chest the player actually clicked.
 @export var fallback_table: TreasureTable
+## The coin-flip shape of the same fallback chest — see [member Room.treasure_coin].
+@export var fallback_coin_table: TreasureTable
+## Whether the fallback chest (standalone runs only) is the corrupted one.
+@export var fallback_corrupted: bool = false
 
 ## Where a card found in a chest's lining comes from. Left null it falls back to
 ## the workshop's own pool, which is almost always what is wanted: a chest that
@@ -63,6 +67,12 @@ var _modifiers_system: ModifiersSystem
 var _time_system: TimeSystem
 
 var _table: TreasureTable
+## The same chest, coin-shaped — see [member Room.treasure_coin].
+var _coin_table: TreasureTable
+## Whether this visit's chest always bites. Read off the map once, in
+## [method _ready], and used only for phrasing — the tables themselves already
+## enforce it via which slices exist.
+var _corrupted: bool = false
 var _game: TreasureGame
 var _closing: bool = false
 ## The signed seconds the chest actually moved the clock by, once modifiers have
@@ -98,10 +108,12 @@ var _card: Modifier
 func _ready() -> void:
 	_modifiers_system = _resolve_modifiers_system()
 	_time_system = _resolve_time_system()
+	_corrupted = _resolve_corrupted()
 	# Tilted here, before anything is drawn: every game downstream reads its odds
-	# off `_table`, so this is the one place a charm can lean on a chest without
-	# the chest ever misrepresenting itself.
+	# off these tables, so this is the one place a charm can lean on a chest
+	# without the chest ever misrepresenting itself.
 	_table = _tilt(_resolve_table())
+	_coin_table = _tilt(_resolve_coin_table())
 	_read_clock_terms()
 
 	_style_chrome()
@@ -151,7 +163,21 @@ func _open() -> void:
 	tween.tween_property(ui, ^"modulate:a", 1.0, WorkshopStyle.FADE_DURATION)
 	await tween.finished
 
+	await _play_entry_line()
 	_lay_out_game()
+
+
+## The room's own tiny event beat — a line about what this chest is, held long
+## enough to read before the minigame takes the instruction line over. Sourced
+## from `_table` rather than `_coin_table`: which minigame plays is chosen
+## after this beat, so the line has to describe the chest, not the game.
+func _play_entry_line() -> void:
+	var line: String = _table.entry_line if _table != null else ""
+	if line.is_empty():
+		return
+
+	instruction_label.text = line
+	await get_tree().create_timer(TreasureStyle.ENTRY_LINE_HOLD).timeout
 
 
 ## Picks a game the chest allows and hands it the table.
@@ -161,23 +187,30 @@ func _open() -> void:
 ## this particular table says so and the next one is tried (see
 ## [method TreasureGame.can_present]).
 func _lay_out_game() -> void:
-	if _table == null:
+	if _table == null and _coin_table == null:
 		_pay_out_without_a_game()
 		return
 
-	var candidates: Array[TreasureTable.Game] = []
-	for game: TreasureTable.Game in [TreasureTable.Game.COIN, TreasureTable.Game.WHEEL, TreasureTable.Game.PLINKO]:
-		if _table.allows(game):
-			candidates.append(game)
+	# Coin plays from `_coin_table` rather than `_table` — it needs exactly two
+	# outcomes for two faces, and `_table` now carries a third, middling one for
+	# the wheel and the board (see [member Room.treasure_coin]).
+	var candidates: Array[Dictionary] = []
+	for game: TreasureTable.Game in [TreasureTable.Game.WHEEL, TreasureTable.Game.PLINKO]:
+		if _table != null and _table.allows(game):
+			candidates.append({"game": game, "table": _table})
+	if _coin_table != null and _coin_table.allows(TreasureTable.Game.COIN):
+		candidates.append({"game": TreasureTable.Game.COIN, "table": _coin_table})
 
 	candidates.shuffle()
 
-	for game: TreasureTable.Game in candidates:
+	for candidate: Dictionary in candidates:
+		var game: TreasureTable.Game = candidate["game"]
+		var table: TreasureTable = candidate["table"]
 		var instance: TreasureGame = _instance_game(game)
 		if instance == null:
 			continue
 
-		instance.setup(_table)
+		instance.setup(table)
 		if not instance.can_present():
 			instance.queue_free()
 			continue
@@ -191,7 +224,7 @@ func _lay_out_game() -> void:
 		_game.begin()
 		return
 
-	push_error("TreasureRoom: no minigame can present '%s'." % _table.table_name)
+	push_error("TreasureRoom: no minigame can present this chest.")
 	_pay_out_without_a_game()
 
 
@@ -259,11 +292,12 @@ func _clear_game() -> void:
 ## Last resort: a chest with no game that can show it still pays out rather than
 ## stranding the run on a room that can't be left.
 func _pay_out_without_a_game() -> void:
-	if _table == null:
+	var table: TreasureTable = _table if _table != null else _coin_table
+	if table == null:
 		_settle(null)
 		return
 
-	_settle(_table.roll())
+	_settle(table.roll())
 
 
 ## Turns an outcome into seconds. The only place in the room that touches the
@@ -468,6 +502,14 @@ func _show_leave(shown: bool) -> void:
 ## clock six seconds short of full pays exactly +6s, which is the truth and reads
 ## as a bug: the player saw +12 promised and got half of it with no explanation.
 func _result_text(slice: TreasureSlice) -> String:
+	# The chest's own miss: a rolled zero, applied as zero. Checked against the
+	# slice itself rather than `_applied` so a charm that bonuses a "nothing"
+	# into a real number falls through to PAID OUT below instead of lying about
+	# it, and so a bite the clock floor swallowed entirely (`_applied` also
+	# zero, but the slice wasn't) still reads as NOTHING LEFT further down.
+	if is_zero_approx(slice.seconds) and is_zero_approx(_applied):
+		return "YOU GOT LUCKY THIS TIME" if _corrupted else "BETTER LUCK NEXT TIME"
+
 	if is_zero_approx(_withheld):
 		return "PAID OUT" if slice.is_gain() else "IT BITES"
 
@@ -507,6 +549,27 @@ func _resolve_table() -> TreasureTable:
 		push_error("TreasureRoom: no chest to open.")
 
 	return fallback_table
+
+
+## The same chest's coin-flip shape — see [member Room.treasure_coin].
+func _resolve_coin_table() -> TreasureTable:
+	if Global.main_game != null and Global.main_game.map != null:
+		var room: Room = Global.main_game.map.last_room
+		if room != null and room.treasure_coin != null:
+			return room.treasure_coin
+
+	return fallback_coin_table
+
+
+## Whether this chest always bites. Only used for phrasing (see
+## [method _result_text]) — the tables themselves already carry the terms.
+func _resolve_corrupted() -> bool:
+	if Global.main_game != null and Global.main_game.map != null:
+		var room: Room = Global.main_game.map.last_room
+		if room != null:
+			return room.is_corrupted
+
+	return fallback_corrupted
 
 
 ## The chest the player will actually play: the authored one with every held

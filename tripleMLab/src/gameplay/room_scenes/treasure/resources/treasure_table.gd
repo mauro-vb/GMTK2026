@@ -34,6 +34,11 @@ enum Game {
 @export var table_name: String = ""
 ## One line of flavour, shown under the chest's name while the player decides.
 @export_multiline var description: String = ""
+## A short, all-caps beat shown in the room's instruction line for a moment
+## after the chest opens and before the minigame lays out — the room's own
+## tiny "event" line. Kept terse on purpose: the instruction label has no
+## word-wrap, so this has to read at a glance on a 320px-wide screen.
+@export var entry_line: String = ""
 @export_flags("Coin Flip:1", "Wheel:2", "Plinko:4") var games: int = Game.WHEEL | Game.PLINKO
 @export var slices: Array[TreasureSlice] = []
 
