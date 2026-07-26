@@ -1,12 +1,13 @@
 [gd_resource type="Resource" script_class="WorkshopModifier" format=3 uid="uid://dv3nb8kxm6qwl"]
 
-[ext_resource type="Script" uid="uid://cv9jm4pkt7bzn" path="res://src/gameplay/systems/modifiers_system/workshop_modifier.gd" id="1_cb001"]
+[ext_resource type="Texture2D" uid="uid://ye7bbsr7fh0q" path="res://assets/art/icons/Bigger Tank.png" id="1_0ljrr"]
+[ext_resource type="Script" uid="uid://cwajm4pkt7b0n" path="res://src/gameplay/systems/modifiers_system/workshop_modifier.gd" id="1_cb001"]
 
 [resource]
 script = ExtResource("1_cb001")
 extra_offers = -1
-type = 2
 modifier_name = "Cluttered Bench"
 id = "cluttered_bench"
+icon = ExtResource("1_0ljrr")
 description = "There is barely room to lay anything out. Every workshop shows you 1 fewer option."
 metadata/_custom_type_script = "uid://cv9jm4pkt7bzn"

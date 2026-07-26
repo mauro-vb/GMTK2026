@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="ConditionalTimeModifier" format=3 uid="uid://ch5rqawtj4x0m"]
 
-[ext_resource type="Script" uid="uid://bx3mvp8ldz6te" path="res://src/gameplay/systems/modifiers_system/conditional_time_modifier.gd" id="1_bm001"]
+[ext_resource type="Script" uid="uid://bx3mvp8ld06te" path="res://src/gameplay/systems/modifiers_system/conditional_time_modifier.gd" id="1_bm001"]
+[ext_resource type="Texture2D" uid="uid://c77denom5wop6" path="res://assets/art/icons/Barely Made It.png" id="1_v2voi"]
 
 [resource]
 script = ExtResource("1_bm001")
@@ -10,5 +11,6 @@ amount = 6.0
 type = 1
 modifier_name = "Barely Made It"
 id = "barely_made_it"
+icon = ExtResource("1_v2voi")
 description = "Clear a level in under 15 seconds and gain 6 seconds."
 metadata/_custom_type_script = "uid://bx3mvp8ldz6te"

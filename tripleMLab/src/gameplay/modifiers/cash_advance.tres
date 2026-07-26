@@ -1,14 +1,15 @@
 [gd_resource type="Resource" script_class="AddTimeModifier" format=3 uid="uid://bv8mn4kwq3xrt"]
 
 [ext_resource type="Script" uid="uid://cupqjl1qe32nd" path="res://src/gameplay/systems/modifiers_system/add_time_modifier.gd" id="1_cash_adv"]
+[ext_resource type="Texture2D" uid="uid://b8hnmsqay2po2" path="res://assets/art/icons/Costly Dash.png" id="1_g8ay5"]
 [ext_resource type="Resource" uid="uid://dv3nb8kxm6qwl" path="res://src/gameplay/modifiers/cluttered_bench.tres" id="2_cash_adv"]
 
 [resource]
 script = ExtResource("1_cash_adv")
 amount = 25
-type = 2
 modifier_name = "Cash Advance"
 id = "cash_advance"
+icon = ExtResource("1_g8ay5")
 description = "Draw against next week. Gain 25 seconds, right now."
 linked_modifier = ExtResource("2_cash_adv")
 metadata/_custom_type_script = "uid://cupqjl1qe32nd"

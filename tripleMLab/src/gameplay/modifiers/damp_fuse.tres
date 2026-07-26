@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://bh8jn6c0v3rlk"]
 
-[ext_resource type="Script" uid="uid://cj9xt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_df001"]
+[ext_resource type="Script" uid="uid://ckaxt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_df001"]
+[ext_resource type="Texture2D" uid="uid://wewdmd67sod5" path="res://assets/art/icons/Damp Fuse.png" id="1_sbmuy"]
 
 [resource]
 script = ExtResource("1_df001")
@@ -8,7 +9,7 @@ multiplier = 0.0
 type = 0
 modifier_name = "Damp Fuse"
 id = "damp_fuse"
+icon = ExtResource("1_sbmuy")
 description = "Time does not tick at all on the next level."
 duration = 1
-duration_levels = 1
 metadata/_custom_type_script = "uid://cj9xt4bvm7dpl"
