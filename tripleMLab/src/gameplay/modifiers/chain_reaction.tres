@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GainModifierModifier" format=3 uid="uid://dg4kw9pnb2vsm"]
+[gd_resource type="Resource" script_class="GainModifierModifier" format=3 uid="uid://dg4kxapnb2vsm"]
 
 [ext_resource type="Script" uid="uid://dh6qw2nrk8vsy" path="res://src/gameplay/systems/modifiers_system/gain_modifier_modifier.gd" id="1_cr001"]
 [ext_resource type="Resource" uid="uid://bn4zx6hcw5lrp" path="res://src/gameplay/modifiers/jerry_can.tres" id="2_cr002"]

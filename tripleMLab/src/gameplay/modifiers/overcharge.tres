@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="FreeAbilityModifier" format=3 uid="uid://dt3kx6nwq9vmb"]
+[gd_resource type="Resource" script_class="FreeAbilityModifier" format=3 uid="uid://dt3kx6nwravmb"]
 
 [ext_resource type="Script" uid="uid://dn82kfvw6plq3" path="res://src/gameplay/systems/modifiers_system/free_ability_modifier.gd" id="1_overchar"]
 [ext_resource type="Resource" uid="uid://bw3nk6vqm8trx" path="res://src/gameplay/modifiers/cold_storage.tres" id="2_overchar"]

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="OrbWindowModifier" format=3 uid="uid://cq6wb9nxm5vkt"]
+[gd_resource type="Resource" script_class="OrbWindowModifier" format=3 uid="uid://cq6wcanxm5vkt"]
 
 [ext_resource type="Script" uid="uid://bt5r9djhk2mxe" path="res://src/gameplay/systems/modifiers_system/orb_window_modifier.gd" id="1_cold_sna"]
 [ext_resource type="Resource" uid="uid://ch4mb8wvn5rkt" path="res://src/gameplay/modifiers/thin_skin.tres" id="2_cold_sna"]

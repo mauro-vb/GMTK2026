@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ConditionalTimeModifier" format=3 uid="uid://dv9nk2xqm7bwt"]
+[gd_resource type="Resource" script_class="ConditionalTimeModifier" format=3 uid="uid://dwank2xqm7bwt"]
 
 [ext_resource type="Script" uid="uid://bx3mvp8ldz6te" path="res://src/gameplay/systems/modifiers_system/conditional_time_modifier.gd" id="1_docked_p"]
 

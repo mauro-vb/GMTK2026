@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="WorkshopModifier" format=3 uid="uid://bs4mv9xkq7ntd"]
+[gd_resource type="Resource" script_class="WorkshopModifier" format=3 uid="uid://bs4mwaxkq7ntd"]
 
 [ext_resource type="Script" uid="uid://cv9jm4pkt7bzn" path="res://src/gameplay/systems/modifiers_system/workshop_modifier.gd" id="1_ss001"]
 

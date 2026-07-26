@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://bq3vn7wkm5xtc"]
+[gd_scene format=3 uid="uid://bq3vn7wkm5xtc"]
 
 [ext_resource type="Script" uid="uid://cn8wk4mxq2rvt" path="res://src/debug/workshop_check.gd" id="1_check"]
 

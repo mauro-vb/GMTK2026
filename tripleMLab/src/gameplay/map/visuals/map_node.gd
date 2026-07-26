@@ -19,10 +19,6 @@ const SCENE: PackedScene = preload("res://src/gameplay/map/visuals/MapNode.tscn"
 const FACE_DEFAULT: int = 0
 const FACE_ACTIVATED: int = 1
 
-## One [Default, Activated] pair per room type. LEVEL doubles as the
-## fallback for NOT_ASSIGNED. FINAL has no dedicated art yet — reusing
-## Chest as a placeholder until that exists.
-## TODO: swap in real FINAL art when it lands.
 const ROOM_ART: Dictionary[Room.Type, Array] = {
 	Room.Type.NOT_ASSIGNED: [
 		preload("res://assets/art/map/icons/LevelDefault.png"),
@@ -32,7 +28,7 @@ const ROOM_ART: Dictionary[Room.Type, Array] = {
 		preload("res://assets/art/map/icons/LevelDefault.png"),
 		preload("res://assets/art/map/icons/LevelActivated.png"),
 	],
-	Room.Type.SHOP: [
+	Room.Type.WORKSHOP: [
 		preload("res://assets/art/map/icons/WorkBenchDefault.png"),
 		preload("res://assets/art/map/icons/WorkBenchActivated.png"),
 	],
@@ -44,23 +40,8 @@ const ROOM_ART: Dictionary[Room.Type, Array] = {
 		preload("res://assets/art/map/icons/ChestDefault.png"),
 		preload("res://assets/art/map/icons/ChestActivated.png"),
 	],
-]
-
-## Everything that is not a LEVEL is a one-off prop, which is most of what makes
-## those rooms readable at a glance. They have no blown-up twin on the sheets,
-## so they only take [constant SPENT_MODULATE] once they are behind the run.
-##
-## EVENT is here for completeness; the generator does not produce them yet.
-const ROOM_ART: Dictionary[Room.Type, Texture2D] = {
-	Room.Type.NOT_ASSIGNED: preload("res://assets/art/map/rooms/crate.png"),
-	Room.Type.WORKSHOP: preload("res://assets/art/map/rooms/shop_cart.png"),
-	Room.Type.HEAL: preload("res://assets/art/map/rooms/chest.png"),
-	Room.Type.EVENT: preload("res://assets/art/map/rooms/crate.png"),
-	Room.Type.FINAL: preload("res://assets/art/map/rooms/barrel.png"),
 }
 
-## EVENT rooms pick between two art sets depending on whether the event is
-## a good or bad one, rather than looking up ROOM_ART.
 const EVENT_ART_POSITIVE: Array = [
 	preload("res://assets/art/map/icons/AddedTimeDefault.png"),
 	preload("res://assets/art/map/icons/AddedTimeActivated.png"),
@@ -94,7 +75,7 @@ const DETONATE_FLASH: Color = Color(2.4, 2.0, 1.5, 1.0)
 ## the detonate punch, both of which animate [member scale] instead of
 ## [member Node2D.scale] on [member visuals].
 const HOVER_SCALE: float = 1.15
-const HOVER_NEIGHBOR_SCALE: float = 0.9
+const HOVER_NEIGHBOR_SCALE: float = 0.8
 const HOVER_TWEEN_TIME: float = 0.12
 
 var available: bool = false: set = _set_available

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AddMaxTimeModifier" format=3 uid="uid://dh7bq2nvx9kwl"]
+[gd_resource type="Resource" script_class="AddMaxTimeModifier" format=3 uid="uid://dh7bq2nvyakwl"]
 
 [ext_resource type="Script" uid="uid://bk4nd9wtp2xhz" path="res://src/gameplay/systems/modifiers_system/add_max_time_modifier.gd" id="1_pt001"]
 
