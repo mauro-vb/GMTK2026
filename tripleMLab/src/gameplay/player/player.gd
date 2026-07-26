@@ -22,13 +22,6 @@ const TINT_FADE: float = 0.3
 const BLINK_INTERVAL: float = 0.075
 const BLINK_ALPHA: float = 0.25
 
-# Placeholder SFX from the team — short one-shots, not mixed, so they're kept
-# quiet by default rather than at whatever level they were recorded at.
-const RUN_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/landing.wav")
-const LANDING_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/step.wav")
-const POGO_SFX: AudioStreamWAV = preload("res://assets/audio/sfx/hover.wav")
-const SFX_VOLUME_DB: float = -6.0
-
 # Movement abilities a modifier can grant or take away (see GrantAbilityModifier)
 enum Ability { DASH, DOUBLE_JUMP, POGO }
 
@@ -86,12 +79,6 @@ var _tint_time: float = 0.0
 var _blink_time: float = 0.0
 var _blink_elapsed: float = 0.0
 
-# Built in _ready() rather than placed in Player.tscn, so the raw sfx can drop
-# straight in without an editor pass over the scene.
-var _run_audio: AudioStreamPlayer
-var _landing_audio: AudioStreamPlayer
-var _pogo_audio: AudioStreamPlayer
-
 @onready var state_machine: PlayerStateMachine = %StateMachine
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 
@@ -102,27 +89,6 @@ var _pogo_audio: AudioStreamPlayer
 func _ready() -> void:
 	_floor_check_reach = floor_check.target_position.y
 	state_machine.setup(self, stats)
-	_build_sfx_players()
-
-
-## Single-note boop samples, wired to loop or fire once as [method play_run_sound]
-## and friends need them. Built here rather than authored in Player.tscn, so
-## dropping in real sfx later is a file swap, not a scene edit.
-func _build_sfx_players() -> void:
-	_run_audio = _new_sfx_player(RUN_SFX, true)
-	_landing_audio = _new_sfx_player(LANDING_SFX, false)
-	_pogo_audio = _new_sfx_player(POGO_SFX, false)
-
-
-func _new_sfx_player(stream: AudioStreamWAV, looping: bool) -> AudioStreamPlayer:
-	if looping:
-		AudioUtil.configure_loop(stream)
-
-	var player: AudioStreamPlayer = AudioStreamPlayer.new()
-	player.stream = stream
-	player.volume_db = SFX_VOLUME_DB
-	add_child(player)
-	return player
 
 # Clears carried-over motion, ability state and held input, so a room never
 # starts mid-dash, mid-fall or still drifting. The player node is reused across
@@ -265,25 +231,9 @@ func consume_pogo() -> void:
 	is_jump_cut = false
 	dash_used = false
 	pay_ability_cost(Ability.POGO)
-	_pogo_audio.play()
 	if _last_pogo_area != null:
 		_last_pogo_area.bounced.emit()
 		_last_pogo_area = null
-
-## The run loop — started on entering StateRun, stopped on leaving it (see
-## StateRun.enter/exit). Restarting an already-playing loop would click at the
-## seam, so this only ever (re)starts a stopped one.
-func play_run_sound() -> void:
-	if not _run_audio.playing:
-		_run_audio.play()
-
-func stop_run_sound() -> void:
-	_run_audio.stop()
-
-## Fired once per landing — see StateFall.physics_update(), the one place that
-## actually detects the floor being hit rather than just resting on it.
-func play_landing_sound() -> void:
-	_landing_audio.play()
 
 func _find_pogo_area() -> PogoArea:
 	for area: Area2D in pogo_detector.get_overlapping_areas():

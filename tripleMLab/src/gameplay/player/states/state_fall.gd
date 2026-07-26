@@ -19,7 +19,6 @@ func physics_update(delta: float) -> void:
 		return
 
 	if player.is_on_floor():
-		player.play_landing_sound()
 		transitioned.emit(PlayerState.STATE_ID.RUN if player.get_movement_direction() != 0 else PlayerState.STATE_ID.IDLE)
 		return
 
