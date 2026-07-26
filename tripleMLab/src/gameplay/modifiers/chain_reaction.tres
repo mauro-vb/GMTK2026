@@ -1,18 +1,20 @@
 [gd_resource type="Resource" script_class="GainModifierModifier" format=3 uid="uid://dg4kxapnb2vsm"]
 
 [ext_resource type="Script" uid="uid://dh6qw2nrk8vsy" path="res://src/gameplay/systems/modifiers_system/gain_modifier_modifier.gd" id="1_cr001"]
-[ext_resource type="Resource" uid="uid://bn4zx6hcw5lrp" path="res://src/gameplay/modifiers/jerry_can.tres" id="2_cr002"]
-[ext_resource type="Resource" uid="uid://bz5hw9nkq4jrm" path="res://src/gameplay/modifiers/adrenaline.tres" id="3_cr003"]
-[ext_resource type="Resource" uid="uid://cp4vs9lmt6bxh" path="res://src/gameplay/modifiers/warm_catch.tres" id="4_cr004"]
-[ext_resource type="Resource" uid="uid://dt7wb4nxh9lqs" path="res://src/gameplay/modifiers/lucky_break.tres" id="5_cr005"]
+[ext_resource type="Texture2D" uid="uid://do67m7gkaydd4" path="res://assets/art/icons/Dash Upgrade.png" id="1_pm5jy"]
+[ext_resource type="Resource" uid="uid://bn40x6hcw5lrp" path="res://src/gameplay/modifiers/jerry_can.tres" id="2_cr002"]
+[ext_resource type="Script" uid="uid://dguj7fxtd604" path="res://src/gameplay/systems/modifiers_system/resources/modifier.gd" id="2_rr55q"]
+[ext_resource type="Resource" uid="uid://b05hxankq4jrm" path="res://src/gameplay/modifiers/adrenaline.tres" id="3_cr003"]
+[ext_resource type="Resource" uid="uid://cp4vtalmt6bxh" path="res://src/gameplay/modifiers/warm_catch.tres" id="4_cr004"]
+[ext_resource type="Resource" uid="uid://dt7wb4nxialqs" path="res://src/gameplay/modifiers/lucky_break.tres" id="5_cr005"]
 
 [resource]
 script = ExtResource("1_cr001")
-pool = Array[Modifier]([ExtResource("2_cr002"), ExtResource("3_cr003"), ExtResource("4_cr004"), ExtResource("5_cr005")])
-max_level_time = 0.0
+pool = Array[ExtResource("2_rr55q")]([ExtResource("2_cr002"), ExtResource("3_cr003"), ExtResource("4_cr004"), ExtResource("5_cr005")])
 type = 3
 modifier_name = "Chain Reaction"
 id = "chain_reaction"
+icon = ExtResource("1_pm5jy")
 description = "One goes off, something else shakes loose. Every cold orb has a 6% chance of turning up a new modifier."
 chance = 0.06
 metadata/_custom_type_script = "uid://dh6qw2nrk8vsy"

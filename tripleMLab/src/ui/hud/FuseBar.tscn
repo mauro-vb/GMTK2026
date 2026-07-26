@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://c8vqmn3wxk5tb"]
+[gd_scene format=3 uid="uid://c8vqmn3wxk5tb"]
 
 [ext_resource type="Script" uid="uid://djop7ije15e0y" path="res://src/ui/hud/fuse_bar.gd" id="1_fusebar"]
 [ext_resource type="Texture2D" uid="uid://0ri88ivbww1m" path="res://assets/art/map/fuse/fuse_cord_burnt.png" id="2_burnt"]

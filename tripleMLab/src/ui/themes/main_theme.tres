@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=8 format=3 uid="uid://djryy3nm637jt"]
+[gd_resource type="Theme" format=3 uid="uid://djryy3nm637jt"]
 
 [ext_resource type="FontFile" uid="uid://dumnwgfl70q28" path="res://assets/fonts/SF-Mono-Medium.otf" id="1_2i2tj"]
 [ext_resource type="Texture2D" uid="uid://bv8wlwl32v3as" path="res://assets/art/ui/theme/ButtonHover.png" id="1_8ieel"]

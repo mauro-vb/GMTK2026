@@ -1,13 +1,14 @@
 [gd_resource type="Resource" script_class="WorkshopModifier" format=3 uid="uid://bh2wq6nvx4mkt"]
 
-[ext_resource type="Script" uid="uid://cv9jm4pkt7bzn" path="res://src/gameplay/systems/modifiers_system/workshop_modifier.gd" id="1_danger_m"]
+[ext_resource type="Texture2D" uid="uid://b8hnmsqay2po2" path="res://assets/art/icons/Costly Dash.png" id="1_2baxt"]
+[ext_resource type="Script" uid="uid://cwajm4pkt7b0n" path="res://src/gameplay/systems/modifiers_system/workshop_modifier.gd" id="1_danger_m"]
 
 [resource]
 script = ExtResource("1_danger_m")
 clean_weight_scale = 0.35
 combined_weight_scale = 2.5
-type = 2
 modifier_name = "Danger Money"
 id = "danger_money"
+icon = ExtResource("1_2baxt")
 description = "You only get called for the jobs nobody else wants. Workshops mostly lay out tools that bite back."
 metadata/_custom_type_script = "uid://cv9jm4pkt7bzn"

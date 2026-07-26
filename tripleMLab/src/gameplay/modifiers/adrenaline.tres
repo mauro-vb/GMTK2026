@@ -1,13 +1,14 @@
 [gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://b05hxankq4jrm"]
 
-[ext_resource type="Script" uid="uid://cj9xt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_ad001"]
+[ext_resource type="Script" uid="uid://ckaxt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_ad001"]
+[ext_resource type="Texture2D" uid="uid://bh46qe4syhocg" path="res://assets/art/icons/Adrenaline.png" id="1_k47of"]
 
 [resource]
 script = ExtResource("1_ad001")
 multiplier = 0.5
-type = 2
 modifier_name = "Adrenaline"
 id = "adrenaline"
+icon = ExtResource("1_k47of")
 description = "Time burns at half speed for the next 20 seconds of burning."
 duration = 2
 duration_seconds = 20.0

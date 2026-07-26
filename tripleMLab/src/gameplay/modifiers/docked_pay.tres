@@ -1,14 +1,16 @@
 [gd_resource type="Resource" script_class="ConditionalTimeModifier" format=3 uid="uid://dwank2xqm7bwt"]
 
-[ext_resource type="Script" uid="uid://bx3mvp8ldz6te" path="res://src/gameplay/systems/modifiers_system/conditional_time_modifier.gd" id="1_docked_p"]
+[ext_resource type="Script" uid="uid://bx3mvp8ld06te" path="res://src/gameplay/systems/modifiers_system/conditional_time_modifier.gd" id="1_docked_p"]
+[ext_resource type="Texture2D" uid="uid://cu06sd0qifu1b" path="res://assets/art/icons/Lucky Break.png" id="1_s7d28"]
 
 [resource]
 script = ExtResource("1_docked_p")
-amount = -8.0
 comparison = 1
 threshold_seconds = 15.0
+amount = -8.0
 type = 1
 modifier_name = "Docked Pay"
 id = "docked_pay"
+icon = ExtResource("1_s7d28")
 description = "Finish early and they dock you for it. Clear a level in under 15 seconds and lose 8 seconds."
 metadata/_custom_type_script = "uid://bx3mvp8ldz6te"
