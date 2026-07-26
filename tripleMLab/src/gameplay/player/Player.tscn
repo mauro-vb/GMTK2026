@@ -12,6 +12,8 @@
 [ext_resource type="Texture2D" uid="uid://cnia6m4ydemvg" path="res://assets/art/animations/player/IdleAnimation.png" id="6_m5oiw"]
 [ext_resource type="Texture2D" uid="uid://cf0qk07dcd1u2" path="res://assets/art/animations/player/JumpAnimation.png" id="6_ulph6"]
 [ext_resource type="Script" uid="uid://ckgn0cpv58vxk" path="res://src/gameplay/player/states/state_pogo.gd" id="8_7og37"]
+[ext_resource type="Texture2D" uid="uid://3p4x40jbo844" path="res://assets/art/animations/player/FaceAnimation.png" id="8_ulph6"]
+[ext_resource type="Script" uid="uid://3iwi7h858uv6" path="res://src/gameplay/player/animated_face.gd" id="9_51iri"]
 [ext_resource type="Texture2D" uid="uid://b0bgcxaa08dwh" path="res://assets/art/animations/player/RunningAnimation.png" id="9_b1yrm"]
 [ext_resource type="Script" uid="uid://56g3dyfqc6ed" path="res://src/gameplay/player/states/state_double_jump.gd" id="9_vgqeu"]
 [ext_resource type="Script" uid="uid://n8mnvoaov5dv" path="res://src/gameplay/player/states/state_dash.gd" id="13_o6jv2"]
@@ -202,7 +204,7 @@ animations = [{
 }],
 "loop": 0,
 "name": &"dash",
-"speed": 10.0
+"speed": 13.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -337,6 +339,91 @@ animations = [{
 "speed": 10.0
 }]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_0igfg"]
+atlas = ExtResource("8_ulph6")
+region = Rect2(0, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rl7mo"]
+atlas = ExtResource("8_ulph6")
+region = Rect2(30, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a7bg1"]
+atlas = ExtResource("8_ulph6")
+region = Rect2(60, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4hjf5"]
+atlas = ExtResource("8_ulph6")
+region = Rect2(90, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tn1op"]
+atlas = ExtResource("8_ulph6")
+region = Rect2(120, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_04dj6"]
+atlas = ExtResource("8_ulph6")
+region = Rect2(150, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n7g5m"]
+atlas = ExtResource("8_ulph6")
+region = Rect2(180, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dui57"]
+atlas = ExtResource("8_ulph6")
+region = Rect2(210, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2yr2e"]
+atlas = ExtResource("8_ulph6")
+region = Rect2(240, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fn4st"]
+atlas = ExtResource("8_ulph6")
+region = Rect2(270, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5wqs4"]
+atlas = ExtResource("8_ulph6")
+region = Rect2(300, 0, 30, 42)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_munyu"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0igfg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rl7mo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a7bg1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4hjf5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tn1op")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_04dj6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n7g5m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dui57")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2yr2e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fn4st")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5wqs4")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 10.0
+}]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oelj7"]
 size = Vector2(7, 1)
 
@@ -347,15 +434,22 @@ script = ExtResource("1_khxic")
 stats = ExtResource("2_eqbko")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=980908053]
+visible = false
 position = Vector2(0.5, 2)
 shape = SubResource("RectangleShape2D_w2ppj")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=162606036]
 position = Vector2(1, -1)
 sprite_frames = SubResource("SpriteFrames_r4liw")
-animation = &"fall"
-frame = 2
-frame_progress = 1.0
+animation = &"run"
+frame = 6
+
+[node name="Face" type="AnimatedSprite2D" parent="." unique_id=1028405697 node_paths=PackedStringArray("_parent_sprite")]
+position = Vector2(1, -1)
+sprite_frames = SubResource("SpriteFrames_munyu")
+autoplay = "default"
+script = ExtResource("9_51iri")
+_parent_sprite = NodePath("../AnimatedSprite2D")
 
 [node name="StateMachine" type="Node" parent="." unique_id=90990164]
 unique_name_in_owner = true
@@ -389,6 +483,7 @@ collision_layer = 0
 collision_mask = 64
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PogoDetector" unique_id=1629093635]
+visible = false
 position = Vector2(0.5, 2)
 shape = SubResource("RectangleShape2D_w2ppj")
 debug_color = Color(0.8823935, 0.27588096, 0.4981209, 0.41960785)

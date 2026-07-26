@@ -219,9 +219,7 @@ func _init_player() -> void:
 	if player == null:
 		push_error("Loaded player scene does not extend Player or DNE: " + UIDs.PLAYER_SCENE_UID)
 		return
-	
-	## TESTING
-	modifiers_system.add_modifier(load(UIDs.SPARE_FUSE_UID))
+
 
 func _load_system(system_uid: String) -> Node:
 	var system_scene: PackedScene = ResourceLoader.load(system_uid)
