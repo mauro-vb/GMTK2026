@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="WorkshopModifier" format=3 uid="uid://cd7nk3wvx5rmp"]
 
 [ext_resource type="Script" uid="uid://cv9jm4pkt7bzn" path="res://src/gameplay/systems/modifiers_system/workshop_modifier.gd" id="1_ob001"]
+[ext_resource type="Texture2D" uid="uid://bs76gjd8a7g17" path="res://assets/art/icons/Double Jump.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_ob001")
@@ -8,5 +9,6 @@ extra_offers = 2
 type = 2
 modifier_name = "Open Bench"
 id = "open_bench"
+icon = ExtResource("icon_ph")
 description = "The foreman lays out two more than he is supposed to. Every workshop shows you 2 extra options."
 metadata/_custom_type_script = "uid://cv9jm4pkt7bzn"

@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="WorkshopModifier" format=3 uid="uid://ck6mw4r0ravbt"]
 
 [ext_resource type="Script" uid="uid://cv9jm4pkt7bzn" path="res://src/gameplay/systems/modifiers_system/workshop_modifier.gd" id="1_ub001"]
+[ext_resource type="Texture2D" uid="uid://ckl3ty6tt2xkm" path="res://assets/art/icons/Cheap Fuse.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_ub001")
@@ -8,5 +9,6 @@ skip_bonus_seconds = 8.0
 type = 2
 modifier_name = "Union Break"
 id = "union_break"
+icon = ExtResource("icon_ph")
 description = "Nobody works for free. Walk out of a workshop empty-handed and pocket 8 seconds for the trouble."
 metadata/_custom_type_script = "uid://cv9jm4pkt7bzn"

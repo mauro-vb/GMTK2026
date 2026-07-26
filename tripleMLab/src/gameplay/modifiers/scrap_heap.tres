@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="WorkshopModifier" format=3 uid="uid://bh5jx2vwc8ntr"]
 
 [ext_resource type="Script" uid="uid://cv9jm4pkt7bzn" path="res://src/gameplay/systems/modifiers_system/workshop_modifier.gd" id="1_sh001"]
+[ext_resource type="Texture2D" uid="uid://2ri5nyjix3bm" path="res://assets/art/icons/Primed.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_sh001")
@@ -8,5 +9,6 @@ extra_rerolls = 1
 type = 2
 modifier_name = "Scrap Heap"
 id = "scrap_heap"
+icon = ExtResource("icon_ph")
 description = "There is always more in the pile. Sweep a workshop bench once and have it laid out again."
 metadata/_custom_type_script = "uid://cv9jm4pkt7bzn"

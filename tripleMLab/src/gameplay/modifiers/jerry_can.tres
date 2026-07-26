@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="AddTimeModifier" format=3 uid="uid://bn40x6hcw5lrp"]
 
 [ext_resource type="Script" uid="uid://cupqjl1qe32nd" path="res://src/gameplay/systems/modifiers_system/add_time_modifier.gd" id="1_jc001"]
+[ext_resource type="Texture2D" uid="uid://c8atu057wpvwv" path="res://assets/art/icons/Jerry Can.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_jc001")
@@ -9,5 +10,6 @@ type = 2
 stackable = true
 modifier_name = "Jerry Can"
 id = "jerry_can"
+icon = ExtResource("icon_ph")
 description = "Gain 15 seconds, right now."
 metadata/_custom_type_script = "uid://cupqjl1qe32nd"

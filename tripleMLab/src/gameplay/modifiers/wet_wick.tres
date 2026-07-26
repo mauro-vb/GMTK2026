@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://bk2mv7xqc5nrt"]
 
 [ext_resource type="Script" uid="uid://cj9xt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_ww001"]
+[ext_resource type="Texture2D" uid="uid://wewdmd67sod5" path="res://assets/art/icons/Damp Fuse.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_ww001")
@@ -8,6 +9,7 @@ multiplier = 0.6
 type = 0
 modifier_name = "Wet Wick"
 id = "wet_wick"
+icon = ExtResource("icon_ph")
 description = "This one came out of the damp box. Time burns 40% slower for the next 2 levels."
 duration = 1
 duration_levels = 2

@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="OrbWindowModifier" format=3 uid="uid://cp4vtalmt6bxh"]
 
 [ext_resource type="Script" uid="uid://bt5r9djhk2mxe" path="res://src/gameplay/systems/modifiers_system/orb_window_modifier.gd" id="1_wc001"]
+[ext_resource type="Texture2D" uid="uid://ctfjsyhrgwy6" path="res://assets/art/icons/Warm Catch.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_wc001")
@@ -11,5 +12,6 @@ window_seconds = 5.0
 type = 0
 modifier_name = "Warm Catch"
 id = "warm_catch"
+icon = ExtResource("icon_ph")
 description = "Catch them while they are still cool. For the first 5 seconds of a level hot orbs give +1 second instead of burning you."
 metadata/_custom_type_script = "uid://bt5r9djhk2mxe"

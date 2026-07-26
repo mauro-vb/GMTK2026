@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://btawk5t0c2qdn"]
 
 [ext_resource type="Script" uid="uid://cj9xt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_fb001"]
+[ext_resource type="Texture2D" uid="uid://chbos8o6i25lx" path="res://assets/art/icons/Fast Burn.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_fb001")
@@ -8,5 +9,6 @@ multiplier = 1.25
 type = 2
 modifier_name = "Fast Burn"
 id = "fast_burn"
+icon = ExtResource("icon_ph")
 description = "Time burns 25% faster for the rest of the run."
 metadata/_custom_type_script = "uid://cj9xt4bvm7dpl"

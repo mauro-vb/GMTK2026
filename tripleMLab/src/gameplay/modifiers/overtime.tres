@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="ConditionalTimeModifier" format=3 uid="uid://bq6ml2skv8dcn"]
 
 [ext_resource type="Script" uid="uid://bx3mvp8ldz6te" path="res://src/gameplay/systems/modifiers_system/conditional_time_modifier.gd" id="1_ot001"]
+[ext_resource type="Texture2D" uid="uid://bn0wfo8xrx8na" path="res://assets/art/icons/Overtime.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_ot001")
@@ -10,5 +11,6 @@ amount = 6.0
 type = 1
 modifier_name = "Overtime"
 id = "overtime"
+icon = ExtResource("icon_ph")
 description = "Slow and steady. Take longer than 30 seconds in a level and gain 6 seconds for your trouble."
 metadata/_custom_type_script = "uid://bx3mvp8ldz6te"

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cupqjl1qe32nd" path="res://src/gameplay/systems/modifiers_system/add_time_modifier.gd" id="1_short_fu"]
 [ext_resource type="Resource" uid="uid://cr8mv4nkq6wzt" path="res://src/gameplay/modifiers/racing_wick.tres" id="2_short_fu"]
+[ext_resource type="Texture2D" uid="uid://cgn1s2554ccfg" path="res://assets/art/icons/Coating.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_short_fu")
@@ -9,6 +10,7 @@ amount = 10
 type = 2
 modifier_name = "Short Fuse"
 id = "short_fuse"
+icon = ExtResource("icon_ph")
 description = "Cut it down to the quick. Gain 10 seconds right now."
 linked_modifier = ExtResource("2_short_fu")
 metadata/_custom_type_script = "uid://cupqjl1qe32nd"

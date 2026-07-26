@@ -6,6 +6,7 @@
 [ext_resource type="Resource" uid="uid://dj3nh8lrx6pmv" path="res://src/gameplay/modifiers/slow_burn.tres" id="3_lf003"]
 [ext_resource type="Resource" uid="uid://dm6ts3xvp7cwl" path="res://src/gameplay/modifiers/bigger_tank.tres" id="4_lf004"]
 [ext_resource type="Resource" uid="uid://dk6mt80bv3rqx" path="res://src/gameplay/modifiers/primed.tres" id="5_lf005"]
+[ext_resource type="Texture2D" uid="uid://cu06sd0qifu1b" path="res://assets/art/icons/Lucky Break.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_lf001")
@@ -13,6 +14,7 @@ pool = Array[ExtResource("1_xaf8i")]([ExtResource("2_lf002"), ExtResource("3_lf0
 type = 1
 modifier_name = "Lucky Find"
 id = "lucky_find"
+icon = ExtResource("icon_ph")
 description = "A 25% chance of turning up a new modifier at the end of a level."
 chance = 0.25
 metadata/_custom_type_script = "uid://dh6qw2nrk8vsy"

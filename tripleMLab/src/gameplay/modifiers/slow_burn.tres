@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://dj3nh8lrx6pmv"]
 
 [ext_resource type="Script" uid="uid://cj9xt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_sb001"]
+[ext_resource type="Texture2D" uid="uid://b7rx4s6awyfr3" path="res://assets/art/icons/SlowBurn.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_sb001")
@@ -8,5 +9,6 @@ multiplier = 0.8
 type = 2
 modifier_name = "Slow Burn"
 id = "slow_burn"
+icon = ExtResource("icon_ph")
 description = "Time burns 20% slower for the rest of the run."
 metadata/_custom_type_script = "uid://cj9xt4bvm7dpl"

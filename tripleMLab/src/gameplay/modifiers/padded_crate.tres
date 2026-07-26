@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="TreasureModifier" load_steps=2 format=3 uid="uid://dw7kv2nxb5mqr"]
+[gd_resource type="Resource" script_class="TreasureModifier" load_steps=3 format=3 uid="uid://dw7kv2nxb5mqr"]
 
 [ext_resource type="Script" uid="uid://bq3wn8vkx5mtr" path="res://src/gameplay/systems/modifiers_system/treasure_modifier.gd" id="1_pc001"]
+[ext_resource type="Texture2D" uid="uid://ctfjsyhrgwy6" path="res://assets/art/icons/Warm Catch.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_pc001")
@@ -8,5 +9,6 @@ loss_scale = 0.5
 type = 2
 modifier_name = "Padded Crate"
 id = "padded_crate"
+icon = ExtResource("icon_ph")
 description = "You pack the bad news in straw before you open it. Chests that bite take half as much."
 metadata/_custom_type_script = "uid://bq3wn8vkx5mtr"

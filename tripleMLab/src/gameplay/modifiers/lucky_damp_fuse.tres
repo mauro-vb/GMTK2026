@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://dp3kb2vhm6wx0"]
 
 [ext_resource type="Script" uid="uid://cj9xt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_ld001"]
+[ext_resource type="Texture2D" uid="uid://hb66e0rmu318" path="res://assets/art/icons/Lucky Damp Fuse.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_ld001")
@@ -8,6 +9,7 @@ multiplier = 0.0
 type = 0
 modifier_name = "Maybe Damp Fuse"
 id = "lucky_damp_fuse"
+icon = ExtResource("icon_ph")
 description = "A 25% chance that time does not tick at all on the next level."
 duration = 1
 duration_levels = 1
