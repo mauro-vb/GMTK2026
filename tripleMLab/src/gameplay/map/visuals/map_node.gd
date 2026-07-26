@@ -8,6 +8,11 @@ extends Area2D
 
 signal selected(node: Room)
 
+## Fired only while [member available] is true — hover has nothing to say
+## about a room the player cannot pick.
+signal hover_entered(room: Room)
+signal hover_exited(room: Room)
+
 const SCENE: PackedScene = preload("res://src/gameplay/map/visuals/MapNode.tscn")
 
 ## Index into a [Default, Activated] pair.
@@ -71,10 +76,22 @@ const DETONATE_OUT: float = 0.09
 const DETONATE_SETTLE: float = 0.24
 const DETONATE_FLASH: Color = Color(2.4, 2.0, 1.5, 1.0)
 
+## The hovered room steps forward; every other room still in play steps back
+## a little to sell that one choice, without fighting the highlight pulse or
+## the detonate punch, both of which animate [member scale] instead of
+## [member Node2D.scale] on [member visuals].
+const HOVER_SCALE: float = 1.15
+const HOVER_NEIGHBOR_SCALE: float = 0.9
+const HOVER_TWEEN_TIME: float = 0.12
+
 var available: bool = false: set = _set_available
 var room: Room: set = _set_room
 
 var _spent: bool = false
+## visuals.scale at rest — Vector2.ONE for most rooms, FINAL_SCALE for the
+## final room. Hover multiplies against this rather than against whatever
+## visuals.scale happens to be mid-tween.
+var _visuals_base_scale: Vector2 = Vector2.ONE
 
 @onready var visuals: Node2D = $Visuals
 @onready var shadow: Sprite2D = $Visuals/Shadow
@@ -90,9 +107,12 @@ static func new_map_node(node_data: Room) -> MapNode:
 
 func _ready() -> void:
 	input_event.connect(_on_input_event)
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
 
 	if room.type == Room.Type.FINAL:
-		visuals.scale = Vector2.ONE * FINAL_SCALE
+		_visuals_base_scale = Vector2.ONE * FINAL_SCALE
+	visuals.scale = _visuals_base_scale
 
 	_refresh_art()
 
@@ -125,12 +145,29 @@ func _flash_to_spent() -> void:
 func _set_available(value: bool) -> void:
 	available = value
 	_refresh_art()
+	set_hover_scale(1.0)
 
 	if available:
 		await get_tree().create_timer(randf_range(.0, .25)).timeout
 		animation_player.play("highlight")
 	elif not room.selected:
 		animation_player.play("RESET")
+
+## Tweens visuals to [param factor] times its resting scale. Map calls this
+## on every available node when any one of them is hovered: 1.15 for the
+## room under the cursor, 0.9 for its still-available siblings, 1.0 to reset.
+func set_hover_scale(factor: float) -> void:
+	var tween: Tween = create_tween()
+	tween.tween_property(visuals, ^"scale", _visuals_base_scale * factor, HOVER_TWEEN_TIME) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _on_mouse_entered() -> void:
+	if available:
+		hover_entered.emit(room)
+
+func _on_mouse_exited() -> void:
+	if available:
+		hover_exited.emit(room)
 
 func _set_room(value: Room) -> void:
 	# Runs from new_map_node() before the node is in the tree, so it may only

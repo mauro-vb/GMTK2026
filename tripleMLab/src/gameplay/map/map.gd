@@ -113,6 +113,8 @@ func unlock_next_nodes() -> void:
 func _add_map_node(room: Room) -> void:
 	var new_map_node: MapNode = MapNode.new_map_node(room)
 	new_map_node.selected.connect(_on_node_selected)
+	new_map_node.hover_entered.connect(_on_node_hover_entered)
+	new_map_node.hover_exited.connect(_on_node_hover_exited)
 	nodes.add_child(new_map_node)
 	_connect_fuses(room)
 
@@ -168,6 +170,25 @@ func _on_node_selected(room: Room) -> void:
 	progress += 1
 	_refresh_dud_fuses()
 	selected.emit(room)
+
+## The room the cursor just entered steps forward; every other still-available
+## room steps back a touch so the one under the cursor reads as the pick.
+func _on_node_hover_entered(room: Room) -> void:
+	for map_node: MapNode in nodes.get_children():
+		if not map_node.available:
+			continue
+
+		if map_node.room == room:
+			map_node.set_hover_scale(MapNode.HOVER_SCALE)
+		else:
+			map_node.set_hover_scale(MapNode.HOVER_NEIGHBOR_SCALE)
+
+## Only resets once the cursor has actually left a room, not on every exit
+## event a fast mouse can fire while crossing between two adjacent nodes.
+func _on_node_hover_exited(_room: Room) -> void:
+	for map_node: MapNode in nodes.get_children():
+		if map_node.available:
+			map_node.set_hover_scale(1.0)
 
 func _seal_room(room: Room) -> void:
 	if room == null:
