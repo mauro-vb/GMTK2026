@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="AddTimeModifier" format=3 uid="uid://bm5tc7xdw2nhk"]
 
 [ext_resource type="Script" uid="uid://cupqjl1qe32nd" path="res://src/gameplay/systems/modifiers_system/add_time_modifier.gd" id="1_ff001"]
+[ext_resource type="Texture2D" uid="uid://c8076s4l5iyn5" path="res://assets/art/icons/Fresh Fuse.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_ff001")
@@ -8,5 +9,6 @@ amount = 10
 type = 1
 modifier_name = "Fresh Fuse"
 id = "fresh_fuse"
+icon = ExtResource("icon_ph")
 description = "Gain 10 seconds every time a level is completed."
 metadata/_custom_type_script = "uid://cupqjl1qe32nd"

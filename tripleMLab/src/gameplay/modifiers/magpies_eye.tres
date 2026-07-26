@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="TreasureModifier" load_steps=2 format=3 uid="uid://bt5wn9kvx3qmc"]
+[gd_resource type="Resource" script_class="TreasureModifier" load_steps=3 format=3 uid="uid://bt5wn9kvx3qmc"]
 
 [ext_resource type="Script" uid="uid://bq3wn8vkx5mtr" path="res://src/gameplay/systems/modifiers_system/treasure_modifier.gd" id="1_me001"]
+[ext_resource type="Texture2D" uid="uid://hb66e0rmu318" path="res://assets/art/icons/Lucky Damp Fuse.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_me001")
@@ -8,5 +9,6 @@ gain_card_chance = 0.5
 type = 2
 modifier_name = "Magpie's Eye"
 id = "magpies_eye"
+icon = ExtResource("icon_ph")
 description = "You go through the lining as well as the lid. Half the chests that pay out have something worth carrying in them too."
 metadata/_custom_type_script = "uid://bq3wn8vkx5mtr"

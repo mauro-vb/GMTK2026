@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://ct5mxaxdq7bsn"]
 
 [ext_resource type="Script" uid="uid://cj9xt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_dtm01"]
+[ext_resource type="Texture2D" uid="uid://dbj7pg2cmmtiy" path="res://assets/art/icons/Double Time.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_dtm01")
@@ -8,6 +9,7 @@ multiplier = 2.0
 type = 0
 modifier_name = "Double Time"
 id = "double_time"
+icon = ExtResource("icon_ph")
 description = "Time burns twice as fast for the next 3 levels."
 duration = 1
 duration_levels = 3

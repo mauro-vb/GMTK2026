@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="TreasureModifier" load_steps=2 format=3 uid="uid://bn7mk4wxq2vtc"]
+[gd_resource type="Resource" script_class="TreasureModifier" load_steps=3 format=3 uid="uid://bn7mk4wxq2vtc"]
 
 [ext_resource type="Script" uid="uid://bq3wn8vkx5mtr" path="res://src/gameplay/systems/modifiers_system/treasure_modifier.gd" id="1_oc001"]
+[ext_resource type="Texture2D" uid="uid://i4eqgd2px1o4" path="res://assets/art/icons/Live Wirse.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_oc001")
@@ -8,5 +9,6 @@ runs_clock = true
 type = 2
 modifier_name = "On The Clock"
 id = "on_the_clock"
+icon = ExtResource("icon_ph")
 description = "The fuse keeps burning while the lid is up. Chests cost you every second you spend deciding."
 metadata/_custom_type_script = "uid://bq3wn8vkx5mtr"

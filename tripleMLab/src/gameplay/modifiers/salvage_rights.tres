@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="TreasureModifier" load_steps=2 format=3 uid="uid://ck7bm2vnq8wxt"]
+[gd_resource type="Resource" script_class="TreasureModifier" load_steps=3 format=3 uid="uid://ck7bm2vnq8wxt"]
 
 [ext_resource type="Script" uid="uid://bq3wn8vkx5mtr" path="res://src/gameplay/systems/modifiers_system/treasure_modifier.gd" id="1_sr001"]
+[ext_resource type="Texture2D" uid="uid://hb66e0rmu318" path="res://assets/art/icons/Lucky Damp Fuse.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_sr001")
@@ -8,5 +9,6 @@ loss_card_chance = 0.6
 type = 2
 modifier_name = "Salvage Rights"
 id = "salvage_rights"
+icon = ExtResource("icon_ph")
 description = "A chest that took your time still owes you. More often than not it hands over something to carry instead."
 metadata/_custom_type_script = "uid://bq3wn8vkx5mtr"

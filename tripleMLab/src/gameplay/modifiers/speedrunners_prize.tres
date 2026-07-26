@@ -5,6 +5,7 @@
 [ext_resource type="Resource" uid="uid://cl6vb3mnp8wjx" path="res://src/gameplay/modifiers/dash_upgrade.tres" id="2_sp002"]
 [ext_resource type="Resource" uid="uid://dq2xs7wkh4mtb" path="res://src/gameplay/modifiers/double_jump_upgrade.tres" id="3_sp003"]
 [ext_resource type="Resource" uid="uid://dm6ts3xvp7cwl" path="res://src/gameplay/modifiers/bigger_tank.tres" id="4_sp004"]
+[ext_resource type="Texture2D" uid="uid://csk13oefpj8jm" path="res://assets/art/icons/Speedrunners.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_sp001")
@@ -13,5 +14,6 @@ max_level_time = 20.0
 type = 1
 modifier_name = "Speedrunner's Prize"
 id = "speedrunners_prize"
+icon = ExtResource("icon_ph")
 description = "Clear a level in under 20 seconds and walk away with a new modifier."
 metadata/_custom_type_script = "uid://dh6qw2nrk8vsy"

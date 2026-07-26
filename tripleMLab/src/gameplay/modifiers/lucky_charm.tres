@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="TreasureModifier" load_steps=2 format=3 uid="uid://bx4nq9wmk7vtd"]
+[gd_resource type="Resource" script_class="TreasureModifier" load_steps=3 format=3 uid="uid://bx4nq9wmk7vtd"]
 
 [ext_resource type="Script" uid="uid://bq3wn8vkx5mtr" path="res://src/gameplay/systems/modifiers_system/treasure_modifier.gd" id="1_lc001"]
+[ext_resource type="Texture2D" uid="uid://cu06sd0qifu1b" path="res://assets/art/icons/Lucky Break.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_lc001")
@@ -8,5 +9,6 @@ gain_scale = 1.5
 type = 2
 modifier_name = "Lucky Charm"
 id = "lucky_charm"
+icon = ExtResource("icon_ph")
 description = "A bent nail off the first chest you ever opened. Every chest that pays out pays half again."
 metadata/_custom_type_script = "uid://bq3wn8vkx5mtr"

@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="AddMaxTimeModifier" format=3 uid="uid://dh7bq2nvyakwl"]
 
 [ext_resource type="Script" uid="uid://bk4nd9wtp2xhz" path="res://src/gameplay/systems/modifiers_system/add_max_time_modifier.gd" id="1_pt001"]
+[ext_resource type="Texture2D" uid="uid://c8atu057wpvwv" path="res://assets/art/icons/Jerry Can.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_pt001")
@@ -8,5 +9,6 @@ amount = -10.0
 type = 2
 modifier_name = "Punctured Tank"
 id = "punctured_tank"
+icon = ExtResource("icon_ph")
 description = "It holds. Mostly. Lower the maximum time you can carry by 10 seconds."
 metadata/_custom_type_script = "uid://bk4nd9wtp2xhz"

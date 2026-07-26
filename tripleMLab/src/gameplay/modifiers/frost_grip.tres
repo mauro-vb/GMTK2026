@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bt5r9djhk2mxe" path="res://src/gameplay/systems/modifiers_system/orb_window_modifier.gd" id="1_fg001"]
 [ext_resource type="Resource" uid="uid://bw3nk6vqm8trx" path="res://src/gameplay/modifiers/cold_storage.tres" id="2_fg002"]
+[ext_resource type="Texture2D" uid="uid://stsmq08fe00g" path="res://assets/art/icons/Cold Fuse.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_fg001")
@@ -12,6 +13,7 @@ window_seconds = 6.0
 type = 0
 modifier_name = "Frost Grip"
 id = "frost_grip"
+icon = ExtResource("icon_ph")
 description = "Cold hands, good grip. For the first 6 seconds of a level cold orbs are worth 4 seconds each."
 linked_modifier = ExtResource("2_fg002")
 metadata/_custom_type_script = "uid://bt5r9djhk2mxe"

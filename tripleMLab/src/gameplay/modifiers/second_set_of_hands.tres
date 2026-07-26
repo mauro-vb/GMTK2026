@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="WorkshopModifier" format=3 uid="uid://bs4mwaxkq7ntd"]
 
 [ext_resource type="Script" uid="uid://cv9jm4pkt7bzn" path="res://src/gameplay/systems/modifiers_system/workshop_modifier.gd" id="1_ss001"]
+[ext_resource type="Texture2D" uid="uid://b781yyq521fl5" path="res://assets/art/icons/DoublePrimed.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_ss001")
@@ -9,5 +10,6 @@ consume_on_use = true
 type = 2
 modifier_name = "Second Set of Hands"
 id = "second_set_of_hands"
+icon = ExtResource("icon_ph")
 description = "Someone else holds the ladder while you rummage. Take two modifiers from a workshop instead of one."
 metadata/_custom_type_script = "uid://cv9jm4pkt7bzn"

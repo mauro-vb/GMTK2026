@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="TreasureModifier" load_steps=2 format=3 uid="uid://dp8mk3nwq6vxr"]
+[gd_resource type="Resource" script_class="TreasureModifier" load_steps=3 format=3 uid="uid://dp8mk3nwq6vxr"]
 
 [ext_resource type="Script" uid="uid://bq3wn8vkx5mtr" path="res://src/gameplay/systems/modifiers_system/treasure_modifier.gd" id="1_sc001"]
+[ext_resource type="Texture2D" uid="uid://ccteaa4i8mndi" path="res://assets/art/icons/Spare Fuse.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_sc001")
@@ -8,5 +9,6 @@ retry_on_loss = true
 type = 2
 modifier_name = "Second Chance"
 id = "second_chance"
+icon = ExtResource("icon_ph")
 description = "The first chest that bites gets shut and opened again. Whatever comes out the second time is yours, better or worse."
 metadata/_custom_type_script = "uid://bq3wn8vkx5mtr"

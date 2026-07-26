@@ -1,11 +1,13 @@
 [gd_resource type="Resource" script_class="FreeAbilityModifier" format=3 uid="uid://dk6mt80bv3rqx"]
 
 [ext_resource type="Script" uid="uid://dn82kfvw6plq3" path="res://src/gameplay/systems/modifiers_system/free_ability_modifier.gd" id="1_pr001"]
+[ext_resource type="Texture2D" uid="uid://2ri5nyjix3bm" path="res://assets/art/icons/Primed.png" id="icon_ph"]
 
 [resource]
 script = ExtResource("1_pr001")
 type = 0
 modifier_name = "Primed"
 id = "primed"
+icon = ExtResource("icon_ph")
 description = "The first movement ability you use each level is on the house."
 metadata/_custom_type_script = "uid://dn82kfvw6plq3"
