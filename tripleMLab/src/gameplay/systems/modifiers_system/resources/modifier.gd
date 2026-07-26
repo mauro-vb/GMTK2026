@@ -100,6 +100,30 @@ func modify_workshop_skip_bonus(seconds: float) -> float:
 func on_workshop_visited(_picks_taken: int) -> bool:
 	return false
 
+# Treasure hooks. Same shape again: a chest pays out through these rather than
+# straight into the clock, so a modifier can sweeten a win or soften a loss
+# without the treasure room knowing it exists. See [TreasureModifier].
+#
+# The odds themselves are deliberately *not* on offer here. A chest advertises
+# what it is before the player commits to it (see [TreasureTable.get_odds_text]),
+# and a modifier that silently bent those numbers would make that advertisement a
+# lie. Modifiers change what the outcomes are worth, never how likely they are.
+
+## Seconds a chest is about to pay out. `seconds` is positive.
+func modify_treasure_gain(seconds: float) -> float:
+	return seconds
+
+## Seconds a chest is about to take. `seconds` is positive — it's an amount, not
+## a signed change, so scaling it down is always the kind thing to do.
+func modify_treasure_loss(seconds: float) -> float:
+	return seconds
+
+## Called on every held modifier once a chest has paid out. Return true to be
+## dropped. `seconds` is the signed change that was actually applied, so a
+## one-shot charm can decline to spend itself on a chest it didn't help with.
+func on_treasure_opened(_seconds: float) -> bool:
+	return false
+
 ## Whether this modifier would do anything at all for the run as it stands.
 ##
 ## Almost everything is unconditionally useful and inherits `true`. The exception

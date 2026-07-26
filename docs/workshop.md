@@ -572,11 +572,10 @@ during the opening fade; and the map HUD overlapping the bench.
 
 ## 8. Known limitations
 
-- **`enter_rest` / `enter_event` are still unimplemented** (pre-existing). Selecting a HEAL
-  room dead-ends the run — the map is already removed and `_current_room` stays null, so
-  nothing can hand the room back. `MapGenerator` forces an entire row of HEAL rooms at row
-  4, so any run reaching row 3+ will meet one. This blocks *playtesting* the workshop more
-  than the workshop itself; it was left alone as an unrelated system.
+- ~~**`enter_rest` / `enter_event` are still unimplemented**~~ — `enter_rest` is now
+  `enter_treasure` and the forced row halfway through the run is a row of chests, so a run
+  no longer dead-ends on it. See `docs/treasure.md`. `enter_event` is still unimplemented,
+  and the generator still never produces `Room.Type.EVENT`.
 - **Workshop rooms are rare.** Weight 2.5 against levels' 10.0, never consecutive, never on
   row 0. A run can finish without meeting one. Worth raising while the room is being
   tested.
