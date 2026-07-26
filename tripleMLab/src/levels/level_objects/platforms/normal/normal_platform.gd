@@ -1,3 +1,4 @@
+@tool
 class_name NormalPlatform
 extends JumpThroughPlatform
 

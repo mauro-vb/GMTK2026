@@ -1,3 +1,4 @@
+@tool
 class_name Orb
 extends Node2D
 
@@ -6,24 +7,47 @@ signal collected(orb_type)
 enum Type { COLD, HOT }
 
 const TIME_ADDED: int = 2
-const TEXTURE_UIDs: Dictionary[Type, Texture2D] = {
+
+const TEXTURES: Dictionary[Type, Texture2D] = {
 	Type.COLD: preload("uid://bcvwcjovn3urq"),
-	Type.HOT: preload("uid://dl6hdiixm8xoi")
+	Type.HOT: preload("uid://dl6hdiixm8xoi"),
 }
 
-@export var type: Type = Type.COLD
+## Setter fires as soon as you change this in the Inspector, so the sprite
+## updates live in the editor instead of only after a reload.
+@export var type: Type = Type.COLD:
+	set(value):
+		type = value
+		_refresh_sprite()
+
 @onready var area: Area2D = %Area2D
 @onready var sprite: Sprite2D = %Sprite2D
 
-# Called when the node enters the scene tree for the first time.
+
 func _ready() -> void:
-	sprite.texture = TEXTURE_UIDs[type]
+	# %Sprite2D isn't resolvable until the node is in the tree, which _init()
+	# runs before — that's why the old version never painted in the editor.
+	# _ready() runs both at runtime and in-editor (this script is @tool), so
+	# this is the one place both need.
+	_refresh_sprite()
+
+	if Engine.is_editor_hint():
+		return
+
 	area.body_entered.connect(_on_body_entered)
 
+func _refresh_sprite() -> void:
+	# The @export setter can fire before @onready has run (e.g. right after
+	# the node is constructed), so sprite may still be null here.
+	if sprite == null:
+		return
+
+	sprite.texture = TEXTURES[type]
 
 func _on_body_entered(body: Node2D) -> void:
 	if body is not Player:
 		return
+
 	var modifier_type: Modifier.Type = Modifier.Type.COLD_ORB_TOUCHED if type == Type.COLD else Modifier.Type.HOT_ORB_TOUCHED
 	var modifiers_system: ModifiersSystem = Global.main_game.modifiers_system
 

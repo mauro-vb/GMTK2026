@@ -56,6 +56,8 @@ var _direction_stack: Array[String] = []
 # FloorCheck's authored cast length, used whenever the look-ahead doesn't need more
 var _floor_check_reach: float = 0.0
 
+var _last_pogo_area: PogoArea = null
+
 @onready var state_machine: PlayerStateMachine = %StateMachine
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 
@@ -140,7 +142,7 @@ func _update_timers(delta: float) -> void:
 	else:
 		jump_buffer_timer = max(jump_buffer_timer - delta, 0.0)
 	
-	var touching_pogoable := pogo_detector.has_overlapping_bodies() or pogo_detector.has_overlapping_areas()
+	var touching_pogoable: = pogo_detector.has_overlapping_bodies() or pogo_detector.has_overlapping_areas()
 	pogo_grace_timer = stats.pogo_grace_time if touching_pogoable else max(pogo_grace_timer - delta, 0.0)
 
 	if Input.is_action_just_pressed("attack"):
