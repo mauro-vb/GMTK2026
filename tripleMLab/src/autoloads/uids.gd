@@ -9,7 +9,7 @@ const MODIFIER_DISPLAY_SCENE_UID: String = "uid://dv6ct8mkr3jqw"
 # WORLD
 const MAP_SCENE_UID: String = "uid://ipmc68r6n333"
 const PLAYER_SCENE_UID: String = "uid://kwjq37d8yab5"
-const TEST_LEVEL_UID: String = "res://src/levels/initial_levels/Level1.tscn"
+const TEST_LEVEL_UID: String = "uid://cakjv0qfpmcuk"
 const WORKSHOP_SCENE_UID: String = "uid://bkq7wn3vxm2td"
 
 # WORKSHOP
