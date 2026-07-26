@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://bh3qw7nvx4mkt"]
-
-[ext_resource type="Script" uid="uid://cs7mv3nxq9wkb" path="res://src/debug/treasure_check.gd" id="1_check"]
-
-[node name="TreasureCheck" type="Node"]
-script = ExtResource("1_check")

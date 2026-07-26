@@ -16,11 +16,18 @@ var next_nodes: Array[Room]
 var selected: bool = false
 var parents: Array[Room] = []
 
-## Which chest this is, for TREASURE rooms only. Dealt by [MapGenerator] so the
-## chests along one row are three different bets rather than three rolls of the
-## same one, and read by [MapNode] for its icon and by [TreasureRoom] for the
-## game it lays on. Null on every other room type.
+## Which chest this is, for TREASURE rooms only. Dealt by [MapGenerator] —
+## [member is_corrupted] decides whether it's the good or the corrupted table —
+## and read by [MapNode] for its icon and by [TreasureRoom] for the game it
+## lays on. Null on every other room type.
 var treasure: TreasureTable = null
+
+## Whether this TREASURE room always bites (true) or always pays (false).
+## Decided once, at map-gen time, by [method MapGenerator._assign_treasure_tables]
+## — a chest's fate isn't a roll inside the room, it's a fact about the room
+## before the player ever walks in. [MapNode] reads it to tint the chest on the
+## map. Meaningless on every other room type.
+var is_corrupted: bool = false
 
 func _to_string() -> String:
 	return "%s: (%s)" % [coordinates, get_type()[0]]
