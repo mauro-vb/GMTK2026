@@ -88,6 +88,3 @@ shape = SubResource("CircleShape2D_munyu")
 unique_name_in_owner = true
 position = Vector2(1, -4)
 sprite_frames = SubResource("SpriteFrames_cotu6")
-animation = &"triggered"
-frame = 11
-frame_progress = 1.0
