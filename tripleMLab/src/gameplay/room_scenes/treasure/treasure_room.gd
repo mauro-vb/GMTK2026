@@ -506,18 +506,21 @@ func _result_text(slice: TreasureSlice) -> String:
 	# slice itself rather than `_applied` so a charm that bonuses a "nothing"
 	# into a real number falls through to PAID OUT below instead of lying about
 	# it, and so a bite the clock floor swallowed entirely (`_applied` also
-	# zero, but the slice wasn't) still reads as NOTHING LEFT further down.
+	# zero, but the slice wasn't) still reads as FUSE PROTECTED further down.
 	if is_zero_approx(slice.seconds) and is_zero_approx(_applied):
 		return "YOU GOT LUCKY THIS TIME" if _corrupted else "BETTER LUCK NEXT TIME"
 
 	if is_zero_approx(_withheld):
 		return "PAID OUT" if slice.is_gain() else "IT BITES"
 
-	# A payout that overflowed the tank, or a bite the run was too short to take.
+	# A payout the clock had no room for — all of it or just the overflow — or a
+	# bite the run was too short to take. Either way the number on screen is
+	# smaller than the wedge or the bin promised, so the qualifier always fires,
+	# not just at a full zero (see `_withheld`, which is nonzero either way).
 	if slice.is_gain():
-		return "PAID OUT  ·  TANK FULL"
+		return "PAID OUT  ·  FUSE MAXED OUT"
 
-	return "IT BITES  ·  NOTHING LEFT"
+	return "IT BITES  ·  FUSE PROTECTED"
 
 
 ## Closes the room and hands it back to MainGame.
