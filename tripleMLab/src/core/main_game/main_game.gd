@@ -122,6 +122,38 @@ func load_game() -> void:
 	map.selected.connect(func(room): enter_room(room.scene_uid, room.type))
 
 
+## The tutorial, entered from the title screen instead of from a map.
+##
+## It is an ordinary level and needs what a level needs — a player, and the
+## systems the player reaches into (paying an ability's time cost looks for the
+## clock) — but it is deliberately not a run: nothing is dealt, the fuse never
+## ticks, and walking out of the door goes back to the menu rather than on to a
+## map. That is the whole point of it: it is the only place in the game where
+## the movement can be tried without the clock running.
+func load_tutorial() -> void:
+	rooms_cleared = 0
+	_in_final_room = false
+	_run_ended = false
+
+	_load_systems()
+	_init_player()
+	time_system.ticking = false
+
+	# The menu comes down and nothing takes its place. The level HUD is a clock
+	# this room doesn't run and a modifier row it never fills.
+	unload_scene(SceneContainer.UI)
+
+	_current_room = load_scene(UIDs.TUTORIAL_LEVEL_UID, SceneContainer.LEVEL) as BaseLevel
+	if _current_room == null:
+		push_error("TUTORIAL_LEVEL_UID did not resolve to a BaseLevel instance")
+		return_to_menu()
+		return
+
+	player_root.add_child(player)
+	player.reset_for_new_room()
+	_current_room.exited.connect(return_to_menu, CONNECT_DEFERRED | CONNECT_ONE_SHOT)
+
+
 ## Leaves the map and hands off to the correct room handler based on type.
 ## Common map <-> room bookkeeping (hiding the map, restoring it, HUD swap)
 ## lives here; the type-specific handlers below only deal with what's

@@ -12,6 +12,9 @@ const MAP_SCENE_UID: String = "uid://ipmc68r6n333"
 const PLAYER_SCENE_UID: String = "uid://kwjq37d8yab5"
 ## Only reached when [LevelPool] finds nothing to deal — see LevelPool.LEVEL_DIR.
 const FALLBACK_LEVEL_UID: String = "uid://bobnq2ochp5k2"
+## The one level that is never dealt: it is reached from the title screen and
+## lives outside [LevelPool]'s directory so a run can't roll it.
+const TUTORIAL_LEVEL_UID: String = "uid://d1tg1w5046hti"
 const WORKSHOP_SCENE_UID: String = "uid://bkq7wn3vxm2td"
 const TREASURE_ROOM_SCENE_UID: String = "uid://dn8kw3vqm7xbt"
 

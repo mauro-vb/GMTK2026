@@ -16,6 +16,7 @@ const MAX_VOLUME_DB: float = 0.0
 # On Ready
 @onready var title: TextureRect = %Title
 @onready var play_button: Button = %PlayButton
+@onready var tutorial_button: Button = %TutorialButton
 @onready var difficulty_button: Button = %DifficultyButton
 @onready var difficulty_hint: Label = %DifficultyHint
 @onready var quit_button: Button = %QuitButton
@@ -24,6 +25,7 @@ const MAX_VOLUME_DB: float = 0.0
 # Lifecycle
 func _ready() -> void:
 	play_button.pressed.connect(_on_play_button_pressed)
+	tutorial_button.pressed.connect(_on_tutorial_button_pressed)
 	difficulty_button.pressed.connect(_on_difficulty_button_pressed)
 	quit_button.pressed.connect(_on_quit_button_pressed)
 
@@ -75,6 +77,10 @@ func _refresh_difficulty() -> void:
 # Callbacks
 func _on_play_button_pressed() -> void:
 	Global.main_game.load_game()
+
+
+func _on_tutorial_button_pressed() -> void:
+	Global.main_game.load_tutorial()
 
 
 ## Steps to the next earned mode, wrapping back to normal past the top. Cycling
