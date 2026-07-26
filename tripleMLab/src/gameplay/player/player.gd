@@ -145,7 +145,7 @@ func _update_timers(delta: float) -> void:
 	var touching_pogo_area := _find_pogo_area()
 	if touching_pogo_area != null:
 		_last_pogo_area = touching_pogo_area
-		
+
 	var touching_pogoable := touching_pogo_area != null or pogo_detector.has_overlapping_bodies()
 	pogo_grace_timer = stats.pogo_grace_time if touching_pogoable else max(pogo_grace_timer - delta, 0.0)
 
