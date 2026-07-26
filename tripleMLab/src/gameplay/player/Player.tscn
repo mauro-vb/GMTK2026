@@ -441,8 +441,7 @@ shape = SubResource("RectangleShape2D_w2ppj")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=162606036]
 position = Vector2(1, -1)
 sprite_frames = SubResource("SpriteFrames_r4liw")
-animation = &"run"
-frame = 6
+animation = &"pogo"
 
 [node name="Face" type="AnimatedSprite2D" parent="." unique_id=1028405697 node_paths=PackedStringArray("_parent_sprite")]
 position = Vector2(1, -1)

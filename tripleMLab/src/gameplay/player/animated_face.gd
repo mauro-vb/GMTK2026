@@ -4,11 +4,13 @@ const FRAME_OFFSETS: Dictionary = {
 	"pogo": {
 		0: Vector2(0, -1),
 		1: Vector2(3, -1),
+		2: Vector2(6, -4),
 		5: Vector2(-1, 0),
 	},
 	"double_jump": {
 		0: Vector2(0, -1),
 		1: Vector2(3, -1),
+		2: Vector2(6, -4),
 		5: Vector2(-1, 0),
 	},
 	"fall": {
