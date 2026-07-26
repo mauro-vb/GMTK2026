@@ -10,7 +10,14 @@ const NAME_SETTING: String = "application/config/name"
 
 
 func _ready() -> void:
-	mouse_entered.connect(func(): print("mouse entered menu"))
+	# An FPS counter over the title screen is the first thing a jam player sees,
+	# so the overlay takes itself off screen in an exported build. It stays on in
+	# an editor run, which is the only place anybody is reading it anyway.
+	if not OS.is_debug_build():
+		hide()
+		set_process(false)
+		return
+
 	_set_version_label()
 	_set_debug_label()
 

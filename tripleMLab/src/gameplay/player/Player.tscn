@@ -17,6 +17,7 @@
 [ext_resource type="Texture2D" uid="uid://b0bgcxaa08dwh" path="res://assets/art/animations/player/RunningAnimation.png" id="9_b1yrm"]
 [ext_resource type="Script" uid="uid://56g3dyfqc6ed" path="res://src/gameplay/player/states/state_double_jump.gd" id="9_vgqeu"]
 [ext_resource type="Script" uid="uid://n8mnvoaov5dv" path="res://src/gameplay/player/states/state_dash.gd" id="13_o6jv2"]
+[ext_resource type="Texture2D" uid="uid://dxbo8i508ctyb" path="res://assets/art/animations/player/DetonationAnimation.png" id="14_dtn8k"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_w2ppj"]
 size = Vector2(7, 12)
@@ -181,6 +182,26 @@ region = Rect2(150, 0, 30, 42)
 atlas = ExtResource("9_b1yrm")
 region = Rect2(180, 0, 30, 42)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_dtn80"]
+atlas = ExtResource("14_dtn8k")
+region = Rect2(0, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dtn81"]
+atlas = ExtResource("14_dtn8k")
+region = Rect2(30, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dtn82"]
+atlas = ExtResource("14_dtn8k")
+region = Rect2(60, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dtn83"]
+atlas = ExtResource("14_dtn8k")
+region = Rect2(90, 0, 30, 42)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dtn84"]
+atlas = ExtResource("14_dtn8k")
+region = Rect2(120, 0, 30, 42)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_r4liw"]
 animations = [{
 "frames": [{
@@ -205,6 +226,26 @@ animations = [{
 "loop": 0,
 "name": &"dash",
 "speed": 13.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dtn80")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dtn81")
+}, {
+"duration": 2.0,
+"texture": SubResource("AtlasTexture_dtn82")
+}, {
+"duration": 2.0,
+"texture": SubResource("AtlasTexture_dtn83")
+}, {
+"duration": 3.0,
+"texture": SubResource("AtlasTexture_dtn84")
+}],
+"loop": 0,
+"name": &"detonation",
+"speed": 12.0
 }, {
 "frames": [{
 "duration": 1.0,

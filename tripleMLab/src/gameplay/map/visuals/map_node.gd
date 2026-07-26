@@ -36,9 +36,11 @@ const ROOM_ART: Dictionary[Room.Type, Array] = {
 		preload("res://assets/art/map/icons/ChestDefault.png"),
 		preload("res://assets/art/map/icons/ChestActivated.png"),
 	],
+	# The final room is a level like any other — the last one — so it wears the
+	# level's own face rather than a chest's. FINAL_SCALE is what marks it out.
 	Room.Type.FINAL: [
-		preload("res://assets/art/map/icons/ChestDefault.png"),
-		preload("res://assets/art/map/icons/ChestActivated.png"),
+		preload("res://assets/art/map/icons/LevelDefault.png"),
+		preload("res://assets/art/map/icons/LevelActivated.png"),
 	],
 }
 

@@ -186,10 +186,18 @@ func _assign_treasure_tables() -> void:
 
 ## Types are picked first and the scene each one loads is resolved after, so a
 ## room only has to be told what it is, never what file that means.
+##
+## Only rooms the player can actually reach are dealt a scene. Rooms with no
+## outgoing cords are the ones no path leads to and [method Map.create_map]
+## never draws them — dealing them a level would spend entries out of the pool's
+## bag on rooms nobody visits, and the run would start repeating levels early.
 func _apply_scene_uids() -> void:
+	var pool: LevelPool = LevelPool.new()
 	for current_row: Array[Room] in map_data:
 		for node: Room in current_row:
-			node.apply_type_scene()
+			if node.next_nodes.is_empty() and node.type != Room.Type.FINAL:
+				continue
+			node.apply_type_scene(pool)
 
 func _set_node_randomly(node: Room) -> void:
 	var is_consecutive_type: Callable = func(candidate: Room.Type, type: Room.Type) -> bool:

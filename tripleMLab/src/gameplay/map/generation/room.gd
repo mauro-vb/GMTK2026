@@ -9,7 +9,7 @@ extends Resource
 enum Type { NOT_ASSIGNED, LEVEL, WORKSHOP, TREASURE, EVENT, FINAL }
 
 @export var type: Type
-@export var scene_uid: String = UIDs.TEST_LEVEL_UID
+@export var scene_uid: String = UIDs.FALLBACK_LEVEL_UID
 var position: Vector2
 var coordinates: Vector2i
 var next_nodes: Array[Room]
@@ -47,13 +47,18 @@ func get_type() -> String:
 
 ## Points `scene_uid` at whatever this room's type loads. Called once the
 ## generator has finished assigning types, so a room is never left pointing at
-## the test level just because it turned out to be a workshop.
+## the fallback level just because it turned out to be a workshop.
 ##
-## Types not listed keep whatever `scene_uid` they already have — LEVEL rooms
-## are meant to vary, so they are nobody's business but the level pool's.
-func apply_type_scene() -> void:
+## Workshops and chests are one scene each; levels are dealt by `pool`, which is
+## why it is passed in rather than built here — one pool per map is what stops
+## the same level turning up twice in a run (see [LevelPool]).
+func apply_type_scene(pool: LevelPool) -> void:
 	match type:
 		Type.WORKSHOP:
 			scene_uid = UIDs.WORKSHOP_SCENE_UID
 		Type.TREASURE:
 			scene_uid = UIDs.TREASURE_ROOM_SCENE_UID
+		Type.LEVEL:
+			scene_uid = pool.next_level_uid()
+		Type.FINAL:
+			scene_uid = pool.final_level_uid()

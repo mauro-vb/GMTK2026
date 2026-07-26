@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://bkq7wn3vxm2td"]
+[gd_scene load_steps=4 format=3 uid="uid://bkq7wn3vxm2td"]
 
 [ext_resource type="Script" uid="uid://bx6tq4nvm9zkr" path="res://src/gameplay/room_scenes/workshop/workshop.gd" id="1_workshop"]
 [ext_resource type="Resource" uid="uid://cm2vj7xkq9nsw" path="res://src/gameplay/room_scenes/workshop/default_pool.tres" id="2_pool"]
+[ext_resource type="PackedScene" uid="uid://c8vqmn3wxk5tb" path="res://src/ui/hud/FuseBar.tscn" id="9_fusebar"]
 
 [node name="Workshop" type="Node2D"]
 script = ExtResource("1_workshop")
@@ -52,12 +53,11 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 4
 
-[node name="TimeLabel" type="Label" parent="CanvasLayer/UI/Layout/Column/Strip"]
-unique_name_in_owner = true
+[node name="FuseBar" parent="CanvasLayer/UI/Layout/Column/Strip" instance=ExtResource("9_fusebar")]
+custom_minimum_size = Vector2(96, 12)
 layout_mode = 2
-mouse_filter = 2
-vertical_alignment = 1
-text = "60"
+size_flags_horizontal = 0
+readout_size = 8
 
 [node name="Spacer" type="Control" parent="CanvasLayer/UI/Layout/Column/Strip"]
 layout_mode = 2

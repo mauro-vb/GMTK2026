@@ -1,9 +1,11 @@
-[gd_resource type="Theme" format=3 uid="uid://djryy3nm637jt"]
+[gd_resource type="Theme" load_steps=8 format=3 uid="uid://djryy3nm637jt"]
 
 [ext_resource type="FontFile" uid="uid://dumnwgfl70q28" path="res://assets/fonts/SF-Mono-Medium.otf" id="1_2i2tj"]
 [ext_resource type="Texture2D" uid="uid://bv8wlwl32v3as" path="res://assets/art/ui/theme/ButtonHover.png" id="1_8ieel"]
 [ext_resource type="FontFile" uid="uid://bn7xy5s6ubsuj" path="res://assets/fonts/josefin-sans.bold.ttf" id="1_cotu6"]
 [ext_resource type="Texture2D" uid="uid://d1qdd1x6cwm7b" path="res://assets/art/ui/theme/ButtonDefault.png" id="2_cotu6"]
+[ext_resource type="Texture2D" uid="uid://djdruc00lp0f5" path="res://assets/art/ui/theme/UITextBox.png" id="3_panel"]
+[ext_resource type="Texture2D" uid="uid://b6ovd623mb0m4" path="res://assets/art/ui/theme/UITextBox2.png" id="4_raised"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_y5cp6"]
 texture = ExtResource("1_8ieel")
@@ -27,13 +29,65 @@ texture_margin_right = 2.0
 texture_margin_bottom = 3.0
 modulate_color = Color(0.52906674, 0.5290667, 0.5290667, 1)
 
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel"]
+content_margin_left = 6.0
+content_margin_top = 5.0
+content_margin_right = 6.0
+content_margin_bottom = 5.0
+texture = ExtResource("3_panel")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_raised"]
+content_margin_left = 6.0
+content_margin_top = 5.0
+content_margin_right = 6.0
+content_margin_bottom = 5.0
+texture = ExtResource("4_raised")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+
 [resource]
+default_font = ExtResource("1_2i2tj")
+default_font_size = 8
 Button/colors/font_color = Color(0.88235295, 0.93333334, 0.84705883, 1)
+Button/colors/font_disabled_color = Color(0.541, 0.549, 0.639, 0.5)
+Button/colors/font_focus_color = Color(1, 0.898, 0.612, 1)
+Button/colors/font_hover_color = Color(1, 0.898, 0.612, 1)
+Button/colors/font_pressed_color = Color(1, 0.898, 0.612, 1)
 Button/font_sizes/font_size = 12
 Button/fonts/font = ExtResource("1_cotu6")
+Button/styles/focus = SubResource("StyleBoxTexture_y5cp6")
 Button/styles/hover = SubResource("StyleBoxTexture_y5cp6")
 Button/styles/normal = SubResource("StyleBoxTexture_t0lsh")
 Button/styles/pressed = SubResource("StyleBoxTexture_cotu6")
+HintLabel/base_type = &"Label"
+HintLabel/colors/font_color = Color(0.541, 0.549, 0.639, 1)
+HintLabel/font_sizes/font_size = 6
+Label/colors/font_color = Color(0.88235295, 0.93333334, 0.84705883, 1)
+Label/colors/font_shadow_color = Color(0.043, 0.039, 0.078, 0.75)
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 1
+Label/font_sizes/font_size = 8
+Label/fonts/font = ExtResource("1_2i2tj")
+Panel/styles/panel = SubResource("StyleBoxTexture_panel")
+PanelContainer/styles/panel = SubResource("StyleBoxTexture_panel")
+RaisedPanel/base_type = &"PanelContainer"
+RaisedPanel/styles/panel = SubResource("StyleBoxTexture_raised")
+SubtitleLabel/base_type = &"Label"
+SubtitleLabel/colors/font_color = Color(0.964, 0.529, 0.235, 1)
+SubtitleLabel/font_sizes/font_size = 8
+TimerLabel/base_type = &"Label"
+TimerLabel/colors/font_color = Color(0.964, 0.529, 0.235, 1)
+TimerLabel/font_sizes/font_size = 16
+TitleLabel/base_type = &"Label"
+TitleLabel/colors/font_color = Color(0.88235295, 0.93333334, 0.84705883, 1)
+TitleLabel/font_sizes/font_size = 16
+TitleLabel/fonts/font = ExtResource("1_cotu6")
 TooltipPanel/colors/title_color = Color(0.16862746, 0.16078432, 0.28235295, 1)
 TooltipPanel/font_sizes/title_font_size = 6
 TooltipPanel/fonts/title_font = ExtResource("1_2i2tj")

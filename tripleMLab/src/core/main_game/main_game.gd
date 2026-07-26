@@ -10,9 +10,21 @@ var modifiers_system: ModifiersSystem = null
 var player: Player = null
 var map: Map = null
 
+## Rooms actually finished this run. Counted on the way out of a room, so dying
+## in one doesn't credit it. Reported on the run-end screen.
+var rooms_cleared: int = 0
+
 var _container_roots: Dictionary[SceneContainer, Node] = {}
 var _loaded_scenes: Dictionary[SceneContainer, Node] = {}
 var _current_room: RoomScene = null
+
+## Set on the way into the last room of the map. Leaving that room ends the run
+## in a win instead of dropping back to a map with nothing left on it.
+var _in_final_room: bool = false
+## Guards the run-end handoff. The clock can expire on the same frame the player
+## reaches an exit, and either path alone is a perfectly good ending — both at
+## once is two end screens stacked on each other.
+var _run_ended: bool = false
 
 # System root node
 @onready var systems: Node = %Systems
@@ -86,21 +98,22 @@ func change_scene(new_scene_uid: String, container: SceneContainer = SceneContai
 	return load_scene(new_scene_uid, container)
 
 func load_game() -> void:
+	rooms_cleared = 0
+	_in_final_room = false
+	_run_ended = false
+
 	_load_systems()
 	_init_player()
-	
+	time_system.time_expired.connect(_on_time_expired)
+
 	change_scene(UIDs.MAP_HUD_SCENE_UID, SceneContainer.UI)
 	map = load_scene(UIDs.MAP_SCENE_UID) as Map
 	if map == null:
 		push_error("MAP_SCENE_UID did not resolve to a Map instance")
 		return
 
-	# TODO: node_selected currently ignores the clicked node's data and always
-	#       goes to enter_room(TEST_LEVEL_UID) as RoomType.COMBAT. Once Map
-	#       nodes carry their own {type, level_uid}, this becomes:
-	#       map.node_selected.connect(func(node_data):
-	#           enter_room(node_data.level_uid, node_data.room_type)
-	#       )
+	# Rooms carry their own type and scene (dealt in MapGenerator._apply_scene_uids),
+	# so a click is just "load what that node says it is".
 	map.selected.connect(func(room): enter_room(room.scene_uid, room.type))
 
 
@@ -114,9 +127,12 @@ func enter_room(room_uid: String, room_type: Room.Type) -> void:
 	#       e.g.:
 	#       await _play_transition_out()
 	world.remove_child(map)
+	_in_final_room = room_type == Room.Type.FINAL
 
 	match room_type:
-		Room.Type.LEVEL:#, RoomType.ELITE, RoomType.BOSS:
+		# The final room is an ordinary level to load and play; all that is
+		# different about it is that leaving it ends the run (see exit_room).
+		Room.Type.LEVEL, Room.Type.FINAL:
 			enter_level(room_uid)
 		Room.Type.WORKSHOP:
 			enter_workshop(room_uid)
@@ -202,17 +218,95 @@ func exit_room() -> void:
 	#       so leaving a room doesn't just snap back to the map instantly either.
 	#       e.g.:
 	#       await _play_transition_out()
+	if _run_ended:
+		return
+
 	time_system.ticking = false
 	if _current_room is BaseLevel:
 		modifiers_system.activate_modifiers(Modifier.Type.EXIT_LEVEL)
 		player_root.remove_child(player)
 	unload_scene(SceneContainer.LEVEL)
-	change_scene(UIDs.MAP_HUD_SCENE_UID, SceneContainer.UI)
 	_current_room = null
-	
+	rooms_cleared += 1
+
+	# Nothing to go back to: the last room of the map was the whole point of the
+	# run, so walking out of it is the win rather than another trip to the map.
+	if _in_final_room:
+		end_run(true)
+		return
+
+	change_scene(UIDs.MAP_HUD_SCENE_UID, SceneContainer.UI)
 	world.add_child(map)
 	map.unlock_next_nodes()
 	# TODO: await _play_transition_in() here once transitions exist.
+
+
+## Ends the run either way and hands over to the run-end screen.
+##
+## Everything from the run is left standing behind the screen — the level the
+## player died in, the debris, the map. It is only cleared once they choose what
+## to do next, so the last thing they see is the thing that killed them rather
+## than an empty stage.
+##
+## Callers are responsible for having claimed the ending first (see
+## [member _run_ended]); this does the work and does not second-guess it.
+func end_run(victory: bool) -> void:
+	_run_ended = true
+	time_system.ticking = false
+
+	var screen: RunEndScreen = change_scene(UIDs.RUN_END_SCENE_UID, SceneContainer.UI) as RunEndScreen
+	if screen == null:
+		push_error("RUN_END_SCENE_UID did not resolve to a RunEndScreen instance")
+		return
+
+	screen.setup(victory, rooms_cleared)
+	screen.retry_pressed.connect(restart_run, CONNECT_ONE_SHOT)
+	screen.menu_pressed.connect(return_to_menu, CONNECT_ONE_SHOT)
+
+
+## Tears the finished run down and deals a fresh one, straight back into a level
+## rather than back out to the title.
+func restart_run() -> void:
+	_teardown_run()
+	load_game()
+
+
+func return_to_menu() -> void:
+	_teardown_run()
+	change_scene(UIDs.START_MENU_SCENE_UID, SceneContainer.UI)
+
+
+## Frees everything a run owns, so the next one starts from nothing.
+##
+## The player and the map are re-parented rather than kept in one place — the
+## player only lives under PlayerRoot while a level is up, and the map is lifted
+## out of the world for the duration of a room. Either can therefore be sitting
+## outside the tree when a run ends, which is why each is detached from whatever
+## parent it happens to have instead of from the one it usually has.
+func _teardown_run() -> void:
+	unload_scene(SceneContainer.LEVEL)
+	unload_scene(SceneContainer.UI)
+	_current_room = null
+
+	for orphan: Node in [player, map]:
+		if orphan == null:
+			continue
+		if orphan.get_parent() != null:
+			orphan.get_parent().remove_child(orphan)
+		orphan.queue_free()
+
+	player = null
+	map = null
+
+	# Systems are rebuilt per run rather than reset: a fresh TimeSystem cannot be
+	# carrying an expired flag or a leftover rate contribution, and a fresh
+	# ModifiersSystem cannot be holding last run's cards.
+	for system: Node in systems.get_children():
+		systems.remove_child(system)
+		system.queue_free()
+
+	time_system = null
+	modifiers_system = null
 
 
 ## Instantiates the player. Not added to the tree here — it's parented under
@@ -227,6 +321,24 @@ func _init_player() -> void:
 	if player == null:
 		push_error("Loaded player scene does not extend Player or DNE: " + UIDs.PLAYER_SCENE_UID)
 		return
+
+
+## The fuse reached the end. Blows the player up where they stand, then ends the
+## run — the explosion is awaited so the run-end screen lands on the debris
+## rather than wiping the death off the screen mid-animation.
+func _on_time_expired() -> void:
+	if _run_ended:
+		return
+
+	# Claimed before the await, not after: the explosion takes half a second, and
+	# a level exit reached in that window must not be allowed to turn a death
+	# into a room clear behind the animation's back.
+	_run_ended = true
+
+	if _current_room is BaseLevel and player != null:
+		await player.explode()
+
+	end_run(false)
 
 
 func _load_system(system_uid: String) -> Node:
