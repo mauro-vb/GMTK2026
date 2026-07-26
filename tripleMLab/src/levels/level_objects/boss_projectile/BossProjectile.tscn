@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://bqx7v3nmk52wt"]
+
+[ext_resource type="Script" path="res://src/levels/level_objects/boss_projectile/boss_projectile.gd" id="1_boss_proj"]
+[ext_resource type="Texture2D" uid="uid://dl6hdiixm8xoi" path="res://assets/art/level_elements/HotOrb.png" id="2_orb_tex"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_boss_proj"]
+radius = 4.0
+
+[node name="BossProjectile" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_boss_proj")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+texture = ExtResource("2_orb_tex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("CircleShape2D_boss_proj")
