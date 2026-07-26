@@ -197,6 +197,9 @@ func consume_pogo() -> void:
 	pogo_buffer_timer = 0.0
 	is_jump_cut = false
 	pay_ability_cost(Ability.POGO)
+	if _last_pogo_area != null:
+		_last_pogo_area.bounced.emit()
+		_last_pogo_area = null
 
 func _find_pogo_area() -> PogoArea:
 	for area: Area2D in pogo_detector.get_overlapping_areas():
