@@ -218,7 +218,7 @@ func _apply_emphasis(value: float) -> void:
 	if entry == null:
 		return
 
-	frame.add_theme_stylebox_override(&"panel", WorkshopStyle.card_frame(entry.is_combined(), value))
+	frame.add_theme_stylebox_override(&"panel", WorkshopStyle.card_frame(value))
 	glow.modulate.a = value
 
 	if not taken:

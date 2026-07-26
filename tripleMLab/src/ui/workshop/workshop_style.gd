@@ -82,6 +82,10 @@ const FONT_DISPLAY: Font = preload("uid://bn7xy5s6ubsuj")
 ## where the display face closes up, and reads as the workshop's paperwork.
 const FONT_TEXT: Font = preload("uid://dumnwgfl70q28")
 
+## The card frame's two faces — see [method card_frame].
+const CARD_ART: Texture2D = preload("uid://dmkncxmp38d52")
+const CARD_ART_LIT: Texture2D = preload("uid://t1llgg0ij8l0")
+
 const SIZE_TITLE: int = 10
 const SIZE_SUBTITLE: int = 7
 const SIZE_CARD_NAME: int = 8
@@ -121,18 +125,22 @@ static func card_accent(is_combined: bool) -> Color:
 	return CAUTION if is_combined else EDGE
 
 # --- Styleboxes --------------------------------------------------------------
-## The card body. `emphasis` runs 0 (at rest) to 1 (hovered or focused) and is
-## what the border rides on, so hover and keyboard focus are the same state
-## rather than two that can disagree.
+## The card body. `emphasis` runs 0 (at rest) to 1 (hovered or focused) — the
+## shadow still rides it continuously, but the frame is real art now, so which
+## face it wears is a swap rather than a blend. [constant HOVER_DURATION] is
+## short enough that the swap reads as instant, the same way a Button's own
+## theme states swap rather than crossfade.
 ##
-## ART: replace with a StyleBoxTexture over a nine-sliced card frame; keep the
-## content margins so the layout inside doesn't move.
-static func card_frame(is_combined: bool, emphasis: float) -> StyleBoxFlat:
-	var box: StyleBoxFlat = StyleBoxFlat.new()
-	box.bg_color = PANEL.lerp(PANEL_RAISED, emphasis)
-	box.set_border_width_all(1)
-	box.border_color = card_accent(is_combined) * Color(1, 1, 1, lerpf(0.6, 1.0, emphasis))
-	box.set_corner_radius_all(1)
+## The trade-off/plain distinction the border used to carry now lives entirely
+## in [method card_glow] and the seam strip — both untouched — since the two
+## sprites here are one pair, not one pair per kind of card.
+static func card_frame(emphasis: float) -> StyleBoxTexture:
+	var box: StyleBoxTexture = StyleBoxTexture.new()
+	box.texture = CARD_ART_LIT if emphasis >= 0.5 else CARD_ART
+	box.texture_margin_left = 3.0
+	box.texture_margin_top = 3.0
+	box.texture_margin_right = 3.0
+	box.texture_margin_bottom = 3.0
 	box.set_content_margin_all(CARD_PADDING)
 
 	# A real shadow rather than a darker outline: it is what separates a lifted
