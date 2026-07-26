@@ -104,8 +104,8 @@ func load_game() -> void:
 	_run_ended = false
 
 	_load_systems()
-	_apply_hard_mode()
 	_init_player()
+	_apply_difficulty()
 	time_system.time_expired.connect(_on_time_expired)
 	# The map is part of the run, not a break from it — the level track carries
 	# through both, and only a workshop or a chest interrupts it.
@@ -267,8 +267,10 @@ func end_run(victory: bool) -> void:
 
 	# A victory here can only mean the last room was walked out of (see
 	# exit_room), and the last room is the barrage — so this is the one place in
-	# the game that "beaten" happens, and the only place hard mode is unlocked.
-	var newly_unlocked: bool = Global.unlock_hard_mode() if victory else false
+	# the game that "beaten" happens, and the only place the ladder moves.
+	var newly_unlocked: Global.Difficulty = (
+		Global.unlock_next_difficulty() if victory else Global.Difficulty.NORMAL
+	)
 
 	var screen: RunEndScreen = change_scene(UIDs.RUN_END_SCENE_UID, SceneContainer.UI) as RunEndScreen
 	if screen == null:
@@ -277,7 +279,7 @@ func end_run(victory: bool) -> void:
 
 	screen.setup(victory, rooms_cleared, newly_unlocked)
 	screen.retry_pressed.connect(restart_run, CONNECT_ONE_SHOT)
-	screen.hard_mode_pressed.connect(restart_run_on_hard, CONNECT_ONE_SHOT)
+	screen.difficulty_pressed.connect(restart_run_on, CONNECT_ONE_SHOT)
 	screen.menu_pressed.connect(return_to_menu, CONNECT_ONE_SHOT)
 
 
@@ -288,11 +290,11 @@ func restart_run() -> void:
 	load_game()
 
 
-## Takes the offer made on the win screen: the same fresh run, on half a fuse.
+## Takes the offer made on the run-end screen: the same fresh run, one rung up.
 ## The choice is left set afterwards, so "Run It Again" from a hard run stays
 ## hard until the player says otherwise at the menu.
-func restart_run_on_hard() -> void:
-	Global.hard_mode = true
+func restart_run_on(difficulty: Global.Difficulty) -> void:
+	Global.difficulty = difficulty
 	restart_run()
 
 
@@ -335,20 +337,30 @@ func _teardown_run() -> void:
 	modifiers_system = null
 
 
-## Shortens the fuse for a hard-mode run, before anything has had a chance to
-## read it.
+## Applies the run's difficulty, before anything has had a chance to read it.
 ##
-## This is the whole of hard mode. It runs against the freshly built TimeSystem
-## rather than being baked into [constant TimeSystem.STARTING_TIME], so every
-## modifier that adds, removes or scales time keeps working off the run's own
-## maximum and none of them needs to know which mode this is.
-func _apply_hard_mode() -> void:
-	if not Global.hard_mode or time_system == null:
+## This is the whole of the ladder: a shorter fuse, and a movement ability or two
+## taken out of the player's hands. The map, the rooms, the boss and every
+## modifier are untouched — what a mode asks is "do all of that with less", not
+## "do a different game".
+##
+## The clock is set on the freshly built TimeSystem rather than baked into
+## [constant TimeSystem.STARTING_TIME], so every modifier that adds, removes or
+## scales time keeps working off the run's own maximum and none of them needs to
+## know which mode this is.
+func _apply_difficulty() -> void:
+	if time_system != null:
+		# TimeSystem starts full and its max_time setter pulls current_time down
+		# with it, so this one assignment scales both.
+		time_system.max_time = TimeSystem.STARTING_TIME * Global.time_scale()
+
+	if player == null:
 		return
 
-	# TimeSystem starts full and its max_time setter pulls current_time down with
-	# it, so this one assignment halves both.
-	time_system.max_time = TimeSystem.STARTING_TIME * Global.HARD_MODE_TIME_SCALE
+	if not Global.keeps_double_jump():
+		player.lock_ability(Player.Ability.DOUBLE_JUMP)
+	if not Global.keeps_dash():
+		player.lock_ability(Player.Ability.DASH)
 
 
 ## Instantiates the player. Not added to the tree here — it's parented under

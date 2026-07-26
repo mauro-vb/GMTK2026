@@ -93,13 +93,19 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Play"
 
-[node name="HardModeButton" type="Button" parent="MarginContainer/VBoxContainer"]
+[node name="DifficultyButton" type="Button" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(74, 0)
 layout_mode = 2
 size_flags_horizontal = 4
-toggle_mode = true
-text = "Hard Mode"
+text = "Difficulty: Normal"
+
+[node name="DifficultyHint" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HintLabel"
+text = "Half the fuse. Same job."
+horizontal_alignment = 1
 
 [node name="QuitButton" type="Button" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true

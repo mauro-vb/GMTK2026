@@ -34,6 +34,11 @@ func _set_ability(value: bool) -> void:
 	if player == null:
 		return
 
+	# What the run's difficulty took away is not this modifier's to hand back
+	# (see Player.lock_ability). Taking it away again is a no-op either way.
+	if player.is_ability_locked(ability):
+		return
+
 	match ability:
 		Player.Ability.DASH:
 			player.has_dash_ability = value
