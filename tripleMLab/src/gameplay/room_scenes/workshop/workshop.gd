@@ -62,7 +62,6 @@ var _detail_tween: Tween
 # On Ready
 @onready var ui: Control = %UI
 @onready var backdrop: ColorRect = %Backdrop
-@onready var time_label: Label = %TimeLabel
 @onready var carry_row: HBoxContainer = %CarryRow
 @onready var location_label: Label = %Location
 @onready var instruction_label: Label = %Instruction
@@ -232,7 +231,6 @@ func _style_chrome() -> void:
 	backdrop.color = WorkshopStyle.INK
 	backdrop.color.a = WorkshopStyle.BACKDROP_ALPHA
 
-	WorkshopStyle.apply_text(time_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_BODY, WorkshopStyle.MUTED)
 	WorkshopStyle.apply_text(location_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_SEAM, WorkshopStyle.MUTED)
 	WorkshopStyle.apply_text(instruction_label, WorkshopStyle.FONT_DISPLAY, WorkshopStyle.SIZE_TITLE, WorkshopStyle.EMBER)
 	WorkshopStyle.apply_text(detail_name, WorkshopStyle.FONT_DISPLAY, WorkshopStyle.SIZE_CARD_NAME, WorkshopStyle.PARCHMENT)
@@ -251,17 +249,14 @@ func _style_chrome() -> void:
 
 
 ## The map HUD is down while the bench is open (see MainGame.enter_workshop), so
-## the two things it was carrying are rebuilt here: the clock, and the row of
-## what the player already has.
+## the row of what the player already has is rebuilt here. The clock beside it is
+## a [FuseBar] straight out of the HUD and wires itself up, which is the point:
+## the bench shows the same fuse the level did, not a second opinion about it.
 ##
 ## The clock is usually frozen in a workshop and is shown anyway — a player
 ## carrying "Live Wire" is on a timer while they browse, and that is exactly the
 ## moment they must not have to guess how long they have been standing here.
 func _build_strip() -> void:
-	if _time_system != null:
-		_time_system.time_changed.connect(_on_time_changed)
-		_on_time_changed(_time_system.current_time)
-
 	if _modifiers_system == null:
 		return
 
@@ -429,12 +424,6 @@ func _resolve_time_system() -> TimeSystem:
 	return Global.main_game.time_system
 
 # Callbacks
-## Matches the HUD's rounding so the number doesn't appear to jump when the
-## workshop hands the clock back.
-func _on_time_changed(value: float) -> void:
-	time_label.text = str(ceil(value))
-
-
 func _on_card_highlighted(card: WorkshopCard) -> void:
 	_show_detail(card.entry)
 

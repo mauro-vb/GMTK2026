@@ -93,7 +93,6 @@ var _card: Modifier
 # On Ready
 @onready var ui: Control = %UI
 @onready var backdrop: ColorRect = %Backdrop
-@onready var time_label: Label = %TimeLabel
 @onready var carry_row: HBoxContainer = %CarryRow
 @onready var location_label: Label = %Location
 @onready var instruction_label: Label = %Instruction
@@ -407,11 +406,6 @@ func _style_chrome() -> void:
 	backdrop.color = WorkshopStyle.INK
 	backdrop.color.a = WorkshopStyle.BACKDROP_ALPHA
 
-	# A clock that is running reads in the run's warning colour rather than as
-	# quiet furniture — the number moving is the whole of the drawback, and it
-	# sits in the corner where a static number has been every other visit.
-	WorkshopStyle.apply_text(time_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_BODY,
-		WorkshopStyle.CAUTION if should_tick_time else WorkshopStyle.MUTED)
 	WorkshopStyle.apply_text(location_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_SEAM, WorkshopStyle.MUTED)
 	WorkshopStyle.apply_text(instruction_label, WorkshopStyle.FONT_DISPLAY, WorkshopStyle.SIZE_TITLE, WorkshopStyle.EMBER)
 	WorkshopStyle.apply_text(result_label, WorkshopStyle.FONT_DISPLAY, TreasureStyle.SIZE_RESULT, WorkshopStyle.PARCHMENT)
@@ -426,13 +420,14 @@ func _style_chrome() -> void:
 
 
 ## The map HUD is down while a chest is open (see MainGame.enter_treasure), so
-## the clock and the row of what the player is carrying are rebuilt here, exactly
-## as the workshop rebuilds them.
+## the row of what the player is carrying is rebuilt here, exactly as the
+## workshop rebuilds it. The clock beside it is a [FuseBar] and wires itself up.
+##
+## The fuse says on its own whether this visit is on a running clock — under
+## "Thumb On The Scale" it visibly burns down while the chest is open, which is
+## the drawback happening in front of the player rather than a colour hinting
+## that it might be.
 func _build_strip() -> void:
-	if _time_system != null:
-		_time_system.time_changed.connect(_on_time_changed)
-		_on_time_changed(_time_system.current_time)
-
 	if _modifiers_system == null:
 		return
 
@@ -640,12 +635,6 @@ func _resolve_time_system() -> TimeSystem:
 	return Global.main_game.time_system
 
 # Callbacks
-## Matches the HUD's rounding so the number doesn't appear to jump when the room
-## hands the clock back.
-func _on_time_changed(value: float) -> void:
-	time_label.text = str(ceil(value))
-
-
 func _on_prompt_changed(prompt: String) -> void:
 	instruction_label.text = prompt
 

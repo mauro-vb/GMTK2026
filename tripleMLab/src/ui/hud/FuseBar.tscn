@@ -1,0 +1,111 @@
+[gd_scene load_steps=10 format=3 uid="uid://c8vqmn3wxk5tb"]
+
+[ext_resource type="Script" uid="uid://djop7ije15e0y" path="res://src/ui/hud/fuse_bar.gd" id="1_fusebar"]
+[ext_resource type="Texture2D" uid="uid://0ri88ivbww1m" path="res://assets/art/map/fuse/fuse_cord_burnt.png" id="2_burnt"]
+[ext_resource type="Texture2D" uid="uid://2m1xlphdu3f" path="res://assets/art/map/fuse/fuse_cord.png" id="3_cord"]
+[ext_resource type="Texture2D" uid="uid://dl0ikk6vt4lql" path="res://assets/art/map/fuse/fuse_spark.png" id="4_spark"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_spark0"]
+atlas = ExtResource("4_spark")
+region = Rect2(0, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_spark1"]
+atlas = ExtResource("4_spark")
+region = Rect2(8, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_spark2"]
+atlas = ExtResource("4_spark")
+region = Rect2(16, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_spark3"]
+atlas = ExtResource("4_spark")
+region = Rect2(24, 0, 8, 8)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_spark"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_spark0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_spark1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_spark2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_spark3")
+}],
+"loop": true,
+"name": &"burn",
+"speed": 12.0
+}]
+
+[node name="FuseBar" type="Control"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_fusebar")
+
+[node name="Row" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="Bar" type="Control" parent="Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 16)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+mouse_filter = 2
+clip_contents = true
+
+[node name="Track" type="TextureRect" parent="Row/Bar"]
+unique_name_in_owner = true
+texture_filter = 1
+texture_repeat = 2
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 4.0
+mouse_filter = 2
+texture = ExtResource("2_burnt")
+stretch_mode = 1
+
+[node name="Fill" type="TextureRect" parent="Row/Bar"]
+unique_name_in_owner = true
+texture_filter = 1
+texture_repeat = 2
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 4.0
+mouse_filter = 2
+texture = ExtResource("3_cord")
+stretch_mode = 1
+
+[node name="Spark" type="AnimatedSprite2D" parent="Row/Bar"]
+texture_filter = 1
+unique_name_in_owner = true
+sprite_frames = SubResource("SpriteFrames_spark")
+animation = &"burn"
+autoplay = "burn"
+
+[node name="TimeLabel" type="Label" parent="Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(26, 0)
+layout_mode = 2
+size_flags_vertical = 1
+theme_type_variation = &"TimerLabel"
+text = "60"
+horizontal_alignment = 2
+vertical_alignment = 1

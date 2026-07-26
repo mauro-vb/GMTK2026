@@ -2,6 +2,7 @@ extends Node
 
 # UI
 const START_MENU_SCENE_UID: String = "uid://decj2y8v3qpdf"
+const RUN_END_SCENE_UID: String = "uid://cx4mn7wqb2vtl"
 const MAP_HUD_SCENE_UID: String = "uid://ogipvp6hivr7"
 const LEVEL_HUD_SCENE_UID: String = "uid://4o0nmaeak4ns"
 const MODIFIER_DISPLAY_SCENE_UID: String = "uid://dv6ct8mkr3jqw"
@@ -9,7 +10,8 @@ const MODIFIER_DISPLAY_SCENE_UID: String = "uid://dv6ct8mkr3jqw"
 # WORLD
 const MAP_SCENE_UID: String = "uid://ipmc68r6n333"
 const PLAYER_SCENE_UID: String = "uid://kwjq37d8yab5"
-const TEST_LEVEL_UID: String = "uid://bobnq2ochp5k2"
+## Only reached when [LevelPool] finds nothing to deal — see LevelPool.LEVEL_DIR.
+const FALLBACK_LEVEL_UID: String = "uid://bobnq2ochp5k2"
 const WORKSHOP_SCENE_UID: String = "uid://bkq7wn3vxm2td"
 const TREASURE_ROOM_SCENE_UID: String = "uid://dn8kw3vqm7xbt"
 

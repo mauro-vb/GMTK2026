@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://dn8kw3vqm7xbt"]
+[gd_scene load_steps=5 format=3 uid="uid://dn8kw3vqm7xbt"]
 
 [ext_resource type="Script" uid="uid://bk7vn4mxq9wtc" path="res://src/gameplay/room_scenes/treasure/treasure_room.gd" id="1_treasure"]
 [ext_resource type="Resource" uid="uid://bv8kq4nwm6xtr" path="res://src/gameplay/room_scenes/treasure/tables/good.tres" id="2_fallback"]
 [ext_resource type="Resource" path="res://src/gameplay/room_scenes/treasure/tables/good_coin.tres" id="3_fallback_coin"]
+[ext_resource type="PackedScene" uid="uid://c8vqmn3wxk5tb" path="res://src/ui/hud/FuseBar.tscn" id="9_fusebar"]
 
 [node name="TreasureRoom" type="Node2D"]
 script = ExtResource("1_treasure")
@@ -55,12 +56,11 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 4
 
-[node name="TimeLabel" type="Label" parent="CanvasLayer/UI/Layout/Column/Strip"]
-unique_name_in_owner = true
+[node name="FuseBar" parent="CanvasLayer/UI/Layout/Column/Strip" instance=ExtResource("9_fusebar")]
+custom_minimum_size = Vector2(96, 12)
 layout_mode = 2
-mouse_filter = 2
-vertical_alignment = 1
-text = "60"
+size_flags_horizontal = 0
+readout_size = 8
 
 [node name="Spacer" type="Control" parent="CanvasLayer/UI/Layout/Column/Strip"]
 layout_mode = 2

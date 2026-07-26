@@ -43,7 +43,9 @@ const FRAME_OFFSETS: Dictionary = {
 		6: Vector2(-1, -1),
 	},
 }
-const ALWAYS_HIDDEN_ANIMATIONS: Array[String] = ["dash"]
+## "detonation" is here for the obvious reason: there is no face left to draw on
+## a cloud of debris.
+const ALWAYS_HIDDEN_ANIMATIONS: Array[String] = ["dash", "detonation"]
 @export var _parent_sprite: AnimatedSprite2D
 var _base_position: Vector2
 var _current_offset: Vector2 = Vector2.ZERO

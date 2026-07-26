@@ -1,9 +1,10 @@
-[gd_scene format=3 uid="uid://decj2y8v3qpdf"]
+[gd_scene load_steps=4 format=3 uid="uid://decj2y8v3qpdf"]
 
 [ext_resource type="Script" uid="uid://drqp4w45f0wv4" path="res://src/ui/start_menu/start_menu.gd" id="1_87wup"]
 [ext_resource type="Texture2D" uid="uid://bkdrsuctcu22s" path="res://assets/art/map/background.png" id="2_qanne"]
+[ext_resource type="Texture2D" uid="uid://0wrh5tyrrss7" path="res://assets/art/ui/title/Title.png" id="3_title"]
 
-[node name="StartMenu" type="Control" unique_id=611429252]
+[node name="StartMenu" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,29 +13,89 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_87wup")
 
-[node name="Background" type="TextureRect" parent="." unique_id=1597142964]
+[node name="Background" type="TextureRect" parent="."]
+texture_filter = 1
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 texture = ExtResource("2_qanne")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=78074955]
+[node name="Scrim" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+color = Color(0.043, 0.039, 0.078, 0.45)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1774382663]
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 3
 
-[node name="PlayButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=4339949]
-unique_name_in_owner = true
+[node name="TitleSlot" type="Control" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(245, 51)
 layout_mode = 2
+mouse_filter = 2
+
+[node name="Title" type="TextureRect" parent="MarginContainer/VBoxContainer/TitleSlot"]
+unique_name_in_owner = true
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_title")
+stretch_mode = 5
+
+[node name="Subtitle" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_type_variation = &"SubtitleLabel"
+text = "You will die in a minute.
+Get to the end before that!"
+horizontal_alignment = 1
+
+[node name="Gap" type="Control" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 5)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PlayButton" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(74, 0)
+layout_mode = 2
+size_flags_horizontal = 4
 text = "Play"
+
+[node name="QuitButton" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(74, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Quit"

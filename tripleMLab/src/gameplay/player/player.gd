@@ -73,6 +73,8 @@ func _ready() -> void:
 # rooms (only re-parented, so _ready() doesn't run again) — every bit of state
 # that isn't reset here survives the swap. Called by MainGame.enter_level()
 func reset_for_new_room() -> void:
+	can_move = true
+	sprite.visible = true
 	velocity = Vector2.ZERO
 	coyote_timer = 0.0
 	jump_buffer_timer = 0.0
@@ -93,7 +95,6 @@ func reset_for_new_room() -> void:
 
 # Newly-pressed direction overrides already-held opposite direction, instead of canceling out
 func _unhandled_input(event: InputEvent) -> void:
-	
 	if event.is_action_released("left"):
 		_pop_direction("left")
 	elif event.is_action_released("right"):
@@ -107,7 +108,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		_push_direction("right")
 	elif event.is_action_released("jump") and velocity.y < 0:
 		is_jump_cut = true
-	elif event.is_action_pressed("attack") and pogo_grace_timer <= 0.0 and not _is_whiffing:
+	# `can_move` covers being frozen ("Cold Fuse") and being blown up: a whiff
+	# would play an animation over a death that is meant to be the last thing on
+	# screen. Direction bookkeeping above still runs either way, so a key held
+	# through a freeze isn't lost.
+	elif event.is_action_pressed("attack") and can_move and pogo_grace_timer <= 0.0 and not _is_whiffing:
 		play_pogo_whiff()
 		
 
@@ -299,6 +304,26 @@ func play_animation(anim_name: String) -> void:
 		return
 	if sprite.animation != anim_name:
 		sprite.play(anim_name)
+
+## The fuse ran out. Blows the player up and leaves the debris on screen for the
+## last frame of it. Awaitable, so MainGame can hold the run-end screen back
+## until the charge has actually gone off.
+##
+## Goes straight to `sprite.play()` rather than through [method play_animation]:
+## that one is written to be interruptible by the state machine, and a death is
+## the one animation nothing gets to talk over. The whiff and dash guards are
+## cleared for the same reason — either could still be mid-await and would put
+## its own animation back on top a frame later.
+func explode() -> void:
+	can_move = false
+	velocity = Vector2.ZERO
+	_is_whiffing = false
+	_is_dash_animating = false
+	_dash_anim_token += 1
+
+	sprite.play(&"detonation")
+	await sprite.animation_finished
+
 
 func play_pogo_whiff() -> void:
 	_is_whiffing = true
