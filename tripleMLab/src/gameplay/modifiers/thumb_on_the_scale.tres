@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TreasureModifier" load_steps=3 format=3 uid="uid://cj4nv7wxk2mtb"]
+
+[ext_resource type="Script" uid="uid://bq3wn8vkx5mtr" path="res://src/gameplay/systems/modifiers_system/treasure_modifier.gd" id="1_ts001"]
+[ext_resource type="Resource" uid="uid://bn7mk4wxq2vtc" path="res://src/gameplay/modifiers/on_the_clock.tres" id="2_ts002"]
+
+[resource]
+script = ExtResource("1_ts001")
+gain_weight_scale = 1.6
+type = 2
+modifier_name = "Thumb On The Scale"
+id = "thumb_on_the_scale"
+description = "You lean on it, and nobody down here is going to say anything. Every chest is far likelier to pay out — and it says so before you open it."
+linked_modifier = ExtResource("2_ts002")
+metadata/_custom_type_script = "uid://bq3wn8vkx5mtr"

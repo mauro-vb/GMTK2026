@@ -95,6 +95,13 @@ const DOCKED_PAY_UID: String = "uid://dv9nk2xqm7bwt"
 # MODIFIERS - treasure terms
 const LUCKY_CHARM_UID: String = "uid://bx4nq9wmk7vtd"
 const PADDED_CRATE_UID: String = "uid://dw7kv2nxb5mqr"
+const THUMB_ON_THE_SCALE_UID: String = "uid://cj4nv7wxk2mtb"
+## The drawback half of Thumb On The Scale — never offered on its own.
+const ON_THE_CLOCK_UID: String = "uid://bn7mk4wxq2vtc"
+const SECOND_CHANCE_UID: String = "uid://dp8mk3nwq6vxr"
+const MAGPIES_EYE_UID: String = "uid://bt5wn9kvx3qmc"
+const SALVAGE_RIGHTS_UID: String = "uid://ck7bm2vnq8wxt"
+const SHALLOW_SEAM_UID: String = "uid://dv4kn6wxm9btq"
 
 # MODIFIERS - workshop terms
 const SECOND_SET_OF_HANDS_UID: String = "uid://bs4mv9xkq7ntd"

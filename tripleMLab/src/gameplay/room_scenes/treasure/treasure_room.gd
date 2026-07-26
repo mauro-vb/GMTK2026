@@ -9,9 +9,15 @@ extends RoomScene
 ## The room itself knows nothing about coins, wheels or plinko boards. It reads
 ## the chest's [TreasureTable] off the map node the player clicked, asks it which
 ## minigames may present it, lays one of them out, and waits to be told an
-## outcome. Everything else here is bookkeeping: the seconds are run past every
-## held modifier on the way out (see [TreasureModifier]), and the result is
-## announced.
+## outcome. Everything else here is bookkeeping: the chest's odds are run past
+## every held modifier on the way *in* and its seconds on the way out (see
+## [TreasureModifier]), and the result is announced.
+##
+## Which way round those two happen is the whole of the room's honesty. Odds are
+## asked for before a game is laid out, so a wheel's wedges and a board's row are
+## cut from the tilted numbers and the player can see the tilt before committing
+## to it. Seconds are asked for after the outcome is known, where nothing is left
+## to advertise.
 ##
 ## The room states no odds of its own. Each game is drawn so that its terms are
 ## legible from the thing itself — the size of a wheel's wedges, the row of
@@ -34,11 +40,21 @@ extends RoomScene
 ## is over anyway, without ever being told why. Set it to 0.0 to let chests kill.
 const SURVIVAL_FLOOR: float = 2.0
 
+## The beat between a chest biting and the same chest being opened again, for a
+## run carrying a second chance. Long enough to read what was just dodged.
+const RETRY_PAUSE: float = 0.9
+
 # Exports
 ## Used when the room is loaded without a map behind it — the debug harness, or
 ## running the scene straight out of the editor. A real visit always takes the
 ## chest the player actually clicked.
 @export var fallback_table: TreasureTable
+
+## Where a card found in a chest's lining comes from. Left null it falls back to
+## the workshop's own pool, which is almost always what is wanted: a chest that
+## hands out modifiers should be handing out the same modifiers a bench does, and
+## the pool's `min_depth` terms then hold for both.
+@export var card_pool: WorkshopPool
 
 # Public
 
@@ -56,6 +72,13 @@ var _applied: float = 0.0
 ## the tank's ceiling, or a bite stopped by [constant SURVIVAL_FLOOR]. Always
 ## positive, and zero when the chest paid in full.
 var _withheld: float = 0.0
+## How many times a second chance has reopened this chest. Bounded by the
+## modifiers that pay for them — each is spent on the reopening it buys — and
+## kept here so the room can say it happened.
+var _retries: int = 0
+## The modifier a chest coughed up alongside the seconds, if any (see
+## [method _offer_card]).
+var _card: Modifier
 
 # On Ready
 @onready var ui: Control = %UI
@@ -75,7 +98,11 @@ var _withheld: float = 0.0
 func _ready() -> void:
 	_modifiers_system = _resolve_modifiers_system()
 	_time_system = _resolve_time_system()
-	_table = _resolve_table()
+	# Tilted here, before anything is drawn: every game downstream reads its odds
+	# off `_table`, so this is the one place a charm can lean on a chest without
+	# the chest ever misrepresenting itself.
+	_table = _tilt(_resolve_table())
+	_read_clock_terms()
 
 	_style_chrome()
 	_build_strip()
@@ -96,6 +123,25 @@ func _ready() -> void:
 # Public
 
 # Private
+## Whether this particular visit is on a running clock.
+##
+## `should_tick_time` is false in the scene, because a gamble is not a time
+## trial. A run carrying the drawback half of a combined card flips it back —
+## and it is flipped **here, in `_ready`**, because `MainGame.enter_room()` reads
+## the flag off the room immediately after loading it (`time_system.ticking =
+## _current_room.should_tick_time`). Writing to `ticking` directly instead would
+## be overwritten one line later; changing what the room *says about itself* is
+## read by the thing that asks.
+##
+## The header says so too. A clock that has quietly started running is the one
+## thing in this room the player must not have to notice for themselves.
+func _read_clock_terms() -> void:
+	if _modifiers_system == null or not _modifiers_system.is_treasure_clock_running():
+		return
+
+	should_tick_time = true
+
+
 func _open() -> void:
 	backdrop.color.a = 0.0
 	ui.modulate.a = 0.0
@@ -171,6 +217,45 @@ func _instance_game(game: TreasureTable.Game) -> TreasureGame:
 	return scene.instantiate() as TreasureGame
 
 
+## Whether something the player is carrying will pay for this bite to be torn up.
+##
+## Only ever asked about a bite: a second chance is insurance, not a reroll of a
+## payout the player is happy with. Whoever agrees is spent inside
+## [method ModifiersSystem.claim_treasure_retry], so a chest can only be reopened
+## as many times as the run brought charms to reopen it with.
+func _claim_retry(slice: TreasureSlice) -> bool:
+	if slice == null or slice.is_gain() or _modifiers_system == null:
+		return false
+
+	return _modifiers_system.claim_treasure_retry(slice.seconds)
+
+
+## Throws the outcome away and opens the same chest again.
+##
+## The game is laid out from scratch rather than replayed, so the second opening
+## is often a different one of the chest's games — which is the honest reading of
+## "open it again", and stops the retry from being a button that rerolls a wheel.
+func _retry() -> void:
+	_retries += 1
+	instruction_label.text = "IT BIT  ·  SECOND CHANCE"
+
+	_clear_game()
+	await get_tree().create_timer(RETRY_PAUSE).timeout
+	_lay_out_game()
+
+
+## Detached before freeing rather than only queued: a game still parented to the
+## board when the next one is built would be laid out alongside it for a frame,
+## and both would be listening for input.
+func _clear_game() -> void:
+	if _game == null:
+		return
+
+	board.remove_child(_game)
+	_game.queue_free()
+	_game = null
+
+
 ## Last resort: a chest with no game that can show it still pays out rather than
 ## stranding the run on a room that can't be left.
 func _pay_out_without_a_game() -> void:
@@ -207,13 +292,57 @@ func _settle(slice: TreasureSlice) -> void:
 
 	_show_result(slice)
 
-	# Last thing, as with a workshop visit: one-shot charms spend themselves here
-	# and they need to know what the chest actually did.
+	# Last things, as with a workshop visit: one-shot charms spend themselves
+	# here and they need to know what the chest actually did — and then, for a
+	# run carrying the right charm, the chest is searched for anything that isn't
+	# seconds. In that order, so a card found in the lining can't be burned by
+	# the chest that handed it over.
 	if _modifiers_system != null:
 		_modifiers_system.notify_treasure_opened(_applied)
 
+	_offer_card(slice)
+
 	_show_leave(true)
 	leave_button.grab_focus()
+
+
+## A chest that owes more than time. Nothing offers this until the player is
+## carrying something that does (the base chance is zero), which is why the roll
+## is the first thing here and usually the last.
+##
+## The card is drawn from the workshop's own pool at the run's current depth, so
+## a chest can only hand over what a bench that deep could have laid out — no
+## first-row run gets handed a run-defining modifier out of a hole in the ground.
+func _offer_card(slice: TreasureSlice) -> void:
+	if _modifiers_system == null:
+		return
+
+	var was_gain: bool = slice.is_gain() if slice != null else _applied >= 0.0
+	var chance: float = _modifiers_system.get_treasure_card_chance(was_gain)
+	if chance <= 0.0 or randf() > chance:
+		return
+
+	var pool: WorkshopPool = _card_pool()
+	if pool == null:
+		return
+
+	var entries: Array[WorkshopEntry] = pool.draw(1, _depth(), _modifiers_system)
+	if entries.is_empty() or entries[0].modifier == null:
+		return
+
+	_card = entries[0].modifier
+	# The icon lands in the carry strip on its own — the strip is listening (see
+	# `_build_strip`) — so all the header has to do is name it. Without the name
+	# the player is left to work out which of the icons is new.
+	_modifiers_system.add_modifier(_card)
+	instruction_label.text = "%s  ·  %s" % [instruction_label.text, _card.modifier_name.to_upper()]
+
+
+func _card_pool() -> WorkshopPool:
+	if card_pool != null:
+		return card_pool
+
+	return ResourceLoader.load(UIDs.WORKSHOP_DEFAULT_POOL_UID) as WorkshopPool
 
 
 func _gain_seconds(seconds: float) -> float:
@@ -244,7 +373,11 @@ func _style_chrome() -> void:
 	backdrop.color = WorkshopStyle.INK
 	backdrop.color.a = WorkshopStyle.BACKDROP_ALPHA
 
-	WorkshopStyle.apply_text(time_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_BODY, WorkshopStyle.MUTED)
+	# A clock that is running reads in the run's warning colour rather than as
+	# quiet furniture — the number moving is the whole of the drawback, and it
+	# sits in the corner where a static number has been every other visit.
+	WorkshopStyle.apply_text(time_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_BODY,
+		WorkshopStyle.CAUTION if should_tick_time else WorkshopStyle.MUTED)
 	WorkshopStyle.apply_text(location_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_SEAM, WorkshopStyle.MUTED)
 	WorkshopStyle.apply_text(instruction_label, WorkshopStyle.FONT_DISPLAY, WorkshopStyle.SIZE_TITLE, WorkshopStyle.EMBER)
 	WorkshopStyle.apply_text(result_label, WorkshopStyle.FONT_DISPLAY, TreasureStyle.SIZE_RESULT, WorkshopStyle.PARCHMENT)
@@ -272,6 +405,11 @@ func _build_strip() -> void:
 	for modifier: Modifier in _modifiers_system.modifiers:
 		_add_carried(modifier)
 
+	# A chest that hands over a card puts it in the strip on the spot, the way a
+	# workshop does when a card is taken — otherwise the only sign of it is a
+	# name in the header and an icon that shows up two rooms later.
+	_modifiers_system.modifier_added.connect(_add_carried)
+
 
 func _add_carried(modifier: Modifier) -> void:
 	var texture: Texture2D = modifier.icon as Texture2D
@@ -287,7 +425,13 @@ func _refresh_header() -> void:
 		instruction_label.text = "EMPTY"
 		return
 
+	# The chest names itself — and, when the fuse is burning, says so next to its
+	# own name. A clock that has quietly started running is the one thing in this
+	# room the player must not be left to notice for themselves.
 	location_label.text = _table.table_name.to_upper()
+	if should_tick_time:
+		location_label.text += "  ·  ON THE CLOCK"
+
 	instruction_label.text = "OPEN IT"
 
 
@@ -365,6 +509,55 @@ func _resolve_table() -> TreasureTable:
 	return fallback_table
 
 
+## The chest the player will actually play: the authored one with every held
+## modifier's say over its odds folded in.
+##
+## Done once, on arrival, and *before* a game is laid out — which is the whole
+## condition on which the odds may be touched at all. A wheel cuts its wedges and
+## a board deals its row out of `_table`, so a chest leaned on by a charm draws
+## itself leaned on and the player reads the tilt off the game in front of them.
+##
+## A copy per visit, slices and all, so nothing here writes back into the shared
+## .tres and the next chest of the same kind is the authored one again. Returns
+## the original untouched when no modifier had anything to say, which is the
+## usual case — and refuses a tilt that would leave a chest with no outcomes at
+## all rather than laying out a chest that cannot resolve.
+func _tilt(source: TreasureTable) -> TreasureTable:
+	if source == null or _modifiers_system == null:
+		return source
+
+	var slices: Array[TreasureSlice] = []
+	var changed: bool = false
+	for slice: TreasureSlice in source.slices:
+		if slice == null:
+			continue
+
+		var copy: TreasureSlice = slice.duplicate() as TreasureSlice
+		copy.weight = _modifiers_system.get_treasure_weight(slice.weight, slice.is_gain())
+		changed = changed or not is_equal_approx(copy.weight, slice.weight)
+		slices.append(copy)
+
+	if not changed:
+		return source
+
+	var tilted: TreasureTable = source.duplicate() as TreasureTable
+	tilted.slices = slices
+	if not tilted.is_valid():
+		push_warning("TreasureRoom: a tilt emptied '%s'; opening it as authored." % source.table_name)
+		return source
+
+	return tilted
+
+
+## How far into the run this chest is, for the pool a card in the lining is drawn
+## from. The workshop asks the same question of the same place.
+func _depth() -> int:
+	if Global.main_game == null or Global.main_game.map == null:
+		return 0
+
+	return Global.main_game.map.progress
+
+
 func _resolve_modifiers_system() -> ModifiersSystem:
 	if Global.main_game == null or Global.main_game.modifiers_system == null:
 		push_error("TreasureRoom: ModifiersSystem not found.")
@@ -395,6 +588,14 @@ func _on_game_resolved(slice: TreasureSlice) -> void:
 	# A beat between the coin landing and the clock moving, so the payout reads
 	# as a consequence of it rather than as part of the same frame.
 	await get_tree().create_timer(TreasureStyle.PAYOUT_DELAY).timeout
+
+	# ...and, for a run that brought one, the beat where a bad outcome is torn up
+	# instead. Asked before the clock is touched, so a second chance is a chest
+	# reopened rather than a refund.
+	if _claim_retry(slice):
+		_retry()
+		return
+
 	_settle(slice)
 
 

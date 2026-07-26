@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="WorkshopPool" load_steps=83 format=3 uid="uid://cm2vj7xkq9nsw"]
+[gd_resource type="Resource" script_class="WorkshopPool" load_steps=93 format=3 uid="uid://cm2vj7xkq9nsw"]
 
 [ext_resource type="Script" uid="uid://bq5xt2nhw8crd" path="res://src/gameplay/systems/modifiers_system/resources/workshop_pool.gd" id="1_pool"]
 [ext_resource type="Script" uid="uid://dk7pv3mzr9jwq" path="res://src/gameplay/systems/modifiers_system/resources/workshop_entry.gd" id="2_entry"]
@@ -42,6 +42,11 @@
 [ext_resource type="Resource" uid="uid://bh2wq6nvx4mkt" path="res://src/gameplay/modifiers/danger_money.tres" id="m37_danger_money"]
 [ext_resource type="Resource" uid="uid://bx4nq9wmk7vtd" path="res://src/gameplay/modifiers/lucky_charm.tres" id="m38_lucky_charm"]
 [ext_resource type="Resource" uid="uid://dw7kv2nxb5mqr" path="res://src/gameplay/modifiers/padded_crate.tres" id="m39_padded_crat"]
+[ext_resource type="Resource" uid="uid://cj4nv7wxk2mtb" path="res://src/gameplay/modifiers/thumb_on_the_scale.tres" id="m40_thumb_on_th"]
+[ext_resource type="Resource" uid="uid://dp8mk3nwq6vxr" path="res://src/gameplay/modifiers/second_chance.tres" id="m41_second_chan"]
+[ext_resource type="Resource" uid="uid://bt5wn9kvx3qmc" path="res://src/gameplay/modifiers/magpies_eye.tres" id="m42_magpies_eye"]
+[ext_resource type="Resource" uid="uid://ck7bm2vnq8wxt" path="res://src/gameplay/modifiers/salvage_rights.tres" id="m43_salvage_rig"]
+[ext_resource type="Resource" uid="uid://dv4kn6wxm9btq" path="res://src/gameplay/modifiers/shallow_seam.tres" id="m44_shallow_sea"]
 
 [sub_resource type="Resource" id="Resource_e00"]
 script = ExtResource("2_entry")
@@ -323,7 +328,42 @@ weight = 0.8
 min_depth = 1
 metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
 
+[sub_resource type="Resource" id="Resource_e40"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m40_thumb_on_th")
+weight = 0.7
+min_depth = 2
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e41"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m41_second_chan")
+weight = 0.8
+min_depth = 1
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e42"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m42_magpies_eye")
+weight = 0.6
+min_depth = 2
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e43"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m43_salvage_rig")
+weight = 0.6
+min_depth = 2
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
+[sub_resource type="Resource" id="Resource_e44"]
+script = ExtResource("2_entry")
+modifier = ExtResource("m44_shallow_sea")
+weight = 0.7
+min_depth = 2
+metadata/_custom_type_script = "uid://dk7pv3mzr9jwq"
+
 [resource]
 script = ExtResource("1_pool")
-entries = Array[WorkshopEntry]([SubResource("Resource_e00"), SubResource("Resource_e01"), SubResource("Resource_e02"), SubResource("Resource_e03"), SubResource("Resource_e04"), SubResource("Resource_e05"), SubResource("Resource_e06"), SubResource("Resource_e07"), SubResource("Resource_e08"), SubResource("Resource_e09"), SubResource("Resource_e10"), SubResource("Resource_e11"), SubResource("Resource_e12"), SubResource("Resource_e13"), SubResource("Resource_e14"), SubResource("Resource_e15"), SubResource("Resource_e16"), SubResource("Resource_e17"), SubResource("Resource_e18"), SubResource("Resource_e19"), SubResource("Resource_e20"), SubResource("Resource_e21"), SubResource("Resource_e22"), SubResource("Resource_e23"), SubResource("Resource_e24"), SubResource("Resource_e25"), SubResource("Resource_e26"), SubResource("Resource_e27"), SubResource("Resource_e28"), SubResource("Resource_e29"), SubResource("Resource_e30"), SubResource("Resource_e31"), SubResource("Resource_e32"), SubResource("Resource_e33"), SubResource("Resource_e34"), SubResource("Resource_e35"), SubResource("Resource_e36"), SubResource("Resource_e37"), SubResource("Resource_e38"), SubResource("Resource_e39")])
+entries = Array[WorkshopEntry]([SubResource("Resource_e00"), SubResource("Resource_e01"), SubResource("Resource_e02"), SubResource("Resource_e03"), SubResource("Resource_e04"), SubResource("Resource_e05"), SubResource("Resource_e06"), SubResource("Resource_e07"), SubResource("Resource_e08"), SubResource("Resource_e09"), SubResource("Resource_e10"), SubResource("Resource_e11"), SubResource("Resource_e12"), SubResource("Resource_e13"), SubResource("Resource_e14"), SubResource("Resource_e15"), SubResource("Resource_e16"), SubResource("Resource_e17"), SubResource("Resource_e18"), SubResource("Resource_e19"), SubResource("Resource_e20"), SubResource("Resource_e21"), SubResource("Resource_e22"), SubResource("Resource_e23"), SubResource("Resource_e24"), SubResource("Resource_e25"), SubResource("Resource_e26"), SubResource("Resource_e27"), SubResource("Resource_e28"), SubResource("Resource_e29"), SubResource("Resource_e30"), SubResource("Resource_e31"), SubResource("Resource_e32"), SubResource("Resource_e33"), SubResource("Resource_e34"), SubResource("Resource_e35"), SubResource("Resource_e36"), SubResource("Resource_e37"), SubResource("Resource_e38"), SubResource("Resource_e39"), SubResource("Resource_e40"), SubResource("Resource_e41"), SubResource("Resource_e42"), SubResource("Resource_e43"), SubResource("Resource_e44")])
 metadata/_custom_type_script = "uid://bq5xt2nhw8crd"
