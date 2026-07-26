@@ -51,6 +51,23 @@ const EVENT_ART_NEGATIVE: Array = [
 	preload("res://assets/art/map/icons/LostTimeActivated.png"),
 ]
 
+## Everything that is not a LEVEL is a one-off prop, which is most of what makes
+## those rooms readable at a glance. They have no blown-up twin on the sheets,
+## so they only take [constant SPENT_MODULATE] once they are behind the run.
+##
+## TREASURE is the shared fallback chest: each kind of chest carries its own
+## icon and wears this one only until that art exists (see [method
+## _texture_for_room]).
+##
+## EVENT is here for completeness; the generator does not produce them yet.
+const ROOM_ART: Dictionary[Room.Type, Texture2D] = {
+	Room.Type.NOT_ASSIGNED: preload("res://assets/art/map/rooms/crate.png"),
+	Room.Type.WORKSHOP: preload("res://assets/art/map/rooms/shop_cart.png"),
+	Room.Type.TREASURE: preload("res://assets/art/map/rooms/chest.png"),
+	Room.Type.EVENT: preload("res://assets/art/map/rooms/crate.png"),
+	Room.Type.FINAL: preload("res://assets/art/map/rooms/barrel.png"),
+}
+
 ## The barrel every path converges on is the payoff, so it outsizes the rooms
 ## feeding it. Applied to Visuals, not the root, because the root's scale is
 ## the highlight animation's to drive.
@@ -196,7 +213,32 @@ func _art_pair_for_room() -> Array:
 		# to mark an event as good vs bad.
 		return EVENT_ART_POSITIVE if room.event_positive else EVENT_ART_NEGATIVE
 
+	# ART: a chest wears its own face when its [TreasureTable] has one, so the
+	# three chests on a treasure row are told apart before they're opened —
+	# which is the only way the choice between them is a choice. Drop the
+	# sprites into the tables' `map_icon` / `spent_icon` and nothing here
+	# changes; until then all three share the fallback chest below.
+	var chest: Texture2D = _chest_texture()
+	if chest != null:
+		return chest
+
 	return ROOM_ART.get(room.type, ROOM_ART[Room.Type.NOT_ASSIGNED])
+
+## The chest's own art, or null to fall back. Spent art is optional on its own:
+## a table with an open-chest sprite and no closed one is odd but not broken.
+func _chest_texture() -> Texture2D:
+	if room.type != Room.Type.TREASURE or room.treasure == null:
+		return null
+
+	if _spent and room.treasure.spent_icon != null:
+		return room.treasure.spent_icon
+
+	return room.treasure.map_icon
+
+## A stable per-room number. Two odd primes so neighbouring rooms, which differ
+## by one lane and one step, never land on the same face.
+func _variant() -> int:
+	return absi(room.coordinates.x * 7 + room.coordinates.y * 3)
 
 func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if not available or not event.is_action_pressed("left_mouse"):

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TreasureSet" load_steps=5 format=3 uid="uid://cn6wb3vkm9xqt"]
+
+[ext_resource type="Script" uid="uid://dm2wq8nkv5xbr" path="res://src/gameplay/room_scenes/treasure/resources/treasure_set.gd" id="1_set"]
+[ext_resource type="Resource" uid="uid://cm5nw9vkx3qbt" path="res://src/gameplay/room_scenes/treasure/tables/even_split.tres" id="2_even_split"]
+[ext_resource type="Resource" uid="uid://bv8kq4nwm6xtr" path="res://src/gameplay/room_scenes/treasure/tables/rich_seam.tres" id="3_rich_seam"]
+[ext_resource type="Resource" uid="uid://dk2mx7wnq5vbc" path="res://src/gameplay/room_scenes/treasure/tables/dead_drop.tres" id="4_dead_drop"]
+
+[resource]
+script = ExtResource("1_set")
+tables = Array[TreasureTable]([ExtResource("2_even_split"), ExtResource("3_rich_seam"), ExtResource("4_dead_drop")])
+metadata/_custom_type_script = "uid://dm2wq8nkv5xbr"

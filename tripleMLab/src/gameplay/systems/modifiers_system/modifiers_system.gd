@@ -188,6 +188,35 @@ func notify_workshop_visited(picks_taken: int) -> void:
 		if modifier.on_workshop_visited(picks_taken):
 			remove_modifier(modifier)
 
+
+## Treasure payouts, run past every held modifier the same way workshop numbers
+## and orb values are. Both take and return a positive amount of seconds; the
+## treasure room decides which of the two a slice is.
+func get_treasure_gain(base: float) -> float:
+	var seconds: float = base
+	for modifier: Modifier in modifiers:
+		seconds = modifier.modify_treasure_gain(seconds)
+
+	return maxf(seconds, 0.0)
+
+
+func get_treasure_loss(base: float) -> float:
+	var seconds: float = base
+	for modifier: Modifier in modifiers:
+		seconds = modifier.modify_treasure_loss(seconds)
+
+	return maxf(seconds, 0.0)
+
+
+## Closes out a chest, mirroring notify_workshop_visited(): one-shot charms spend
+## themselves here. `seconds` is the signed change that was applied.
+func notify_treasure_opened(seconds: float) -> void:
+	for modifier: Modifier in modifiers.duplicate():
+		if not modifiers.has(modifier):
+			continue
+		if modifier.on_treasure_opened(seconds):
+			remove_modifier(modifier)
+
 # Private
 func _try_trigger(modifier: Modifier) -> void:
 	if modifier.chance < 1.0 and randf() > modifier.chance:

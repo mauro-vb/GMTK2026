@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="TreasureTable" load_steps=5 format=3 uid="uid://cm5nw9vkx3qbt"]
+
+[ext_resource type="Script" uid="uid://cr9nk3vbx6mwt" path="res://src/gameplay/room_scenes/treasure/resources/treasure_table.gd" id="1_table"]
+[ext_resource type="Script" uid="uid://bt4mq7wxn2kvd" path="res://src/gameplay/room_scenes/treasure/resources/treasure_slice.gd" id="2_slice"]
+
+[sub_resource type="Resource" id="Resource_s00"]
+script = ExtResource("2_slice")
+label = ""
+weight = 50.0
+seconds = 12.0
+metadata/_custom_type_script = "uid://bt4mq7wxn2kvd"
+
+[sub_resource type="Resource" id="Resource_s01"]
+script = ExtResource("2_slice")
+label = ""
+weight = 50.0
+seconds = -12.0
+metadata/_custom_type_script = "uid://bt4mq7wxn2kvd"
+
+[resource]
+script = ExtResource("1_table")
+table_name = "Even Split"
+description = "An honest chest, which is the worst kind. Call the toss and it pays; call it wrong and it takes exactly as much."
+games = 1
+slices = Array[TreasureSlice]([SubResource("Resource_s00"), SubResource("Resource_s01")])
+metadata/_custom_type_script = "uid://cr9nk3vbx6mwt"

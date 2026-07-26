@@ -122,8 +122,8 @@ func enter_room(room_uid: String, room_type: Room.Type) -> void:
 			enter_workshop(room_uid)
 		Room.Type.EVENT:
 			enter_event(room_uid)
-		Room.Type.HEAL:
-			enter_rest(room_uid)
+		Room.Type.TREASURE:
+			enter_treasure(room_uid)
 		_:
 			push_error("Unhandled RoomType %s" % Room.Type.keys()[room_type])
 			
@@ -185,12 +185,16 @@ func enter_event(_event_uid: String) -> void:
 	push_error("enter_event not yet implemented")
 
 
-## Rest rooms: heal/upgrade choice, no combat.
-func enter_rest(_rest_uid: String) -> void:
-	# TODO: likely UI-only like workshop/event. May still want the player parented
-	#       and visible standing in a rest-site background scene depending on
-	#       art direction — decide once the rest room's visual design exists.
-	push_error("enter_rest not yet implemented")
+## Treasure rooms: a chest, and one gamble with the clock. Handled exactly like a
+## workshop — no EntityRoot population, no player in world-space, loaded into
+## SceneContainer.LEVEL so exit_room() tears it down like any other room, and the
+## map HUD comes down because the room carries its own clock and modifier strip.
+func enter_treasure(treasure_uid: String) -> void:
+	unload_scene(SceneContainer.UI)
+
+	_current_room = load_scene(treasure_uid, SceneContainer.LEVEL) as TreasureRoom
+	if _current_room == null:
+		push_error("'%s' did not resolve to a TreasureRoom instance" % treasure_uid)
 
 
 func exit_room() -> void:
