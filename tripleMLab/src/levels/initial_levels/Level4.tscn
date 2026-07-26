@@ -18,75 +18,75 @@ metadata/_custom_type_script = "uid://vl5l3vkfttjf"
 [node name="Hot" type="Node2D" parent="Orbs" unique_id=599733078]
 
 [node name="Orb" parent="Orbs/Hot" unique_id=461625609 instance=ExtResource("2_jdom8")]
-position = Vector2(56, 104)
+position = Vector2(44, 104)
 type = 1
 
 [node name="Orb2" parent="Orbs/Hot" unique_id=1186871749 instance=ExtResource("2_jdom8")]
-position = Vector2(68, 104)
+position = Vector2(56, 104)
 type = 1
 
 [node name="Orb3" parent="Orbs/Hot" unique_id=652190173 instance=ExtResource("2_jdom8")]
-position = Vector2(140, 104)
+position = Vector2(136, 104)
 type = 1
 
 [node name="Orb4" parent="Orbs/Hot" unique_id=1922283904 instance=ExtResource("2_jdom8")]
-position = Vector2(152, 104)
+position = Vector2(148, 104)
 type = 1
 
 [node name="Orb5" parent="Orbs/Hot" unique_id=696869412 instance=ExtResource("2_jdom8")]
-position = Vector2(96, 80)
+position = Vector2(92, 80)
 type = 1
 
 [node name="Orb6" parent="Orbs/Hot" unique_id=1207563894 instance=ExtResource("2_jdom8")]
-position = Vector2(108, 80)
+position = Vector2(104, 80)
 type = 1
 
 [node name="Orb7" parent="Orbs/Hot" unique_id=1568866349 instance=ExtResource("2_jdom8")]
-position = Vector2(180, 80)
+position = Vector2(184, 80)
 type = 1
 
 [node name="Orb8" parent="Orbs/Hot" unique_id=1950872026 instance=ExtResource("2_jdom8")]
-position = Vector2(192, 80)
+position = Vector2(196, 80)
 type = 1
 
 [node name="Orb9" parent="Orbs/Hot" unique_id=1058293081 instance=ExtResource("2_jdom8")]
-position = Vector2(232, 104)
+position = Vector2(228, 104)
 type = 1
 
 [node name="Orb10" parent="Orbs/Hot" unique_id=1679905875 instance=ExtResource("2_jdom8")]
-position = Vector2(244, 104)
+position = Vector2(240, 104)
 type = 1
 
 [node name="Orb11" parent="Orbs/Hot" unique_id=1840351593 instance=ExtResource("2_jdom8")]
-position = Vector2(96, 64)
+position = Vector2(92, 64)
 type = 1
 
 [node name="Orb12" parent="Orbs/Hot" unique_id=1938728564 instance=ExtResource("2_jdom8")]
-position = Vector2(108, 64)
+position = Vector2(104, 64)
 type = 1
 
 [node name="Orb13" parent="Orbs/Hot" unique_id=373302365 instance=ExtResource("2_jdom8")]
-position = Vector2(96, 48)
+position = Vector2(92, 48)
 type = 1
 
 [node name="Orb14" parent="Orbs/Hot" unique_id=1459147652 instance=ExtResource("2_jdom8")]
-position = Vector2(108, 48)
+position = Vector2(104, 48)
 type = 1
 
 [node name="Orb15" parent="Orbs/Hot" unique_id=1229142110 instance=ExtResource("2_jdom8")]
-position = Vector2(180, 64)
+position = Vector2(184, 64)
 type = 1
 
 [node name="Orb16" parent="Orbs/Hot" unique_id=447883162 instance=ExtResource("2_jdom8")]
-position = Vector2(192, 64)
+position = Vector2(196, 64)
 type = 1
 
 [node name="Orb17" parent="Orbs/Hot" unique_id=1519713559 instance=ExtResource("2_jdom8")]
-position = Vector2(180, 48)
+position = Vector2(184, 48)
 type = 1
 
 [node name="Orb18" parent="Orbs/Hot" unique_id=1020552673 instance=ExtResource("2_jdom8")]
-position = Vector2(192, 48)
+position = Vector2(196, 48)
 type = 1
 
 [node name="Orb19" parent="Orbs/Hot" unique_id=832519511 instance=ExtResource("2_jdom8")]
