@@ -106,11 +106,15 @@ func _build() -> void:
 	# equally unchosen until one of them is pressed.
 	for button: Button in [heads_button, tails_button]:
 		WorkshopStyle.apply_button_text(button, WorkshopStyle.SIZE_SUBTITLE)
-		button.add_theme_stylebox_override(&"normal", TreasureStyle.choice_button(WorkshopStyle.EDGE, 0.0))
-		button.add_theme_stylebox_override(&"hover", TreasureStyle.choice_button(WorkshopStyle.EMBER, 1.0))
-		button.add_theme_stylebox_override(&"focus", TreasureStyle.cursor_button(WorkshopStyle.EDGE))
-		button.add_theme_stylebox_override(&"pressed", TreasureStyle.choice_button(WorkshopStyle.SPARK, 1.0))
-		button.add_theme_stylebox_override(&"disabled", TreasureStyle.choice_button(WorkshopStyle.EDGE, 0.0))
+		button.add_theme_stylebox_override(&"normal", TreasureStyle.choice_button(0.0))
+		button.add_theme_stylebox_override(&"hover", TreasureStyle.choice_button(1.0))
+		# A parchment wash rather than the run's accent: see
+		# [method TreasureStyle.cursor_button]. It also has to be a *light* wash —
+		# the box under it is the sheet's dark blue, and a dark cursor on a dark
+		# box is a cursor nobody can find.
+		button.add_theme_stylebox_override(&"focus", TreasureStyle.cursor_button(WorkshopStyle.PARCHMENT))
+		button.add_theme_stylebox_override(&"pressed", TreasureStyle.choice_button(1.0))
+		button.add_theme_stylebox_override(&"disabled", TreasureStyle.choice_button(0.0))
 
 	heads_button.pressed.connect(_on_side_called.bind(true))
 	tails_button.pressed.connect(_on_side_called.bind(false))

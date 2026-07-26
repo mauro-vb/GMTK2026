@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://dn8kw3vqm7xbt"]
+[gd_scene load_steps=6 format=3 uid="uid://dn8kw3vqm7xbt"]
 
 [ext_resource type="Script" uid="uid://bk7vn4mxq9wtc" path="res://src/gameplay/room_scenes/treasure/treasure_room.gd" id="1_treasure"]
 [ext_resource type="Resource" uid="uid://bv8kq4nwm6xtr" path="res://src/gameplay/room_scenes/treasure/tables/good.tres" id="2_fallback"]
 [ext_resource type="Resource" path="res://src/gameplay/room_scenes/treasure/tables/good_coin.tres" id="3_fallback_coin"]
+[ext_resource type="Texture2D" uid="uid://bkdrsuctcu22s" path="res://assets/art/map/background.png" id="4_backdrop"]
 [ext_resource type="PackedScene" uid="uid://c8vqmn3wxk5tb" path="res://src/ui/hud/FuseBar.tscn" id="9_fusebar"]
 
 [node name="TreasureRoom" type="Node2D"]
@@ -23,7 +24,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Backdrop" type="ColorRect" parent="CanvasLayer/UI"]
+[node name="Backdrop" type="Control" parent="CanvasLayer/UI"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -31,7 +32,31 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.043, 0.039, 0.078, 0.88)
+mouse_filter = 2
+
+[node name="Background" type="TextureRect" parent="CanvasLayer/UI/Backdrop"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_backdrop")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Scrim" type="ColorRect" parent="CanvasLayer/UI/Backdrop"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.043, 0.039, 0.078, 0.58)
 
 [node name="Layout" type="MarginContainer" parent="CanvasLayer/UI"]
 layout_mode = 1
@@ -41,15 +66,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 5
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 6
 
 [node name="Column" type="VBoxContainer" parent="CanvasLayer/UI/Layout"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 3
 
 [node name="Strip" type="HBoxContainer" parent="CanvasLayer/UI/Layout/Column"]
 layout_mode = 2
@@ -71,6 +96,7 @@ mouse_filter = 2
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
+theme_type_variation = &"HintLabel"
 text = "CHEST"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -96,6 +122,7 @@ theme_override_constants/separation = 0
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
+theme_type_variation = &"SubtitleLabel"
 text = "OPEN IT"
 horizontal_alignment = 1
 

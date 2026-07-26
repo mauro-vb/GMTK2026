@@ -234,17 +234,19 @@ func _build_slots() -> void:
 		child.queue_free()
 
 	_slot_buttons.clear()
-	var accent: Color = TreasureStyle.METAL
 
 	for index: int in BINS:
 		var button: Button = Button.new()
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.custom_minimum_size.y = SLOT_HEIGHT
-		button.add_theme_stylebox_override(&"normal", TreasureStyle.choice_button(accent * Color(1, 1, 1, 0.45), 0.0, 1))
-		button.add_theme_stylebox_override(&"hover", TreasureStyle.choice_button(WorkshopStyle.EMBER, 1.0, 1))
+		button.add_theme_stylebox_override(&"normal", TreasureStyle.choice_button(0.0, 1))
+		button.add_theme_stylebox_override(&"hover", TreasureStyle.choice_button(1.0, 1))
+		# Nine slots side by side, so unlike the coin's two calls the cursor can
+		# take the run's accent: there is no second slot for it to look like it
+		# has already chosen against.
 		button.add_theme_stylebox_override(&"focus", TreasureStyle.cursor_button(WorkshopStyle.EMBER, 1))
-		button.add_theme_stylebox_override(&"pressed", TreasureStyle.choice_button(WorkshopStyle.SPARK, 1.0, 1))
-		button.add_theme_stylebox_override(&"disabled", TreasureStyle.choice_button(WorkshopStyle.EDGE, 0.0, 1))
+		button.add_theme_stylebox_override(&"pressed", TreasureStyle.choice_button(1.0, 1))
+		button.add_theme_stylebox_override(&"disabled", TreasureStyle.choice_button(0.0, 1))
 		button.pressed.connect(_on_slot_chosen.bind(index))
 		# Pointing at a slot moves focus to it, the way a workshop card works, so
 		# the mouse and the stick can never disagree about where the ball is. One

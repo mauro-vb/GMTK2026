@@ -61,7 +61,8 @@ var _detail_tween: Tween
 
 # On Ready
 @onready var ui: Control = %UI
-@onready var backdrop: ColorRect = %Backdrop
+@onready var backdrop: Control = %Backdrop
+@onready var scrim: ColorRect = %Scrim
 @onready var carry_row: HBoxContainer = %CarryRow
 @onready var location_label: Label = %Location
 @onready var instruction_label: Label = %Instruction
@@ -111,12 +112,16 @@ func _read_terms() -> void:
 	_skip_bonus = _modifiers_system.get_workshop_skip_bonus(BASE_SKIP_BONUS)
 
 
+## The cave fades up under the bench rather than the bench appearing over a hole
+## in the screen. The whole backdrop — image and scrim together — rides one
+## `modulate`, so the scrim can never be caught halfway up over a cave that has
+## already arrived.
 func _open() -> void:
-	backdrop.color.a = 0.0
+	backdrop.modulate.a = 0.0
 	ui.modulate.a = 0.0
 
 	var tween: Tween = create_tween().set_parallel(true)
-	tween.tween_property(backdrop, ^"color:a", WorkshopStyle.BACKDROP_ALPHA, WorkshopStyle.FADE_DURATION)
+	tween.tween_property(backdrop, ^"modulate:a", 1.0, WorkshopStyle.FADE_DURATION)
 	tween.tween_property(ui, ^"modulate:a", 1.0, WorkshopStyle.FADE_DURATION)
 	await tween.finished
 
@@ -216,7 +221,7 @@ func _close() -> void:
 	var tween: Tween = create_tween().set_parallel(true)
 	tween.tween_property(ui, ^"modulate:a", 0.0, WorkshopStyle.FADE_DURATION) \
 		.set_delay(WorkshopStyle.FADE_DURATION)
-	tween.tween_property(backdrop, ^"color:a", 0.0, WorkshopStyle.FADE_DURATION) \
+	tween.tween_property(backdrop, ^"modulate:a", 0.0, WorkshopStyle.FADE_DURATION) \
 		.set_delay(WorkshopStyle.FADE_DURATION)
 	await tween.finished
 
@@ -224,15 +229,18 @@ func _close() -> void:
 
 
 # --- Chrome ------------------------------------------------------------------
-## Everything the scene file can't carry: Labels have no entry in the project
-## theme, so without this they'd all render at Godot's default 16px on a 320x180
-## screen. Sizes and colours live in [WorkshopStyle], not here.
+## Everything the scene file can't carry.
+##
+## The room's name, its instruction and its two buttons are all plain theme
+## types now — HintLabel, SubtitleLabel and Button, set in the scene — so a bench
+## is dressed by main_theme.tres exactly as the start menu is. What is left here
+## is the paperwork inside the description panel, which has no theme entry of its
+## own and would otherwise come out at Godot's default 16px on a 320x180 screen,
+## and the panel itself.
 func _style_chrome() -> void:
-	backdrop.color = WorkshopStyle.INK
-	backdrop.color.a = WorkshopStyle.BACKDROP_ALPHA
+	scrim.color = WorkshopStyle.INK
+	scrim.color.a = WorkshopStyle.BACKDROP_ALPHA
 
-	WorkshopStyle.apply_text(location_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_SEAM, WorkshopStyle.MUTED)
-	WorkshopStyle.apply_text(instruction_label, WorkshopStyle.FONT_DISPLAY, WorkshopStyle.SIZE_TITLE, WorkshopStyle.EMBER)
 	WorkshopStyle.apply_text(detail_name, WorkshopStyle.FONT_DISPLAY, WorkshopStyle.SIZE_CARD_NAME, WorkshopStyle.PARCHMENT)
 	WorkshopStyle.apply_text(detail_meta, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_SEAM, WorkshopStyle.MUTED)
 	WorkshopStyle.apply_text(detail_cost, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_BODY, WorkshopStyle.CAUTION)
@@ -243,9 +251,6 @@ func _style_chrome() -> void:
 	card_row.custom_minimum_size.y = WorkshopStyle.CARD_HEIGHT
 	card_row.add_theme_constant_override(&"separation", int(WorkshopStyle.CARD_GAP))
 	carry_row.custom_minimum_size.y = WorkshopStyle.STRIP_HEIGHT
-
-	WorkshopStyle.apply_button_text(reroll_button, WorkshopStyle.SIZE_SUBTITLE)
-	WorkshopStyle.apply_button_text(leave_button, WorkshopStyle.SIZE_SUBTITLE)
 
 
 ## The map HUD is down while the bench is open (see MainGame.enter_workshop), so

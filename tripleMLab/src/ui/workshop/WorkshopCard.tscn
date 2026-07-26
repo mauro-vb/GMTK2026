@@ -23,8 +23,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -3.0
-offset_top = -3.0
+offset_left = 1.0
+offset_top = 1.0
 offset_right = 3.0
 offset_bottom = 3.0
 grow_horizontal = 2
@@ -44,7 +44,7 @@ mouse_filter = 2
 [node name="Body" type="VBoxContainer" parent="Visual/Frame"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = 1
 
 [node name="IconWrap" type="CenterContainer" parent="Visual/Frame/Body"]
 layout_mode = 2
@@ -69,7 +69,7 @@ stretch_mode = 5
 
 [node name="NameLabel" type="Label" parent="Visual/Frame/Body"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 19)
+custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 mouse_filter = 2
 text = "Modifier"

@@ -39,6 +39,9 @@ var _motion_tween: Tween
 
 # On Ready
 @onready var visual: Control = %Visual
+## Sits behind the card face, offset down and right — a shadow, not a halo. See
+## [method WorkshopStyle.card_glow]; the node keeps its old name because it is
+## still "the thing under a lifted card".
 @onready var glow: Panel = %Glow
 @onready var frame: PanelContainer = %Frame
 @onready var seam: PanelContainer = %Seam

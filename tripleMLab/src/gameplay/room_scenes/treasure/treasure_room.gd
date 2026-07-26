@@ -92,7 +92,8 @@ var _card: Modifier
 
 # On Ready
 @onready var ui: Control = %UI
-@onready var backdrop: ColorRect = %Backdrop
+@onready var backdrop: Control = %Backdrop
+@onready var scrim: ColorRect = %Scrim
 @onready var carry_row: HBoxContainer = %CarryRow
 @onready var location_label: Label = %Location
 @onready var instruction_label: Label = %Instruction
@@ -153,12 +154,15 @@ func _read_clock_terms() -> void:
 	should_tick_time = true
 
 
+## The cave fades up under the chest, exactly as it does under a bench: image and
+## scrim ride one `modulate` together, so the room can never be caught with its
+## backdrop half-lit.
 func _open() -> void:
-	backdrop.color.a = 0.0
+	backdrop.modulate.a = 0.0
 	ui.modulate.a = 0.0
 
 	var tween: Tween = create_tween().set_parallel(true)
-	tween.tween_property(backdrop, ^"color:a", WorkshopStyle.BACKDROP_ALPHA, WorkshopStyle.FADE_DURATION)
+	tween.tween_property(backdrop, ^"modulate:a", 1.0, WorkshopStyle.FADE_DURATION)
 	tween.tween_property(ui, ^"modulate:a", 1.0, WorkshopStyle.FADE_DURATION)
 	await tween.finished
 
@@ -399,15 +403,17 @@ func _lose_seconds(seconds: float) -> float:
 
 
 # --- Chrome ------------------------------------------------------------------
-## Everything the scene file can't carry, in the workshop's own hand: Labels have
-## no entry in the project theme, so without this they'd render at Godot's
-## default 16px on a 320x180 screen.
+## Everything the scene file can't carry, in the workshop's own hand.
+##
+## The chest's name, its instruction and the way out are plain theme types now —
+## HintLabel, SubtitleLabel and Button, set in the scene — so a chest is dressed
+## by main_theme.tres exactly as a bench and the start menu are. What is left is
+## the result number, which is deliberately larger than any theme label and gets
+## recoloured per outcome anyway, and the two panels.
 func _style_chrome() -> void:
-	backdrop.color = WorkshopStyle.INK
-	backdrop.color.a = WorkshopStyle.BACKDROP_ALPHA
+	scrim.color = WorkshopStyle.INK
+	scrim.color.a = WorkshopStyle.BACKDROP_ALPHA
 
-	WorkshopStyle.apply_text(location_label, WorkshopStyle.FONT_TEXT, WorkshopStyle.SIZE_SEAM, WorkshopStyle.MUTED)
-	WorkshopStyle.apply_text(instruction_label, WorkshopStyle.FONT_DISPLAY, WorkshopStyle.SIZE_TITLE, WorkshopStyle.EMBER)
 	WorkshopStyle.apply_text(result_label, WorkshopStyle.FONT_DISPLAY, TreasureStyle.SIZE_RESULT, WorkshopStyle.PARCHMENT)
 
 	board.add_theme_stylebox_override(&"panel", TreasureStyle.board_panel())
@@ -415,8 +421,6 @@ func _style_chrome() -> void:
 	result_panel.add_theme_stylebox_override(&"panel", TreasureStyle.result_panel())
 	result_panel.custom_minimum_size.y = TreasureStyle.RESULT_HEIGHT
 	carry_row.custom_minimum_size.y = TreasureStyle.STRIP_HEIGHT
-
-	WorkshopStyle.apply_button_text(leave_button, WorkshopStyle.SIZE_SUBTITLE)
 
 
 ## The map HUD is down while a chest is open (see MainGame.enter_treasure), so
@@ -526,7 +530,7 @@ func _close() -> void:
 
 	var tween: Tween = create_tween().set_parallel(true)
 	tween.tween_property(ui, ^"modulate:a", 0.0, WorkshopStyle.FADE_DURATION)
-	tween.tween_property(backdrop, ^"color:a", 0.0, WorkshopStyle.FADE_DURATION)
+	tween.tween_property(backdrop, ^"modulate:a", 0.0, WorkshopStyle.FADE_DURATION)
 	await tween.finished
 
 	exit()

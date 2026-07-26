@@ -28,21 +28,30 @@ const LOSS: Color = WorkshopStyle.CAUTION
 ## small bite rather than looking like a washed-out version of either.
 const NEUTRAL: Color = Color(0.55, 0.53, 0.58)
 
-## The board a minigame is drawn on, and the ruled lines across it.
-const BOARD: Color = Color(0.078, 0.071, 0.129)
-const BOARD_EDGE: Color = Color(0.207, 0.196, 0.298)
-## Pegs, the wheel's hub, the coin's rim: metal in the dark.
-const METAL: Color = Color(0.612, 0.639, 0.714)
+## The board a minigame is drawn on, and the ruled lines across it — the sunken
+## box's own fill and border, so a wedge drawn on the board and the panel it is
+## drawn on came out of the same sprite.
+const BOARD: Color = WorkshopStyle.PANEL
+const BOARD_EDGE: Color = WorkshopStyle.EDGE
+## Pegs, the wheel's hub, the coin's rim: metal in the dark. The one thing on a
+## board that has to read as an object rather than as furniture, so it takes the
+## sheet's lightest blue and goes a step past it.
+const METAL: Color = Color(0.694, 0.776, 0.855)
 
 # --- Metrics -----------------------------------------------------------------
 ## Floor for the slot a minigame is laid out in. It takes whatever vertical slack
 ## the screen has spare on top of this, and every game reads its geometry off the
 ## size it ends up with rather than assuming one.
-const BOARD_HEIGHT: float = 84.0
+const BOARD_HEIGHT: float = 78.0
 ## The line under the board that says what just happened.
-const RESULT_HEIGHT: float = 12.0
+const RESULT_HEIGHT: float = 14.0
 ## Clock and carried-modifier strip along the top, matching the bench's.
 const STRIP_HEIGHT: float = 12.0
+
+## The row of controls a game puts along the bottom of its own board — the coin's
+## two calls, the wheel's crank. Tall enough for the slim box below plus a 7px
+## face, and no taller: the board above it is what the player is looking at.
+const CHOICE_HEIGHT: float = 17.0
 
 const SIZE_RESULT: int = 10
 const SIZE_ODDS: int = 6
@@ -81,34 +90,52 @@ static func outcome_fill(seconds: float, emphasis: float = 0.0) -> Color:
 	return color
 
 
-## The board every minigame draws on.
+## The board every minigame draws on: the sheet's sunken box, which is the same
+## panel the workshop reads its descriptions off and the run-end screen sits in.
 ##
-## ART: a nine-sliced panel drops in here; keep the content margins so the
-## geometry the games compute inside it doesn't move.
-static func board_panel() -> StyleBoxFlat:
-	var box: StyleBoxFlat = StyleBoxFlat.new()
-	box.bg_color = BOARD
-	box.set_border_width_all(1)
-	box.border_color = BOARD_EDGE
-	box.set_corner_radius_all(1)
-	box.set_content_margin_all(3)
-	return box
+## The 3px content margin is load-bearing — the games compute their geometry
+## inside it — so it survives the change of art unchanged.
+static func board_panel() -> StyleBoxTexture:
+	return WorkshopStyle.sheet_box(
+		WorkshopStyle.BOX_SUNKEN, WorkshopStyle.panel_slice(), Vector4i(3, 3, 3, 3)
+	)
 
 
-## The strip under the board carrying the result.
-static func result_panel() -> StyleBoxFlat:
-	var box: StyleBoxFlat = StyleBoxFlat.new()
-	box.bg_color = WorkshopStyle.PANEL * Color(1, 1, 1, 0.9)
-	box.set_corner_radius_all(1)
-	box.set_content_margin_all(2)
-	return box
+## The strip under the board carrying the result. The *raised* box against the
+## board's sunken one: the number that just landed is the one thing in the room
+## that should look like it is sitting forward of everything else.
+static func result_panel() -> StyleBoxTexture:
+	return WorkshopStyle.raised_panel()
 
 
-## A choice the player is being offered — a coin's side, a plinko slot. Reads as
-## a raised key rather than a card: it is a control, not a thing you take.
+## A choice the player is being offered — a coin's side, the wheel's crank, a
+## plinko slot. Cut from the same sheet as everything else, at the one size the
+## theme's own button can't reach: a Button dressed in ButtonDefault is 25px
+## tall, and these rows are 17 and 8.
+##
+## Always the *raised* box, because the board it sits on is the sunken one. The
+## two-box pairing that reads as "control on a panel" everywhere else in this
+## game reads as "disabled" here if it is used the other way round: a dark key on
+## a dark board is a key the player assumes is spent. That matters most on the
+## coin, where the two calls must look equally unchosen until one is pressed, and
+## on the plinko row, where nine dark keys on a dark board vanish into it.
+##
+## `emphasis` is 0 at rest and 1 lit, and it brightens the same sprite rather
+## than swapping it — the difference between a key and a lit key, not between two
+## kinds of key.
 ##
 ## `padding` is the side margin: two sides of a coin have room to breathe, nine
 ## plinko slots sharing one board do not.
+static func choice_button(emphasis: float, padding: int = 3) -> StyleBoxTexture:
+	var lit: bool = emphasis >= 0.5
+	return WorkshopStyle.sheet_box(
+		WorkshopStyle.BOX_RAISED,
+		WorkshopStyle.panel_slice(),
+		Vector4i(padding, 2, padding, 2),
+		Color(1.3, 1.25, 1.05) if lit else Color.WHITE,
+	)
+
+
 ## Where the keyboard cursor is sitting — which is *not* the same thing as what
 ## the player has chosen, and must not look like it.
 ##
@@ -117,27 +144,14 @@ static func result_panel() -> StyleBoxFlat:
 ## asked to make. So the cursor is a wash and nothing else: visible enough to
 ## navigate by, quiet enough that the two sides still look equal.
 ##
-## Borderless on purpose. Godot draws the focus box *over* the button's current
-## state, so a bordered one would paint out the hover it is sitting on top of and
-## the mouse would lose its own feedback.
+## Borderless on purpose, and still a flat box rather than a sprite. Godot draws
+## the focus style *over* the button's current state — a box with art in it would
+## paint out the hover underneath it and the mouse would lose its own feedback,
+## which is exactly what a translucent wash avoids.
 static func cursor_button(accent: Color, padding: int = 3) -> StyleBoxFlat:
 	var box: StyleBoxFlat = StyleBoxFlat.new()
-	box.bg_color = accent * Color(1, 1, 1, 0.14)
+	box.bg_color = accent * Color(1, 1, 1, 0.22)
 	box.set_border_width_all(0)
-	box.set_corner_radius_all(1)
-	box.content_margin_left = padding
-	box.content_margin_right = padding
-	box.content_margin_top = 2
-	box.content_margin_bottom = 2
-	return box
-
-
-static func choice_button(accent: Color, emphasis: float, padding: int = 3) -> StyleBoxFlat:
-	var box: StyleBoxFlat = StyleBoxFlat.new()
-	box.bg_color = WorkshopStyle.PANEL.lerp(WorkshopStyle.PANEL_RAISED, emphasis)
-	box.set_border_width_all(1)
-	box.border_color = accent * Color(1, 1, 1, lerpf(0.55, 1.0, emphasis))
-	box.set_corner_radius_all(1)
 	box.content_margin_left = padding
 	box.content_margin_right = padding
 	box.content_margin_top = 2

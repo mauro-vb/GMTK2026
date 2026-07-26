@@ -92,11 +92,14 @@ func _build() -> void:
 	_cut_wedges()
 
 	WorkshopStyle.apply_button_text(spin_button, WorkshopStyle.SIZE_SUBTITLE)
-	spin_button.add_theme_stylebox_override(&"normal", TreasureStyle.choice_button(WorkshopStyle.EDGE, 0.0))
-	spin_button.add_theme_stylebox_override(&"hover", TreasureStyle.choice_button(WorkshopStyle.EMBER, 1.0))
-	spin_button.add_theme_stylebox_override(&"focus", TreasureStyle.choice_button(WorkshopStyle.EMBER, 1.0))
-	spin_button.add_theme_stylebox_override(&"pressed", TreasureStyle.choice_button(WorkshopStyle.SPARK, 1.0))
-	spin_button.add_theme_stylebox_override(&"disabled", TreasureStyle.choice_button(WorkshopStyle.EDGE, 0.0))
+	# The wheel has one control, so — unlike the coin's two calls — lighting it is
+	# not a claim about a decision the player hasn't made yet. Focus and hover are
+	# the same raised box, and the crank is the only thing on the board to press.
+	spin_button.add_theme_stylebox_override(&"normal", TreasureStyle.choice_button(0.0))
+	spin_button.add_theme_stylebox_override(&"hover", TreasureStyle.choice_button(1.0))
+	spin_button.add_theme_stylebox_override(&"focus", TreasureStyle.choice_button(1.0))
+	spin_button.add_theme_stylebox_override(&"pressed", TreasureStyle.choice_button(1.0))
+	spin_button.add_theme_stylebox_override(&"disabled", TreasureStyle.choice_button(0.0))
 
 	spin_button.button_down.connect(_on_wind_up)
 	spin_button.button_up.connect(_on_let_go)
