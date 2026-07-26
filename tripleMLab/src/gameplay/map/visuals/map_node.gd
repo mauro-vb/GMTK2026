@@ -65,7 +65,7 @@ const LEVEL_FACES: Array[Array] = [
 ## EVENT is here for completeness; the generator does not produce them yet.
 const ROOM_ART: Dictionary[Room.Type, Texture2D] = {
 	Room.Type.NOT_ASSIGNED: preload("res://assets/art/map/rooms/crate.png"),
-	Room.Type.SHOP: preload("res://assets/art/map/rooms/shop_cart.png"),
+	Room.Type.WORKSHOP: preload("res://assets/art/map/rooms/shop_cart.png"),
 	Room.Type.HEAL: preload("res://assets/art/map/rooms/chest.png"),
 	Room.Type.EVENT: preload("res://assets/art/map/rooms/crate.png"),
 	Room.Type.FINAL: preload("res://assets/art/map/rooms/barrel.png"),

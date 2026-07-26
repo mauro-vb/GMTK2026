@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="OrbWindowModifier" format=3 uid="uid://ch4mb8wvn5rkt"]
+
+[ext_resource type="Script" uid="uid://bt5r9djhk2mxe" path="res://src/gameplay/systems/modifiers_system/orb_window_modifier.gd" id="1_thin_ski"]
+
+[resource]
+script = ExtResource("1_thin_ski")
+affected_orb = 4
+effect = 1
+override_value = -4.0
+window_seconds = 8.0
+type = 0
+modifier_name = "Thin Skin"
+id = "thin_skin"
+description = "Nothing between you and it. For the first 8 seconds of a level hot orbs burn 4 seconds instead of 2."
+metadata/_custom_type_script = "uid://bt5r9djhk2mxe"

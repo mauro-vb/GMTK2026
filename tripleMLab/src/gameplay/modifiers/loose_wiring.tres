@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TickRateModifier" format=3 uid="uid://cw5nq8vbm2xkr"]
+
+[ext_resource type="Script" uid="uid://cj9xt4bvm7dpl" path="res://src/gameplay/systems/modifiers_system/tick_rate_modifier.gd" id="1_loose_wi"]
+[ext_resource type="Resource" uid="uid://bw6qt3nkc8mxv" path="res://src/gameplay/modifiers/sparking_contact.tres" id="2_loose_wi"]
+
+[resource]
+script = ExtResource("1_loose_wi")
+multiplier = 0.8
+type = 2
+modifier_name = "Loose Wiring"
+id = "loose_wiring"
+description = "Slack in the line slows the burn. Time burns 20% slower for the rest of the run."
+linked_modifier = ExtResource("2_loose_wi")
+metadata/_custom_type_script = "uid://cj9xt4bvm7dpl"

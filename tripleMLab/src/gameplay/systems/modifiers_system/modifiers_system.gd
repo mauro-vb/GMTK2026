@@ -136,6 +136,58 @@ func modify_orb_value(orb_trigger: Modifier.Type, value: float) -> float:
 
 	return value
 
+
+## Workshop numbers, each run past every held modifier the same way orb values
+## are. The workshop asks for these instead of reading modifiers itself, so it
+## never has to know which modifier types exist.
+func get_workshop_offers(base: int) -> int:
+	var count: int = base
+	for modifier: Modifier in modifiers:
+		count = modifier.modify_workshop_offers(count)
+
+	return maxi(count, 1)
+
+
+func get_workshop_picks(base: int) -> int:
+	var count: int = base
+	for modifier: Modifier in modifiers:
+		count = modifier.modify_workshop_picks(count)
+
+	return maxi(count, 0)
+
+
+func get_workshop_rerolls(base: int) -> int:
+	var count: int = base
+	for modifier: Modifier in modifiers:
+		count = modifier.modify_workshop_rerolls(count)
+
+	return maxi(count, 0)
+
+
+func get_workshop_offer_weight(weight: float, is_combined: bool) -> float:
+	for modifier: Modifier in modifiers:
+		weight = modifier.modify_workshop_offer_weight(weight, is_combined)
+
+	return maxf(weight, 0.0)
+
+
+func get_workshop_skip_bonus(base: float) -> float:
+	var seconds: float = base
+	for modifier: Modifier in modifiers:
+		seconds = modifier.modify_workshop_skip_bonus(seconds)
+
+	return maxf(seconds, 0.0)
+
+
+## Closes out a workshop visit: any modifier that spends itself on a visit says
+## so here and is dropped. Iterates a copy because that removal mutates the list.
+func notify_workshop_visited(picks_taken: int) -> void:
+	for modifier: Modifier in modifiers.duplicate():
+		if not modifiers.has(modifier):
+			continue
+		if modifier.on_workshop_visited(picks_taken):
+			remove_modifier(modifier)
+
 # Private
 func _try_trigger(modifier: Modifier) -> void:
 	if modifier.chance < 1.0 and randf() > modifier.chance:

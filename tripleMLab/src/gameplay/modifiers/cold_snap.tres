@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="OrbWindowModifier" format=3 uid="uid://cq6wb9nxm5vkt"]
+
+[ext_resource type="Script" uid="uid://bt5r9djhk2mxe" path="res://src/gameplay/systems/modifiers_system/orb_window_modifier.gd" id="1_cold_sna"]
+[ext_resource type="Resource" uid="uid://ch4mb8wvn5rkt" path="res://src/gameplay/modifiers/thin_skin.tres" id="2_cold_sna"]
+
+[resource]
+script = ExtResource("1_cold_sna")
+affected_orb = 3
+effect = 1
+override_value = 4.0
+window_seconds = 8.0
+type = 0
+modifier_name = "Cold Snap"
+id = "cold_snap"
+description = "The whole room drops. For the first 8 seconds of a level cold orbs are worth 4 seconds."
+linked_modifier = ExtResource("2_cold_sna")
+metadata/_custom_type_script = "uid://bt5r9djhk2mxe"
