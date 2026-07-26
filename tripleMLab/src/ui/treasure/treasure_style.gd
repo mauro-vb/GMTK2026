@@ -23,6 +23,10 @@ const GAIN: Color = Color(0.353, 0.788, 0.482)
 ## Seconds coming off it. The workshop's warning red, reused on purpose: the same
 ## colour means "this one bites" on a bench and in a chest.
 const LOSS: Color = WorkshopStyle.CAUTION
+## The whiff: neither a gain nor a loss, so it gets neither colour. A flat grey
+## reads as "nothing happened" at a glance, distinct from a small win or a
+## small bite rather than looking like a washed-out version of either.
+const NEUTRAL: Color = Color(0.55, 0.53, 0.58)
 
 ## The board a minigame is drawn on, and the ruled lines across it.
 const BOARD: Color = Color(0.078, 0.071, 0.129)
@@ -60,9 +64,13 @@ const PAYOUT_DELAY: float = 0.35
 const ENTRY_LINE_HOLD: float = 1.4
 
 # Static
-## Which of the two colours a number is. Zero counts as a payout: a chest that
-## pays nothing is a let-down, not a wound.
+## Which of the three colours a number is. Zero is its own colour now that a
+## whiff is a real, authored outcome on every game rather than an edge case —
+## see [constant NEUTRAL].
 static func outcome_color(seconds: float) -> Color:
+	if is_zero_approx(seconds):
+		return NEUTRAL
+
 	return GAIN if seconds >= 0.0 else LOSS
 
 
