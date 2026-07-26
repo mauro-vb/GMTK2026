@@ -62,6 +62,8 @@ position = Vector2(64, 96)
 
 [node name="NormalPlatform" parent="Platforms/Normal" unique_id=791161608 instance=ExtResource("5_un2fc")]
 position = Vector2(104, 112)
+collision_layer = 256
+collision_mask = 0
 size = 4
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1797342369]
