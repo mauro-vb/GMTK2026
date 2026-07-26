@@ -93,6 +93,13 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Play"
 
+[node name="TutorialButton" type="Button" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(74, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "How To Play"
+
 [node name="DifficultyButton" type="Button" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(74, 0)

@@ -12,6 +12,12 @@ const MAP_SCENE_UID: String = "uid://ipmc68r6n333"
 const PLAYER_SCENE_UID: String = "uid://kwjq37d8yab5"
 ## Only reached when [LevelPool] finds nothing to deal — see LevelPool.LEVEL_DIR.
 const FALLBACK_LEVEL_UID: String = "uid://bobnq2ochp5k2"
+## The two levels that are never dealt: they are reached from the title screen
+## and live outside [LevelPool]'s directory so a run can't roll them. Room one
+## teaches the ground moves and the orbs, room two the dash and the pogo; see
+## MainGame.TUTORIAL_ROOM_UIDS, which walks them in this order.
+const TUTORIAL_ROOM_1_UID: String = "uid://d1tg1w5046hti"
+const TUTORIAL_ROOM_2_UID: String = "uid://cyq8a4mmpnjtq"
 const WORKSHOP_SCENE_UID: String = "uid://bkq7wn3vxm2td"
 const TREASURE_ROOM_SCENE_UID: String = "uid://dn8kw3vqm7xbt"
 
