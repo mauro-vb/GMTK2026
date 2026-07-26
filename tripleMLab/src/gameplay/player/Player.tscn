@@ -353,7 +353,9 @@ shape = SubResource("RectangleShape2D_w2ppj")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=162606036]
 position = Vector2(1, -1)
 sprite_frames = SubResource("SpriteFrames_r4liw")
-animation = &"dash"
+animation = &"fall"
+frame = 2
+frame_progress = 1.0
 
 [node name="StateMachine" type="Node" parent="." unique_id=90990164]
 unique_name_in_owner = true
@@ -383,7 +385,6 @@ script = ExtResource("13_o6jv2")
 metadata/_custom_type_script = "uid://n8mnvoaov5dv"
 
 [node name="PogoDetector" type="Area2D" parent="." unique_id=1963245913]
-position = Vector2(0, -3)
 collision_layer = 0
 collision_mask = 64
 
@@ -394,7 +395,7 @@ debug_color = Color(0.8823935, 0.27588096, 0.4981209, 0.41960785)
 
 [node name="FloorCheck" type="ShapeCast2D" parent="." unique_id=1243180421]
 unique_name_in_owner = true
-position = Vector2(0.5, 5)
+position = Vector2(0.5, 6)
 shape = SubResource("RectangleShape2D_oelj7")
 target_position = Vector2(0, 2)
 collision_mask = 256
