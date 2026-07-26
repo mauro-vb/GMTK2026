@@ -107,3 +107,28 @@ custom_minimum_size = Vector2(74, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Quit"
+
+[node name="Gap2" type="Control" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 5)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="VolumeRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="VolumeLabel" type="Label" parent="MarginContainer/VBoxContainer/VolumeRow"]
+layout_mode = 2
+theme_type_variation = &"SubtitleLabel"
+text = "Music"
+
+[node name="VolumeSlider" type="HSlider" parent="MarginContainer/VBoxContainer/VolumeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.01
+value = 0.5

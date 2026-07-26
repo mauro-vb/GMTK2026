@@ -60,7 +60,16 @@ func _on_body_entered(body: Node2D) -> void:
 
 	var value: float = TIME_ADDED if type == Type.COLD else -TIME_ADDED
 	value = modifiers_system.modify_orb_value(modifier_type, value)
-	Global.main_game.time_system.add_time(value)
+
+	# add_time()/remove_time() aren't interchangeable with a signed amount: each
+	# plays its own burst sfx, and add_time() only ever fires the gain flourish.
+	# A modifier can flip the sign, so this reads what the value actually ended
+	# up as rather than the orb's own type.
+	var time_system: TimeSystem = Global.main_game.time_system
+	if value > 0.0:
+		time_system.add_time(value)
+	elif value < 0.0:
+		time_system.remove_time(-value)
 
 	# Off the value, not off the orb's type: a modifier is allowed to turn the
 	# sign around, and the flash has to report what actually happened to the
